@@ -210,7 +210,7 @@ const val thumbnailTypeKey = "thumbnailType"
 const val showvisthumbnailKey = "showvisthumbnail"
 const val extraspaceKey = "extraspace"
 const val expandedlyricsKey = "expandedlyrics"
-const val lyricshighlightKey = "lyricshighlight"
+const val lyricsHighlightKey = "lyricsHighlight"
 /**** CUSTOM THEME **** */
 
 const val parentalControlEnabledKey = "parentalControlEnabled"
