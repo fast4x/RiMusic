@@ -155,6 +155,8 @@ fun CacheSettings() {
                         CoilDiskCacheMaxSize.`1GB`-> "1GB"
                         CoilDiskCacheMaxSize.`2GB` -> "2GB"
                         CoilDiskCacheMaxSize.`4GB` -> "4GB"
+                        CoilDiskCacheMaxSize.`8GB` -> "8GB"
+                        CoilDiskCacheMaxSize.Custom -> stringResource(R.string.custom)
                     }
                 }
             )

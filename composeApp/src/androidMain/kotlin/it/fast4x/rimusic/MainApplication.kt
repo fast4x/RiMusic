@@ -8,6 +8,7 @@ import coil.request.CachePolicy
 import it.fast4x.rimusic.enums.CoilDiskCacheMaxSize
 import it.fast4x.rimusic.utils.CaptureCrash
 import it.fast4x.rimusic.utils.FileLoggingTree
+import it.fast4x.rimusic.utils.coilCustomDiskCacheKey
 import it.fast4x.rimusic.utils.coilDiskCacheMaxSizeKey
 import it.fast4x.rimusic.utils.getEnum
 import it.fast4x.rimusic.utils.logDebugEnabledKey
@@ -42,6 +43,7 @@ class MainApplication : Application(), ImageLoaderFactory {
     }
 
     override fun newImageLoader(): ImageLoader {
+        val coilCustomDiskCache = preferences.getInt(coilCustomDiskCacheKey, 128) * 1000 * 1000L
         return ImageLoader.Builder(this)
             .crossfade(true)
             .networkCachePolicy(CachePolicy.ENABLED)
@@ -62,10 +64,14 @@ class MainApplication : Application(), ImageLoaderFactory {
                 DiskCache.Builder()
                     .directory(filesDir.resolve("coil"))
                     .maxSizeBytes(
-                        preferences.getEnum(
-                            coilDiskCacheMaxSizeKey,
-                            CoilDiskCacheMaxSize.`128MB`
-                        ).bytes
+                        when (val size =
+                            preferences.getEnum(
+                                coilDiskCacheMaxSizeKey,
+                                CoilDiskCacheMaxSize.`128MB`
+                            )) {
+                            CoilDiskCacheMaxSize.Custom -> coilCustomDiskCache
+                            else -> size.bytes
+                        }
                     )
                     .build()
             )

@@ -58,6 +58,7 @@ import it.fast4x.rimusic.ui.components.themed.SmartMessage
 import it.fast4x.rimusic.ui.styling.Dimensions
 import it.fast4x.rimusic.ui.styling.shimmer
 import it.fast4x.rimusic.utils.bold
+import it.fast4x.rimusic.utils.coilCustomDiskCacheKey
 import it.fast4x.rimusic.utils.coilDiskCacheMaxSizeKey
 import it.fast4x.rimusic.utils.exoPlayerCacheLocationKey
 import it.fast4x.rimusic.utils.exoPlayerCustomCacheKey
@@ -125,6 +126,11 @@ fun DataSettings() {
     var showExoPlayerCustomCacheDialog by remember { mutableStateOf(false) }
     var exoPlayerCustomCache by rememberPreference(
         exoPlayerCustomCacheKey,32
+    )
+
+    var showCoilCustomDiskCacheDialog by remember { mutableStateOf(false) }
+    var coilCustomDiskCache by rememberPreference(
+        coilCustomDiskCacheKey,32
     )
 
     //val release = Build.VERSION.RELEASE;
@@ -354,12 +360,18 @@ fun DataSettings() {
 
             EnumValueSelectorSettingsEntry(
                 title = stringResource(R.string.image_cache_max_size),
-                titleSecondary = "${
-                    Formatter.formatShortFileSize(
-                        context,
-                        diskCacheSize
-                    )
-                } ${stringResource(R.string.used)} (${diskCacheSize * 100 / coilDiskCacheMaxSize.bytes.coerceAtLeast(1)}%)",
+                titleSecondary = when (coilDiskCacheMaxSize) {
+                    CoilDiskCacheMaxSize.Custom -> buildString {
+                            append(Formatter.formatShortFileSize(context, diskCacheSize))
+                            append("/${Formatter.formatShortFileSize(context, coilCustomDiskCache.toLong() * 1000 * 1000)}")
+                            append(" ${stringResource(R.string.used)}")
+                    }
+                    else -> buildString {
+                        append(Formatter.formatShortFileSize(context, diskCacheSize))
+                        append(" ${stringResource(R.string.used)}")
+                        append(" (${diskCacheSize * 100 / coilDiskCacheMaxSize.bytes}%)")
+                    }
+                },
                 trailingContent = {
                     HeaderIconButton(
                         icon = R.drawable.trash,
@@ -369,9 +381,14 @@ fun DataSettings() {
                     )
                 },
                 selectedValue = coilDiskCacheMaxSize,
-                onValueSelected = { coilDiskCacheMaxSize = it},
+                onValueSelected = {
+                    coilDiskCacheMaxSize = it
+                    if (coilDiskCacheMaxSize == CoilDiskCacheMaxSize.Custom)
+                        showCoilCustomDiskCacheDialog = true
+                },
                 valueText = {
                     when (it) {
+                        CoilDiskCacheMaxSize.Custom -> stringResource(R.string.custom)
                         CoilDiskCacheMaxSize.`32MB` -> "32MB"
                         CoilDiskCacheMaxSize.`64MB` -> "64MB"
                         CoilDiskCacheMaxSize.`128MB` -> "128MB"
@@ -380,9 +397,25 @@ fun DataSettings() {
                         CoilDiskCacheMaxSize.`1GB`-> "1GB"
                         CoilDiskCacheMaxSize.`2GB` -> "2GB"
                         CoilDiskCacheMaxSize.`4GB` -> "4GB"
+                        CoilDiskCacheMaxSize.`8GB` -> "8GB"
                     }
                 }
             )
+
+            if (showCoilCustomDiskCacheDialog)
+                InputNumericDialog(
+                    title = stringResource(R.string.set_custom_cache),
+                    placeholder = stringResource(R.string.enter_value_in_mb),
+                    value = coilCustomDiskCache.toString(),
+                    valueMin = "32",
+                    valueMax = "10000",
+                    onDismiss = { showCoilCustomDiskCacheDialog = false },
+                    setValue = {
+                        //Log.d("customCache", it)
+                        coilCustomDiskCache = it.toInt()
+                        showCoilCustomDiskCacheDialog = false
+                    }
+                )
 
             /*
             EnumValueSelectorSettingsEntry(
@@ -508,13 +541,20 @@ fun DataSettings() {
                 title = stringResource(R.string.song_cache_max_size),
                 titleSecondary = when (exoPlayerDiskCacheMaxSize) {
                     ExoPlayerDiskCacheMaxSize.Disabled -> ""
-                    ExoPlayerDiskCacheMaxSize.Custom -> stringResource(R.string.custom_cache_size) +" "+exoPlayerCustomCache+"MB"
+                    ExoPlayerDiskCacheMaxSize.Custom -> buildString {
+                        append(Formatter.formatShortFileSize(context, diskCacheSize))
+                        append("/${Formatter.formatShortFileSize(context,
+                            exoPlayerCustomCache.toLong() * 1000 * 1000
+                        )}")
+                        append(" ${stringResource(R.string.used)}")
+                    }
+                        // stringResource(R.string.custom_cache_size) +" "+exoPlayerCustomCache+"MB"
                     else -> buildString {
                         append(Formatter.formatShortFileSize(context, diskCacheSize))
                         append(" ${stringResource(R.string.used)}")
                         when (val size = exoPlayerDiskCacheMaxSize) {
                             ExoPlayerDiskCacheMaxSize.Unlimited -> {}
-                            ExoPlayerDiskCacheMaxSize.Custom -> { exoPlayerCustomCache }
+                            ExoPlayerDiskCacheMaxSize.Custom -> {} // only needed because of UNLIMITED
                             else -> append(" (${diskCacheSize * 100 / size.bytes}%)")
                         }
                     }
