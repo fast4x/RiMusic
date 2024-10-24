@@ -5,12 +5,10 @@ import android.net.Uri
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSpec
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.PlayerResponse
-import it.fast4x.innertube.models.bodies.PlayerBody
-import it.fast4x.innertube.requests.player
 import it.fast4x.rimusic.enums.AudioQualityFormat
-import it.fast4x.rimusic.utils.getPipedSession
+import me.knighthat.innertube.Piped
+import me.knighthat.innertube.request.player
+import me.knighthat.innertube.response.PlayerResponse
 
 @OptIn(UnstableApi::class)
 internal suspend fun PlayerService.dataSpecProcess(dataSpec: DataSpec, context: Context, metered: Boolean): DataSpec {
@@ -55,23 +53,19 @@ internal suspend fun MyDownloadHelper.dataSpecProcess(dataSpec: DataSpec, contex
 suspend fun getMediaFormat(
     videoId: String,
     audioQualityFormat: AudioQualityFormat,
-): PlayerResponse.StreamingData.AdaptiveFormat? {
+): PlayerResponse.AudioStream? {
     println("PlayerService MyDownloadHelper DataSpecProcess getMediaFormat Playing song $videoId from format $audioQualityFormat")
-    return Innertube.player(
-        body = PlayerBody(videoId = videoId),
-        pipedSession = getPipedSession().toApiSession()
-    )?.fold(
+
+    return Piped.player( videoId )?.fold(
         { playerResponse ->
             when (audioQualityFormat) {
-                AudioQualityFormat.Auto -> playerResponse.streamingData?.autoMaxQualityFormat
-                AudioQualityFormat.High -> playerResponse.streamingData?.highestQualityFormat
-                AudioQualityFormat.Medium -> playerResponse.streamingData?.mediumQualityFormat
-                AudioQualityFormat.Low -> playerResponse.streamingData?.lowestQualityFormat
+                AudioQualityFormat.Auto -> playerResponse.autoMaxQualityFormat
+                AudioQualityFormat.High -> playerResponse.highestQualityFormat
+                AudioQualityFormat.Medium -> playerResponse.mediumQualityFormat
+                AudioQualityFormat.Low -> playerResponse.lowestQualityFormat
             }
         },
         {
-            //return dataSpec.withUri(Uri.parse(dataSpec.uri.toString()))
-
             println("PlayerService MyDownloadHelper DataSpecProcess Error: ${it.message}")
             throw it
         }
