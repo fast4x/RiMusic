@@ -75,21 +75,18 @@ fun HomeScreen(
 
     PersistMapCleanup("home/")
 
-
-
             val openTabFromShortcut1 by remember{ mutableIntStateOf(openTabFromShortcut) }
 
-            var (tabIndex, onTabChanged) =
-                when (openTabFromShortcut1) {
+            var initialtabIndex =
+                    when (openTabFromShortcut1) {
                     -1 -> when (preferences.getEnum(indexNavigationTabKey, HomeScreenTabs.Default)) {
-                            HomeScreenTabs.Default -> rememberPreference(homeScreenTabIndexKey,
-                            HomeScreenTabs.QuickPics.index)
-                          else -> remember {
-                                mutableIntStateOf(preferences.getEnum(indexNavigationTabKey, HomeScreenTabs.QuickPics).index)
-                          }
-                        }
-                    else -> remember { mutableIntStateOf(openTabFromShortcut1) }
+                        HomeScreenTabs.Default -> HomeScreenTabs.QuickPics.index
+                        else -> preferences.getEnum(indexNavigationTabKey, HomeScreenTabs.QuickPics).index
+                    }
+                    else -> openTabFromShortcut1
                 }
+
+            var (tabIndex, onTabChanged) = rememberPreference(homeScreenTabIndexKey, initialtabIndex)
 
             if (tabIndex == -2) navController.navigate(NavRoutes.search.name)
 
