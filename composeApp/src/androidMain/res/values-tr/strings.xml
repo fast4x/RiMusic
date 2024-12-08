@@ -814,10 +814,10 @@
     <string name="jump_previous_blank">Önceki Butonunun Her Zaman Önceki Şarkıyı Oynatması İçin 0 Yazın Veya Boş Bırakın</string>
     <string name="delete_hidden_songs">Tüm gizli şarkıları veri tabanından gerçekten silmek istiyor musunuz? Bu işlem geri alınamaz.</string>
     <string name="delete_hidden_songs_message">Gizli şarkıları sil</string>
-    <string name="cover_type_vinyl">Vinyl</string>
+    <string name="cover_type_vinyl">Plak</string>
     <string name="cover_type_cd">CD</string>
-    <string name="cover_type_cd_with_cover">CD with Cover</string>
-    <string name="wallpaper">Wallpaper</string>
-    <string name="enable_wallpaper">Enable wallpaper</string>
-    <string name="set_cover_thumbnail_as_wallpaper">Set cover thumbnail as wallpaper</string>
+    <string name="cover_type_cd_with_cover">Kapaklı CD</string>
+    <string name="wallpaper">Duvar Kağıdı</string>
+    <string name="enable_wallpaper">Duvar kağıdını etkinleştir</string>
+    <string name="set_cover_thumbnail_as_wallpaper">Kapak resmini duvar kağıdı olarak ayarla</string>
 </resources>

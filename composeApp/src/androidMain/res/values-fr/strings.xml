@@ -117,11 +117,11 @@
     <string name="left">%1$s restantes</string>
     <string name="confirm">Confirmer</string>
     <string name="show">Afficher</string>
-    <string name="unsynchronized_lyrics">les paroles non synchronisées</string>
-    <string name="synchronized_lyrics">les paroles synchronisées</string>
+    <string name="unsynchronized_lyrics">Paroles non synchronisées</string>
+    <string name="synchronized_lyrics">Paroles synchronisées</string>
     <string name="provided_by">Fournies par</string>
     <string name="delete_playback_events">Supprimer %1$s événements de la lecture</string>
-    <string name="existing_data_will_be_overwritten">Les données existantes seront écrasées,%1$s se fermera automatiquement après la restauration de la base de données.</string>
+    <string name="existing_data_will_be_overwritten">Les données existantes seront écrasées. %1$s se fermera automatiquement après la restauration de la base de données.</string>
     <string name="folder_cache">CACHE DU DOSSIERS</string>
     <string name="cache_reset_by_clicking_button">Attention en cliquant sur le bouton ci-dessous, le dossier d\'emplacement du cache sera réinitialisé au paramètre par défaut</string>
     <string name="cache_location_folder">Emplacement du dossier</string>
@@ -160,7 +160,7 @@
     <string name="_6_month">6 Mois</string>
     <string name="_1_year">1 an</string>
     <string name="all">Tout</string>
-    <string name="most_played_songs">Titres les plus écoutées</string>
+    <string name="most_played_songs">Titres les plus écoutés</string>
     <string name="most_listened_artists">Artistes les plus écoutés</string>
     <string name="most_albums_listened">Albums les plus écoutés</string>
     <string name="most_played_playlists">Playlists les plus écoutées</string>
@@ -184,7 +184,7 @@
     <string name="system">Système</string>
     <string name="unlimited">Illimité</string>
     <string name="_light">Clair</string>
-    <string name="downloaded">Téléchargé</string>
+    <string name="downloaded">Téléchargés</string>
     <string name="turn_off">Desactivé</string>
     <string name="download">Télécharger</string>
     <string name="_default">Par défaut</string>
@@ -226,7 +226,7 @@
     <string name="disable_horizontal_swipe">Désactiver le glissement horizontal</string>
     <string name="disable_song_switching_via_swipe">Désactiver le changement de titre par balayage</string>
     <string name="interface_in_use">Interface en cours d\'utilisation</string>
-    <string name="user_interface">Interface utilisateur</string>
+    <string name="user_interface">Interface Utilisateur</string>
     <string name="ui_tab">Interface Utilisateur</string>
     <string name="system_language">Langue du système</string>
     <string name="biggest">Très gros</string>
@@ -235,7 +235,7 @@
     <string name="value_cannot_be_empty">La valeur ne peut pas être vide</string>
     <string name="value_must_be_greater_than">"La valeur doit être supérieure à "</string>
     <string name="custom">Personnalisé</string>
-    <string name="custom_cache_size">Taille du cache personnalisée</string>
+    <string name="custom_cache_size">Taille du cache personnalisé</string>
     <string name="listen_on">Écouter sur</string>
     <string name="error_local_music_not_found">Fichier de musique locale introuvable</string>
     <string name="bodied_bar">Très large</string>
@@ -251,7 +251,7 @@
     <string name="bashkir">Bachkir (Bashkir)</string>
     <string name="esperanto">Espéranto (Esperanto)</string>
     <string name="close_app_with_back_button">Fermer l\'application avec le bouton Retour</string>
-    <string name="when_you_use_the_back_button_from_the_home_page">Lorsque vous utilisez le bouton retour de la page d\'accueil</string>
+    <string name="when_you_use_the_back_button_from_the_home_page">Lorsque vous utilisez le bouton Retour de la page d\'accueil</string>
     <string name="audio_quality_format_high">Élevé</string>
     <string name="audio_quality_format_medium">Moyen</string>
     <string name="audio_quality_format_low">Bas</string>
@@ -316,7 +316,7 @@
     <string name="if_possible_allows_discovery_content_language">Si possible, il permet de recevoir du contenu de découverte dans votre propre langue.</string>
     <string name="set_to">Régler sur</string>
     <string name="end_of_song">fin du titre</string>
-    <string name="restore_completed">Restauration terminée!</string>
+    <string name="restore_completed">Restauration terminée !</string>
     <string name="click_to_close">Cliquer pour fermer</string>
     <string name="lang_dutch">Néerlandais (Nederlands)</string>
     <string name="do_you_really_want_to_renumbering_positions_in_this_playlist">Voulez-vous vraiment renuméroter les positions dans cette playlist ?</string>
@@ -378,8 +378,8 @@
     <string name="restore_from_backup">Restaurer depuis une sauvegarde</string>
     <string name="tab_miscellaneous">Divers</string>
     <string name="swipe_to_action">Action associée au balayage</string>
-    <string name="activate_the_action_menu_by_swiping_the_song_left_or_right">Activez le menu d\'action en faisant glisser le titre vers la gauche ou la droite</string>
-    <string name="smart_recommendations">RECOMMENDATIONS INTELLIGENTE</string>
+    <string name="activate_the_action_menu_by_swiping_the_song_left_or_right">Activer le menu d\'action en faisant glisser le titre vers la gauche ou la droite</string>
+    <string name="smart_recommendations">RECOMMANDATIONS INTELLIGENTES</string>
     <string name="player_collapsed_disable_swiping_down">Désactiver le glissement vers le bas</string>
     <string name="avoid_closing_the_player_cleaning_queue_by_swiping_down">Éviter de fermer le lecteur et de nettoyer la file en glissant vers le bas pendant qu\'il est minimisé</string>
     <string name="sort_date_liked">Date de mise en favoris</string>
@@ -394,7 +394,7 @@
     <string name="value_copied">Copié</string>
     <string name="do_you_really_want_to_delete_cache">Voulez-vous vraiment vider le cache ?</string>
     <string name="lang_swedish">Suédois (Swedish)</string>
-    <string name="pinned_playlists">Playlists épinglées</string>
+    <string name="pinned_playlists">Playlists Épinglées</string>
     <string name="locked">Verrouillé</string>
     <string name="sort_duration">Durée</string>
     <string name="lang_serbian_cyrillic">Cyrillique Serbe (српска ћирилица)</string>
@@ -638,7 +638,7 @@
     <string name="buttonzoomout">Animation de zoom arrière du bouton</string>
     <string name="thumbnailpause">Réduire la miniature quand c\'est en pause</string>
     <string name="upnext">Suivant</string>
-    <string name="showtwosongs">Nombre de chansons dans la Mini file d\'attente (1 à 9)</string>
+    <string name="showtwosongs">Nombre de titres dans la mini-file d\'attente (1 à 9)</string>
     <string name="showalbumcover">Afficher la pochette de l\'album</string>
     <string name="do_not_translate">Ne pas traduire</string>
     <string name="info_sleep_timer_delayed_at_end_of_song">Délai de mise en veille reporté à la fin du titre</string>
@@ -651,7 +651,7 @@
     <string name="twosongs">Deux Titres</string>
     <string name="info_debug_mode_enabled">Mode debug activé</string>
     <string name="info_debug_mode_is_enabled">Le mode débogage est activé, n\'oubliez pas de le désactiver dans les paramètres</string>
-    <string name="tapqueue">Appuyez pour ouvrir la file d\'attente</string>
+    <string name="tapqueue">Appuyer pour ouvrir la file d\'attente</string>
     <string name="past_day">Jour précédent</string>
     <string name="past_week">La semaine dernière</string>
     <string name="past_month">Le mois dernier</string>
@@ -731,7 +731,7 @@
     <string name="social_github">GitHub</string>
     <string name="update">Mettre à jour</string>
     <string name="update_song">Voulez-vous vraiment recharger ce titre ? Son temps de lecture et son cache seront effacés. Cette action est irréversible.</string>
-    <string name="player_pause_listen_history_info">Cela ne sauvegarde pas les événements de lecture utilisés pour les statistiques, l\'historique et les suggestions dans les sélections rapides</string>
+    <string name="player_pause_listen_history_info">Cela ne sauvegarde pas les événements de lecture utilisés pour les statistiques, l\'historique et les suggestions dans la sélection rapide</string>
     <string name="vertical_widget">Widget vertical</string>
     <string name="horizontal_widget">Widget horizontal</string>
     <string name="social_reddit">Reddit</string>
@@ -770,7 +770,7 @@
     <string name="lang_tamil">Tamoul</string>
     <string name="player_auto_load_songs_in_queue">Charger automatiquement les titres dans la file d\'attente</string>
     <string name="player_auto_load_songs_in_queue_description">Ajoute des titres quand la file d\'attente est sur le point de se terminer</string>
-    <string name="show_vinyl_thumbnail_animation">Afficher l\'animation Vinyl comme miniature</string>
+    <string name="show_vinyl_thumbnail_animation">Afficher l\'animation Vinyle comme miniature</string>
     <string name="toggle_romanization">Activer / Désactiver la romanisation</string>
     <string name="edit_thumbnail">Éditer la miniature</string>
     <string name="thumbnail_not_selected">Miniature non sélectionnée</string>
@@ -816,10 +816,10 @@
     <string name="jump_previous_blank">Laissez-le vide ou 0 pour le bouton Précédent pour toujours lire le titre précédent</string>
     <string name="delete_hidden_songs">Voulez-vous vraiment supprimer tous les titres cachés de la base de données ? Cette action est irréversible.</string>
     <string name="delete_hidden_songs_message">Supprimer les titres cachés</string>
-    <string name="cover_type_vinyl">Vinyl</string>
+    <string name="cover_type_vinyl">Vinyle</string>
     <string name="cover_type_cd">CD</string>
-    <string name="cover_type_cd_with_cover">CD with Cover</string>
-    <string name="wallpaper">Wallpaper</string>
-    <string name="enable_wallpaper">Enable wallpaper</string>
-    <string name="set_cover_thumbnail_as_wallpaper">Set cover thumbnail as wallpaper</string>
+    <string name="cover_type_cd_with_cover">CD avec pochette</string>
+    <string name="wallpaper">Fond d\'écran</string>
+    <string name="enable_wallpaper">Activer le fond d\'écran</string>
+    <string name="set_cover_thumbnail_as_wallpaper">Définir la miniature de pochette comme fond d\'écran</string>
 </resources>

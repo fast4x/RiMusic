@@ -22,7 +22,7 @@
     <string name="artists">Artiști</string>
     <string name="enter_the_playlist_name">Introdu numele playlistului</string>
     <string name="playlists">Playlisturi</string>
-    <string name="favorites">„Favorite”</string>
+    <string name="favorites">Favorite</string>
     <string name="quick_picks">Selecții rapide</string>
     <string name="songs">Melodii</string>
     <string name="other_versions">Versiuni alternative</string>
@@ -48,7 +48,7 @@
     <string name="itag">Itag</string>
     <string name="bitrate">Rată de biți</string>
     <string name="size">Dimensiune</string>
-    <string name="cached">„În cache”</string>
+    <string name="cached">În cache</string>
     <string name="loudness">Intensitate</string>
     <string name="clear">Golește</string>
     <string name="error">A apărut o eroare.</string>
@@ -184,7 +184,7 @@
     <string name="system">Sistem</string>
     <string name="unlimited">Nelimitat</string>
     <string name="_light">Luminos</string>
-    <string name="downloaded">„Descărcate”</string>
+    <string name="downloaded">Descărcate</string>
     <string name="turn_off">Oprește</string>
     <string name="download">Descarcă</string>
     <string name="_default">Implicit</string>
@@ -200,7 +200,7 @@
     <string name="stop">Oprește</string>
     <string name="listen_on_youtube">Ascultă pe YouTube</string>
     <string name="listen_on_youtube_music">Ascultă pe YouTube Music</string>
-    <string name="on_device">„Pe dispozitiv”</string>
+    <string name="on_device">Pe dispozitiv</string>
     <string name="wavy_timeline">Cronologie ondulată</string>
     <string name="play_next">Ascultă după</string>
     <string name="toggle_lyrics">Arată versurile</string>
@@ -386,7 +386,7 @@
     <string name="export_playlist">Exportă playlist-ul</string>
     <string name="lang_afrikaans">Afrikană (Afrikaans)</string>
     <string name="playlist_top">Top Playlisturi</string>
-    <string name="my_playlist_top">„Topul meu %s”</string>
+    <string name="my_playlist_top">Topul meu %s</string>
     <string name="navigation_bar_position">Poziția barei de navigare</string>
     <string name="direction_left">Stânga</string>
     <string name="direction_right">Dreapta</string>
@@ -394,7 +394,7 @@
     <string name="value_copied">Copiat</string>
     <string name="do_you_really_want_to_delete_cache">Ești sigur că vrei să ștergi cache-ul?</string>
     <string name="lang_swedish">Suedeză (Svenska)</string>
-    <string name="pinned_playlists">„Fixate”</string>
+    <string name="pinned_playlists">Fixate</string>
     <string name="locked">Blocat</string>
     <string name="sort_duration">Durată</string>
     <string name="lang_serbian_cyrillic">Sârba chirilică (Српска)</string>
@@ -480,7 +480,7 @@
     <string name="info_wait_it_may_take_a_few_minutes">Te rugăm să aștepți, aceasta poate dura câteva minute...</string>
     <string name="album_and_alternative_versions">Album</string>
     <string name="album_alternative_versions">Versiuni alternative</string>
-    <string name="monthly_playlists">„Lunare”</string>
+    <string name="monthly_playlists">Lunare</string>
     <string name="month_january_s">Ianuarie %s</string>
     <string name="month_february_s">Februarie %s</string>
     <string name="month_march_s">Martie %s</string>
@@ -609,7 +609,7 @@
     <string name="expandedlyrics">Vizualizare extinsă a versurilor</string>
     <string name="expandedlyricsinfo">Disponibil doar când miniatura versurilor este dezactivată</string>
     <string name="info_connect_your_piped_account_first">Conectează-ți mai întâi contul Piped sau dezactivează sincronizarea Piped</string>
-    <string name="piped_playlists">„Piped”</string>
+    <string name="piped_playlists">Piped</string>
     <string name="lang_bengali">Bengali (বাংলা)</string>
     <string name="lang_irish">Irlandeză (Gaeilge)</string>
     <string name="lyricsoutline">Conturul versurilor</string>
@@ -814,10 +814,10 @@
     <string name="jump_previous_blank">Lasă-l gol sau setează-l la 0 pentru ca butonul precedent să redea mereu melodia anterioară</string>
     <string name="delete_hidden_songs">Chiar dorești să ștergi toate melodiile ascunse din baza de date? Această acțiune este ireversibilă.</string>
     <string name="delete_hidden_songs_message">Șterge melodiile ascunse</string>
-    <string name="cover_type_vinyl">Vinyl</string>
+    <string name="cover_type_vinyl">Vinil</string>
     <string name="cover_type_cd">CD</string>
-    <string name="cover_type_cd_with_cover">CD with Cover</string>
-    <string name="wallpaper">Wallpaper</string>
-    <string name="enable_wallpaper">Enable wallpaper</string>
-    <string name="set_cover_thumbnail_as_wallpaper">Set cover thumbnail as wallpaper</string>
+    <string name="cover_type_cd_with_cover">CD cu copertă</string>
+    <string name="wallpaper">Imagine de fundal</string>
+    <string name="enable_wallpaper">Activează imaginea de fundal</string>
+    <string name="set_cover_thumbnail_as_wallpaper">Setează coperta ca fundal</string>
 </resources>

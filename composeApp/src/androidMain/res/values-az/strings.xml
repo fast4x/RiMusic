@@ -815,9 +815,9 @@
     <string name="delete_hidden_songs">Həqiqətən məlumat bazasından bütün gizli mahnıları silmək istəyirsiniz? Bu fəaliyyət geri dəyişmir.</string>
     <string name="delete_hidden_songs_message">Gizli mahnıları sil</string>
     <string name="cover_type_vinyl">Vinyl</string>
-    <string name="cover_type_cd">CD</string>
-    <string name="cover_type_cd_with_cover">CD with Cover</string>
-    <string name="wallpaper">Wallpaper</string>
-    <string name="enable_wallpaper">Enable wallpaper</string>
-    <string name="set_cover_thumbnail_as_wallpaper">Set cover thumbnail as wallpaper</string>
+    <string name="cover_type_cd">Disk</string>
+    <string name="cover_type_cd_with_cover">Cildli Disk</string>
+    <string name="wallpaper">Divar kağızı</string>
+    <string name="enable_wallpaper">Divar kağızın aktiv et</string>
+    <string name="set_cover_thumbnail_as_wallpaper">Cild miniatürün divar kağızı kimi yerləşdir</string>
 </resources>

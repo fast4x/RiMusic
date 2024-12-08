@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="opensource_multilingual_application">YouTube Music\'ten müzik akışı için açık kaynaklı ve çok dilli bir Android uygulamasıdır</string>
+    <string name="opensource_multilingual_application">YouTube Müzik\'ten müzik akışı için açık kaynaklı ve çok dilli bir Android uygulamasıdır</string>
     <string name="your_library">Kütüphaneniz.</string>
     <string name="organized_in_one_place">Hepsi tek bir yerde organize edildi: favori şarkılar, indirilen şarkılar, dinlenen şarkılar ve tüm çalma listeleriniz.</string>
     <string name="beautiful_player">Güzel bir oynatıcı.</string>
