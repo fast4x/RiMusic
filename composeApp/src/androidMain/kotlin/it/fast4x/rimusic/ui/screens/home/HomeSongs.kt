@@ -382,11 +382,6 @@ fun HomeSongs(
             }
             BuiltInPlaylist.Favorites -> Database.listFavoriteSongs( songSort.sortBy, songSort.sortOrder )
             BuiltInPlaylist.Offline -> Database.listOfflineSongs( songSort.sortBy, songSort.sortOrder )
-                .map { songs ->
-                    songs.filter { song ->
-                        binder?.cache?.isCached(song.song.id, 0L, song.contentLength ?: 0L) ?: false
-                    }
-                }
             BuiltInPlaylist.Top -> {
                 if (topPlaylists.period.duration == Duration.INFINITE)
                     Database.songsEntityByPlayTimeWithLimitDesc(limit = maxTopPlaylistItems.number.toInt())
