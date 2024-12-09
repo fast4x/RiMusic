@@ -30,11 +30,14 @@ import androidx.media3.common.MediaItem
 import it.fast4x.innertube.Innertube
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.R
+import it.fast4x.rimusic.enums.QueueSwipeAction
 import it.fast4x.rimusic.ui.components.themed.SmartMessage
 import it.fast4x.rimusic.utils.albumItemToggleBookmarked
 import it.fast4x.rimusic.utils.isSwipeToActionEnabledKey
 import it.fast4x.rimusic.utils.mediaItemToggleLike
 import it.fast4x.rimusic.utils.rememberPreference
+import it.fast4x.rimusic.utils.queueSwipeLeftActionKey
+import it.fast4x.rimusic.utils.queueSwipeRightActionKey
 import kotlinx.coroutines.flow.distinctUntilChanged
 import me.knighthat.colorPalette
 
@@ -111,17 +114,31 @@ fun SwipeableContent(
 @Composable
 fun SwipeableQueueItem(
     mediaItem: MediaItem,
-    onSwipeToLeft: () -> Unit,
-    onSwipeToRight: () -> Unit,
+    onPlayNext: (() -> Unit) = {},
+    onDownload: (() -> Unit) = {},
+    onRemoveFromQueue: (() -> Unit) = {},
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
+    val queueSwipeLeftAction by rememberPreference(queueSwipeLeftActionKey, QueueSwipeAction.RemoveFromQueue)
+    val queueSwipeRightAction by rememberPreference(queueSwipeRightActionKey, QueueSwipeAction.PlayNext)
+
+    fun getActionCallback(actionName: QueueSwipeAction): () -> Unit {
+        return when (actionName) {
+            QueueSwipeAction.PlayNext -> onPlayNext
+            QueueSwipeAction.Download -> onDownload
+            QueueSwipeAction.RemoveFromQueue -> onRemoveFromQueue
+            else -> ({})
+        }
+    }
+    val swipeLeftCallback = getActionCallback(queueSwipeLeftAction)
+    val swipeRighCallback = getActionCallback(queueSwipeRightAction)
 
     SwipeableContent(
-        swipeToLeftIcon = R.drawable.trash,
-        swipeToRightIcon = R.drawable.play_skip_forward,
-        onSwipeToLeft = onSwipeToLeft,
-        onSwipeToRight = onSwipeToRight,
+        swipeToLeftIcon = queueSwipeLeftAction.icon,
+        swipeToRightIcon = queueSwipeRightAction.icon,
+        onSwipeToLeft = swipeLeftCallback,
+        onSwipeToRight = swipeRighCallback,
         modifier = modifier
     ) {
         content()

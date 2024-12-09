@@ -820,4 +820,7 @@
     <string name="wallpaper">Wallpaper</string>
     <string name="enable_wallpaper">Enable wallpaper</string>
     <string name="set_cover_thumbnail_as_wallpaper">Set cover thumbnail as wallpaper</string>
+    <string name="queue_left_swipe">Queue Left Swipe</string>
+    <string name="action_on_swipe_left_in_queue">Action performed when swiped left in queue</string>
+    <string name="queue_right_swipe">Queue Right Swipe</string>
 </resources>

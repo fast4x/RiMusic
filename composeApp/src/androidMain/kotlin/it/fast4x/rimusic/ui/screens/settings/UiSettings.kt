@@ -67,6 +67,7 @@ import it.fast4x.rimusic.enums.PlayerThumbnailSize
 import it.fast4x.rimusic.enums.PlayerTimelineSize
 import it.fast4x.rimusic.enums.PlayerTimelineType
 import it.fast4x.rimusic.enums.PlayerType
+import it.fast4x.rimusic.enums.QueueSwipeAction
 import it.fast4x.rimusic.enums.QueueType
 import it.fast4x.rimusic.enums.RecommendationsNumber
 import it.fast4x.rimusic.enums.ThumbnailRoundness
@@ -173,6 +174,8 @@ import it.fast4x.rimusic.utils.playerTimelineSizeKey
 import it.fast4x.rimusic.utils.playerTimelineTypeKey
 import it.fast4x.rimusic.utils.playerTypeKey
 import it.fast4x.rimusic.utils.playlistindicatorKey
+import it.fast4x.rimusic.utils.queueSwipeLeftActionKey
+import it.fast4x.rimusic.utils.queueSwipeRightActionKey
 import it.fast4x.rimusic.utils.queueTypeKey
 import it.fast4x.rimusic.utils.recommendationsNumberKey
 import it.fast4x.rimusic.utils.rememberEqualizerLauncher
@@ -517,6 +520,10 @@ fun DefaultUiSettings() {
         false
     )
     showButtonPlayerSystemEqualizer = false
+    var queueSwipeLeftAction by rememberPreference(queueSwipeLeftActionKey, QueueSwipeAction.RemoveFromQueue)
+    queueSwipeLeftAction = QueueSwipeAction.RemoveFromQueue
+    var queueSwipeRightAction by rememberPreference(queueSwipeRightActionKey, QueueSwipeAction.PlayNext)
+    queueSwipeRightAction = QueueSwipeAction.PlayNext
     var showButtonPlayerDiscover by rememberPreference(showButtonPlayerDiscoverKey, false)
     showButtonPlayerDiscover = false
     var playerEnableLyricsPopupMessage by rememberPreference(
@@ -658,6 +665,15 @@ fun UiSettings(
 
 
     val launchEqualizer by rememberEqualizerLauncher(audioSessionId = { binder?.player?.audioSessionId })
+
+    var queueSwipeLeftAction by rememberPreference(
+        queueSwipeLeftActionKey,
+        QueueSwipeAction.RemoveFromQueue
+    )
+    var queueSwipeRightAction by rememberPreference(
+        queueSwipeRightActionKey,
+        QueueSwipeAction.PlayNext
+    )
 
     var minimumSilenceDuration by rememberPreference(minimumSilenceDurationKey, 2_000_000L)
 
@@ -1854,6 +1870,34 @@ fun UiSettings(
                 onCheckedChange = { isSwipeToActionEnabled = it }
             )
 
+            AnimatedVisibility(visible = isSwipeToActionEnabled) {
+                Column(
+                    modifier = Modifier.padding(start = 25.dp)
+                ) {
+                    EnumValueSelectorSettingsEntry<QueueSwipeAction>(
+                        title = stringResource(R.string.queue_left_swipe),
+                        selectedValue = queueSwipeLeftAction,
+                        onValueSelected = {
+                            queueSwipeLeftAction = it
+                            restartService = true
+                        },
+                        valueText = {
+                            it.displayName
+                        },
+                    )
+                    EnumValueSelectorSettingsEntry<QueueSwipeAction>(
+                        title = stringResource(R.string.queue_right_swipe),
+                        selectedValue = queueSwipeRightAction,
+                        onValueSelected = {
+                            queueSwipeRightAction = it
+                            restartService = true
+                        },
+                        valueText = {
+                            it.displayName
+                        },
+                    )
+                }
+            }
 
         SettingsGroupSpacer()
         SettingsEntryGroupText(title = stringResource(R.string.songs).uppercase())
