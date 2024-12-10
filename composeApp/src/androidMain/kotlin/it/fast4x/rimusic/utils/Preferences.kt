@@ -315,7 +315,8 @@ const val albumTypeKey = "albumType"
 const val enableWallpaperKey = "enableWallpaper"
 const val wallpaperTypeKey = "wallpaperType"
 
-
+const val queueSwipeLeftActionKey = "queueSwipeLeftAction"
+const val queueSwipeRightActionKey = "queueSwipeRightAction"
 
 /*
 @PublishedApi
