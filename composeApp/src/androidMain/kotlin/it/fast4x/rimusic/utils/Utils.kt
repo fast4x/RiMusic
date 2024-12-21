@@ -347,9 +347,16 @@ fun Uri?.thumbnail(size: Int): Uri? {
 fun formatAsDuration(millis: Long) = DateUtils.formatElapsedTime(millis / 1000).removePrefix("0")
 fun durationToMillis(duration: String): Long {
     val parts = duration.split(":")
-    val hours = parts[0].toLong()
-    val minutes = parts[1].toLong()
-    return hours * 3600000 + minutes * 60000
+    if (parts.size == 3){
+        val hours = parts[0].toLong()
+        val minutes = parts[1].toLong()
+        val seconds = parts[2].toLong()
+        return hours * 3600000 + minutes * 60000 + seconds * 1000
+    } else {
+        val minutes = parts[0].toLong()
+        val seconds = parts[1].toLong()
+        return minutes * 60000 + seconds * 1000
+    }
 }
 
 fun durationTextToMillis(duration: String): Long {
@@ -363,8 +370,8 @@ fun durationTextToMillis(duration: String): Long {
 
 fun formatAsTime(millis: Long): String {
     //if (millis == 0L) return ""
-    val timePart1 = Duration.ofMillis(millis / 60).toMinutes().minutes
-    val timePart2 = Duration.ofMillis(millis / 60).seconds % 60
+    val timePart1 = Duration.ofMillis(millis).toMinutes().minutes
+    val timePart2 = Duration.ofMillis(millis).seconds % 60
 
     return "${timePart1} ${timePart2}s"
 }
