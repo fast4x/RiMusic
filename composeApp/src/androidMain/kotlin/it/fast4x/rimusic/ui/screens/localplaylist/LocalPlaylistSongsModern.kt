@@ -1229,8 +1229,7 @@ fun LocalPlaylistSongsModern(
                                                         coroutineScope = coroutineScope,
                                                         pipedSession = pipedSession.toApiSession(),
                                                         id = UUID.fromString(playlistPreview.playlist.browseId),
-                                                        videos = listMediaItems.map { it.mediaId }
-                                                            .toList()
+                                                        videos = playlistSongs.map { it.asMediaItem.mediaId }
                                                     )
                                             } else {
                                                 listMediaItems.forEachIndexed { index, song ->
