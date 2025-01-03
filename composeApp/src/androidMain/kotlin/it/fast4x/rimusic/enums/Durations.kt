@@ -66,7 +66,7 @@ enum class DurationInMinutes {
             `25` -> 25
             `30` -> 30
             `60` -> 60
-        } * 3600000L
+        } * 60000L
 }
 
 enum class DurationInMilliseconds {

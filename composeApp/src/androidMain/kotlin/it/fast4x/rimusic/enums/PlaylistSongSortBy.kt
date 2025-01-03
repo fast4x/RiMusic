@@ -24,6 +24,8 @@ enum class PlaylistSongSortBy(
 
     PlayTime( R.string.sort_listening_time, R.drawable.trending ),
 
+    RelativePlayTime(R.string.sort_listening_time, R.drawable.trending), // TODO different icon than PlayTime
+
     Position( R.string.sort_position, R.drawable.position ),
 
     Title( R.string.sort_title, R.drawable.text ),

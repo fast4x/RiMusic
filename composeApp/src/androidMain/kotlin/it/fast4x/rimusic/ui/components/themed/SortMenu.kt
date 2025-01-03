@@ -28,6 +28,7 @@ fun SortMenu (
     onTitle: (() -> Unit)? = null,
     onDatePlayed: (() -> Unit)? = null,
     onPlayTime: (() -> Unit)? = null,
+    onRelativePlayTime: (() -> Unit)? = null,
     onName: (() -> Unit)? = null,
     onSongNumber: (() -> Unit)? = null,
     onPosition: (() -> Unit)? = null,
@@ -109,6 +110,16 @@ fun SortMenu (
                 onClick = {
                     onDismiss()
                     onPlayTime()
+                }
+            )
+        }
+        onRelativePlayTime?.let {
+            MenuEntry(
+                icon = R.drawable.trending,
+                text = stringResource(R.string.sort_relative_listening_time),
+                onClick = {
+                    onDismiss()
+                    onRelativePlayTime()
                 }
             )
         }

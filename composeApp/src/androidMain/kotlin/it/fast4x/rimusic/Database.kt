@@ -62,7 +62,7 @@ import it.fast4x.rimusic.service.LOCAL_KEY_PREFIX
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.intellij.lang.annotations.MagicConstant
-
+import kotlin.collections.sortedBy
 
 @Dao
 interface Database {
@@ -83,10 +83,30 @@ interface Database {
     @Query("SELECT Song.*, contentLength FROM Song INNER JOIN Format ON id = songId WHERE contentLength IS NOT NULL AND totalPlayTimeMs > 0 ORDER BY totalPlayTimeMs")
     fun songsOfflineByPlayTimeAsc(): Flow<List<SongEntity>>
 
+    fun songsOfflineByRelativePlayTimeAsc(): Flow<List<SongEntity>>{
+        val songs = songsOfflineByPlayTimeAsc()
+        songs.map { it }
+        return songs.map {
+            it.sortedBy { se ->
+                se.relativePlayTime()
+            }
+        }
+    }
+
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
     @Query("SELECT Song.*, contentLength FROM Song INNER JOIN Format ON id = songId WHERE contentLength IS NOT NULL AND totalPlayTimeMs > 0 ORDER BY totalPlayTimeMs DESC")
     fun songsOfflineByPlayTimeDesc(): Flow<List<SongEntity>>
+
+    fun songsOfflineByRelativePlayTimeDesc(): Flow<List<SongEntity>>{
+        val songs = songsOfflineByPlayTimeDesc()
+        songs.map { it }
+        return songs.map {
+            it.sortedBy { se ->
+                se.relativePlayTime()
+            }
+        }
+    }
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
@@ -164,6 +184,11 @@ interface Database {
                 SortOrder.Ascending -> songsOfflineByDurationAsc()
                 SortOrder.Descending -> songsOfflineByDurationDesc()
             }
+
+            SongSortBy.RelativePlayTime -> when (sortOrder) {
+                SortOrder.Ascending -> songsOfflineByRelativePlayTimeAsc()
+                SortOrder.Descending -> songsOfflineByRelativePlayTimeDesc()
+            }
         }
     }
 
@@ -185,11 +210,31 @@ interface Database {
     @RewriteQueriesToDropUnusedColumns
     fun songsFavoritesByPlayTimeAsc(): Flow<List<SongEntity>>
 
+    fun songsFavoritesByRelativePlayTimeAsc(): Flow<List<SongEntity>> {
+        val songs = songsFavoritesByPlayTimeAsc()
+        songs.map { it }
+        return songs.map {
+            it.sortedBy { se ->
+                se.relativePlayTime()
+            }
+        }
+    }
+
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
     @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL ORDER BY totalPlayTimeMs DESC")
     @RewriteQueriesToDropUnusedColumns
     fun songsFavoritesByPlayTimeDesc(): Flow<List<SongEntity>>
+
+    fun songsFavoritesByRelativePlayTimeDesc(): Flow<List<SongEntity>> {
+        val songs = songsFavoritesByPlayTimeDesc()
+        songs.map { it }
+        return songs.map {
+            it.sortedByDescending { se ->
+                se.relativePlayTime()
+            }
+        }
+    }
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
@@ -258,6 +303,10 @@ interface Database {
             SongSortBy.PlayTime -> when (sortOrder) {
                 SortOrder.Ascending -> songsFavoritesByPlayTimeAsc()
                 SortOrder.Descending -> songsFavoritesByPlayTimeDesc()
+            }
+            SongSortBy.RelativePlayTime -> when (sortOrder) {
+                SortOrder.Ascending -> songsFavoritesByRelativePlayTimeAsc()
+                SortOrder.Descending -> songsFavoritesByRelativePlayTimeDesc()
             }
             SongSortBy.Title, SongSortBy.AlbumName -> when (sortOrder) {
                 SortOrder.Ascending -> songsFavoritesByTitleAsc()
@@ -407,6 +456,16 @@ interface Database {
     @RewriteQueriesToDropUnusedColumns
     fun songsByPlayTimeAsc(showHiddenSongs: Int = 0): Flow<List<SongEntity>>
 
+    fun songsByRelativePlayTimeAsc(showHiddenSongs: Int = 0): Flow<List<SongEntity>> {
+        val songs = songsByPlayTimeAsc(showHiddenSongs)
+        songs.map { it }
+        return songs.map {
+            it.sortedBy { se ->
+                se.relativePlayTime()
+            }
+        }
+    }
+
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
     @Query("SELECT Song.*, Album.title as albumTitle FROM Song LEFT JOIN SongAlbumMap ON Song.id = SongAlbumMap.songId  " +
@@ -414,6 +473,16 @@ interface Database {
             "WHERE (Song.totalPlayTimeMs > :showHiddenSongs OR Song.likedAt NOT NULL) AND Song.id NOT LIKE '$LOCAL_KEY_PREFIX%' ORDER BY Song.totalPlayTimeMs DESC")
     @RewriteQueriesToDropUnusedColumns
     fun songsByPlayTimeDesc(showHiddenSongs: Int = 0): Flow<List<SongEntity>>
+
+    fun songsByRelativePlayTimeDesc(showHiddenSongs: Int = 0): Flow<List<SongEntity>>{
+        val songs = songsByPlayTimeDesc(showHiddenSongs)
+        songs.map { it }
+        return songs.map {
+            it.sortedByDescending { se ->
+                se.relativePlayTime()
+            }
+        }
+    }
 
     fun songs(sortBy: SongSortBy, sortOrder: SortOrder, showHiddenSongs: Int): Flow<List<SongEntity>> {
         return when (sortBy) {
@@ -448,6 +517,11 @@ interface Database {
             SongSortBy.Duration -> when (sortOrder) {
                 SortOrder.Ascending -> songsByDurationAsc(showHiddenSongs)
                 SortOrder.Descending -> songsByDurationDesc(showHiddenSongs)
+            }
+
+            SongSortBy.RelativePlayTime -> when (sortOrder) {
+                SortOrder.Ascending -> songsByRelativePlayTimeAsc(showHiddenSongs)
+                SortOrder.Descending -> songsByRelativePlayTimeDesc(showHiddenSongs)
             }
         }
     }
@@ -744,6 +818,7 @@ interface Database {
         SongSortBy.Artist -> sortFavoriteSongsByArtist()
         SongSortBy.Duration -> sortFavoriteSongsByDuration()
         SongSortBy.AlbumName -> sortFavoriteSongsByAlbum()
+        SongSortBy.RelativePlayTime -> TODO()
     }.map(sortOrder::applyTo)
 
     @Query("SELECT thumbnailUrl FROM Song WHERE likedAt IS NOT NULL AND id NOT LIKE '$LOCAL_KEY_PREFIX%'  LIMIT 4")
@@ -877,6 +952,7 @@ interface Database {
         SongSortBy.Artist -> sortOfflineSongsByArtist()
         SongSortBy.Duration -> sortOfflineSongsByDuration()
         SongSortBy.AlbumName -> sortOfflineSongsByAlbum()
+        SongSortBy.RelativePlayTime -> TODO()
     }.map( sortOrder::applyTo )
 
     @Query("""
@@ -961,6 +1037,29 @@ interface Database {
     """)
     fun sortAllSongsByPlayTime_Filtered(
         filterList: List<String>): Flow<List<SongEntity>>
+
+    fun sortAllSongsByRelativePlayTime(
+        @MagicConstant(intValues = [1, 0]) showHidden: Int
+    ): Flow<List<SongEntity>>{
+        val songs = sortAllSongsByPlayTime(showHidden)
+        return songs.map {
+                it.sortedBy { se ->
+                    val totalPlayTimeMs = se.song.totalPlayTimeMs
+                    if(totalPlayTimeMs > 0) se.contentLength?.div(totalPlayTimeMs) ?: 0L else 0L
+            }
+        }
+    }
+
+    fun sortAllSongsByRelativePlayTime_Filtered(
+        filterList: List<String>): Flow<List<SongEntity>>{
+        val songs = sortAllSongsByPlayTime_Filtered(filterList)
+        return songs.map {
+            it.sortedBy { se ->
+                val totalPlayTimeMs = se.song.totalPlayTimeMs
+                if(totalPlayTimeMs > 0) se.contentLength?.div(totalPlayTimeMs) ?: 0L else 0L
+            }
+        }
+    }
 
     @Query("""
         SELECT DISTINCT Song.*, Format.contentLength, Album.title
@@ -1120,6 +1219,8 @@ interface Database {
         // the sorting is a better idea
         SongSortBy.PlayTime -> if (filterList.isEmpty() && playList != BuiltInPlaylist.Downloaded) sortAllSongsByPlayTime( showHidden )
         else sortAllSongsByPlayTime_Filtered(filterList )
+        SongSortBy.RelativePlayTime -> if (filterList.isEmpty() && playList != BuiltInPlaylist.Downloaded) sortAllSongsByRelativePlayTime(showHidden)
+        else sortAllSongsByRelativePlayTime_Filtered(filterList)
         SongSortBy.Title -> if (filterList.isEmpty() && playList != BuiltInPlaylist.Downloaded) sortAllSongsByTitle( showHidden )
         else sortAllSongsByTitle_Filtered(filterList )
         SongSortBy.DateAdded -> if (filterList.isEmpty() && playList != BuiltInPlaylist.Downloaded) sortAllSongsByRowId( showHidden )
@@ -1830,6 +1931,16 @@ interface Database {
     """)
     fun sortSongsFromPlaylistByPlaytime( id: Long ): Flow<List<SongEntity>>
 
+    fun sortSongsFromPlaylistByRelativePlaytime( id: Long ): Flow<List<SongEntity>> {
+        val songs = sortSongsFromPlaylistByPlaytime(id)
+        songs.map { it }
+        return songs.map {
+            it.sortedBy { se ->
+                se.relativePlayTime()
+            }
+        }
+    }
+
     @Query("""
         SELECT DISTINCT S.*, Album.title as albumTitle, Format.contentLength as contentLength
         FROM Song S 
@@ -1923,6 +2034,7 @@ interface Database {
             PlaylistSongSortBy.ArtistAndAlbum -> sortSongsFromPlaylistByArtistAndAlbum( id )
             PlaylistSongSortBy.DatePlayed -> sortSongsFromPlaylistByDatePlayed( id )
             PlaylistSongSortBy.PlayTime -> sortSongsFromPlaylistByPlaytime( id )
+            PlaylistSongSortBy.RelativePlayTime -> sortSongsFromPlaylistByRelativePlaytime( id )
             PlaylistSongSortBy.Position -> sortSongsPlaylistByPosition( id )
             PlaylistSongSortBy.Title -> sortSongsFromPlaylistByTitle( id )
             PlaylistSongSortBy.Duration -> sortSongsFromPlaylistByDuration( id )

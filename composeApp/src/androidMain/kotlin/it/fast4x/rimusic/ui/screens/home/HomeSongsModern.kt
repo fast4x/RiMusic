@@ -585,6 +585,7 @@ fun HomeSongsModern(
                 when (sortBy) {
                     SongSortBy.Title, SongSortBy.AlbumName -> items = items.sortedBy { it.song.title }
                     SongSortBy.PlayTime -> items = items.sortedBy { it.song.totalPlayTimeMs }
+                    SongSortBy.RelativePlayTime -> items = items.sortedBy { it.relativePlayTime() }
                     SongSortBy.Duration -> items = items.sortedBy { it.song.durationText }
                     SongSortBy.Artist -> items = items.sortedBy { it.song.artistsText }
                     SongSortBy.DatePlayed -> {}
@@ -597,6 +598,7 @@ fun HomeSongsModern(
                 when (sortBy) {
                     SongSortBy.Title, SongSortBy.AlbumName -> items = items.sortedByDescending { it.song.title }
                     SongSortBy.PlayTime -> items = items.sortedByDescending { it.song.totalPlayTimeMs }
+                    SongSortBy.RelativePlayTime -> items = items.sortedByDescending { it.relativePlayTime() }
                     SongSortBy.Duration -> items = items.sortedByDescending { it.song.durationText }
                     SongSortBy.Artist -> items = items.sortedByDescending { it.song.artistsText }
                     SongSortBy.DatePlayed -> {}
@@ -919,6 +921,9 @@ fun HomeSongsModern(
                                                             },
                                                             onPlayTime = {
                                                                 sortBy = SongSortBy.PlayTime
+                                                            },
+                                                            onRelativePlayTime = {
+                                                                sortBy = SongSortBy.RelativePlayTime
                                                             },
                                                             onDateLiked = {
                                                                 sortBy = SongSortBy.DateLiked
@@ -1761,6 +1766,27 @@ fun HomeSongsModern(
                                 if (sortBy == SongSortBy.PlayTime) {
                                     BasicText(
                                         text = song.song.formattedTotalPlayTime,
+                                        style = typography().xxs.semiBold.center.color(colorPalette().onOverlay),
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(
+                                                brush = Brush.verticalGradient(
+                                                    colors = listOf(
+                                                        Color.Transparent,
+                                                        colorPalette().overlay
+                                                    )
+                                                ),
+                                                shape = thumbnailShape()
+                                            )
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                            .align(Alignment.BottomCenter)
+                                    )
+                                }
+                                if (sortBy == SongSortBy.RelativePlayTime){
+                                    BasicText(
+                                        text = "${song.relativePlayTime().toLong()}",
                                         style = typography().xxs.semiBold.center.color(colorPalette().onOverlay),
                                         maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
