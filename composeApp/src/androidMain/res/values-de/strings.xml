@@ -827,7 +827,7 @@
     <string name="action_bar_show_start_radio_button">Starte Radio Button</string>
     <string name="tab_accounts">Konten</string>
     <string name="blankspace">Leerer Abstand oben</string>
-    <string name="settings_enable_autodownload_song">Auto Song Download aktivieren</string>
+    <string name="settings_enable_autodownload_song">Song Auto-Download aktivieren</string>
     <string name="settings_enable_autodownload_song_when_liked">Auto Download, wenn geliked</string>
     <string name="settings_enable_autodownload_song_when_album_bookmarked">Titel automatisch herunterladen, wenn Album in Lesezeichen</string>
     <string name="tab_general">Allgemein</string>
