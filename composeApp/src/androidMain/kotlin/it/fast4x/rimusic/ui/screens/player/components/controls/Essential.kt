@@ -1,5 +1,6 @@
 package it.fast4x.rimusic.ui.screens.player.components.controls
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.tween
@@ -85,6 +86,7 @@ import it.fast4x.rimusic.utils.getIconQueueLoopState
 import it.fast4x.rimusic.utils.getLikeState
 import it.fast4x.rimusic.utils.getUnlikedIcon
 import it.fast4x.rimusic.utils.jumpPreviousKey
+import it.fast4x.rimusic.utils.mediaItemToggleLike
 import it.fast4x.rimusic.utils.playNext
 import it.fast4x.rimusic.utils.playPrevious
 import it.fast4x.rimusic.utils.playerBackgroundColorsKey
@@ -92,6 +94,7 @@ import it.fast4x.rimusic.utils.playerControlsTypeKey
 import it.fast4x.rimusic.utils.queueLoopTypeKey
 import it.fast4x.rimusic.utils.rememberPreference
 import it.fast4x.rimusic.utils.semiBold
+import it.fast4x.rimusic.utils.setDisLikeState
 import it.fast4x.rimusic.utils.setLikeState
 import it.fast4x.rimusic.utils.setQueueLoopState
 import it.fast4x.rimusic.utils.showthumbnailKey
@@ -99,6 +102,7 @@ import it.fast4x.rimusic.utils.textCopyToClipboard
 import it.fast4x.rimusic.utils.textoutlineKey
 
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @UnstableApi
 @ExperimentalFoundationApi
 @Composable
@@ -254,33 +258,45 @@ fun InfoAlbumAndArtistEssential(
                         icon = getLikeState(mediaId),
                         onClick = {
                             val currentMediaItem = binder.player.currentMediaItem
-                            Database.asyncTransaction {
-                                if (like(mediaId, setLikeState(likedAt)) == 0) {
-                                    currentMediaItem
-                                        ?.takeIf { it.mediaId == mediaId }
-                                        ?.let {
-                                            insert(currentMediaItem, Song::toggleLike)
+                            currentMediaItem?.takeIf { it.mediaId == mediaId }.let { mediaItem ->
+                                if (mediaItem != null) {
+                                    mediaItemToggleLike(mediaItem)
+                                    Database.asyncQuery {
+                                        if(songliked(mediaId) != 0){
+                                            MyDownloadHelper.autoDownloadWhenLiked(context(), mediaItem)
                                         }
-                                    if (currentMediaItem != null) {
-                                        MyDownloadHelper.autoDownloadWhenLiked(context(),currentMediaItem)
                                     }
                                 }
                             }
                             if (effectRotationEnabled) isRotated = !isRotated
                         },
-                        modifier = Modifier
-                            .padding(start = 5.dp)
-                            .size(24.dp)
-                    )
-                    if (playerBackgroundColors == PlayerBackgroundColors.BlurredCoverColor) {
-                        Icon(
-                            painter = painterResource(id = getUnlikedIcon()),
-                            tint = colorPalette().text,
-                            contentDescription = null,
+                        onLongClick = {
+                                val currentMediaItem = binder.player.currentMediaItem
+                                Database.asyncTransaction {
+                                    if (like(mediaId, setDisLikeState(likedAt)) == 0) {
+                                        currentMediaItem
+                                            ?.takeIf { it.mediaId == mediaId }
+                                            ?.let {
+                                                insert(currentMediaItem, Song::toggleDislike)
+                                            }
+                                    }
+                                }
+                                if (effectRotationEnabled) isRotated = !isRotated
+                            },
                             modifier = Modifier
                                 .padding(start = 5.dp)
                                 .size(24.dp)
                         )
+                        if (playerBackgroundColors == PlayerBackgroundColors.BlurredCoverColor) {
+                            Icon(
+                                painter = painterResource(id = getUnlikedIcon()),
+                                tint = colorPalette().text,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .padding(start = 5.dp)
+                                    .size(24.dp)
+                            )
+
                     }
                 }
             }
@@ -417,12 +433,26 @@ fun ControlsEssential(
             icon = getLikeState(mediaId),
             onClick = {
                 val currentMediaItem = binder.player.currentMediaItem
+                currentMediaItem?.takeIf { it.mediaId == mediaId }.let { mediaItem ->
+                    if (mediaItem != null) {
+                        mediaItemToggleLike(mediaItem)
+                        Database.asyncQuery {
+                            if(songliked(mediaId) != 0){
+                                MyDownloadHelper.autoDownloadWhenLiked(context(), mediaItem)
+                            }
+                        }
+                    }
+                }
+                if (effectRotationEnabled) isRotated = !isRotated
+            },
+            onLongClick = {
+                val currentMediaItem = binder.player.currentMediaItem
                 Database.asyncTransaction {
-                    if ( like( mediaId, setLikeState(likedAt) ) == 0 ) {
+                    if (like(mediaId, setDisLikeState(likedAt)) == 0) {
                         currentMediaItem
                             ?.takeIf { it.mediaId == mediaId }
                             ?.let {
-                                insert(currentMediaItem, Song::toggleLike)
+                                insert(currentMediaItem, Song::toggleDislike)
                             }
                     }
                 }

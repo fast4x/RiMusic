@@ -76,6 +76,7 @@ import it.fast4x.rimusic.utils.effectRotationKey
 import it.fast4x.rimusic.utils.getLikeState
 import it.fast4x.rimusic.utils.getUnlikedIcon
 import it.fast4x.rimusic.utils.jumpPreviousKey
+import it.fast4x.rimusic.utils.mediaItemToggleLike
 import it.fast4x.rimusic.utils.playNext
 import it.fast4x.rimusic.utils.playPrevious
 import it.fast4x.rimusic.utils.playerBackgroundColorsKey
@@ -83,6 +84,7 @@ import it.fast4x.rimusic.utils.playerControlsTypeKey
 import it.fast4x.rimusic.utils.playerInfoShowIconsKey
 import it.fast4x.rimusic.utils.rememberPreference
 import it.fast4x.rimusic.utils.semiBold
+import it.fast4x.rimusic.utils.setDisLikeState
 import it.fast4x.rimusic.utils.setLikeState
 import it.fast4x.rimusic.utils.showthumbnailKey
 import it.fast4x.rimusic.utils.textCopyToClipboard
@@ -232,16 +234,27 @@ fun InfoAlbumAndArtistModern(
                         icon = getLikeState(mediaId),
                         onClick = {
                             val currentMediaItem = binder.player.currentMediaItem
+                            currentMediaItem?.takeIf { it.mediaId == mediaId }.let { mediaItem ->
+                                if (mediaItem != null) {
+                                    mediaItemToggleLike(mediaItem)
+                                    Database.asyncQuery {
+                                        if(songliked(mediaId) != 0){
+                                            MyDownloadHelper.autoDownloadWhenLiked(context(), mediaItem)
+                                        }
+                                    }
+                                }
+                            }
+                            if (effectRotationEnabled) isRotated = !isRotated
+                        },
+                        onLongClick = {
+                            val currentMediaItem = binder.player.currentMediaItem
                             Database.asyncTransaction {
-                                if ( like( mediaId, setLikeState(likedAt) ) == 0 ) {
+                                if (like(mediaId, setDisLikeState(likedAt)) == 0) {
                                     currentMediaItem
                                         ?.takeIf { it.mediaId == mediaId }
                                         ?.let {
-                                            insert(currentMediaItem, Song::toggleLike)
+                                            insert(currentMediaItem, Song::toggleDislike)
                                         }
-                                    if (currentMediaItem != null) {
-                                        MyDownloadHelper.autoDownloadWhenLiked(context(),currentMediaItem)
-                                    }
                                 }
                             }
                             if (effectRotationEnabled) isRotated = !isRotated

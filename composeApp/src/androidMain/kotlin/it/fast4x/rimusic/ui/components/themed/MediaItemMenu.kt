@@ -118,6 +118,8 @@ import it.fast4x.rimusic.context
 import it.fast4x.rimusic.service.MyDownloadHelper
 import it.fast4x.rimusic.typography
 import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
+import it.fast4x.rimusic.utils.mediaItemToggleLike
+import it.fast4x.rimusic.utils.setDisLikeState
 import timber.log.Timber
 import java.time.LocalTime.now
 import java.time.format.DateTimeFormatter
@@ -1130,12 +1132,19 @@ fun MediaItemMenu(
                             color = colorPalette().favoritesIcon,
                             //color = if (likedAt == null) colorPalette().textDisabled else colorPalette().text,
                             onClick = {
-                                Database.asyncTransaction {
-                                    if ( like( mediaItem.mediaId, setLikeState(likedAt) ) == 0 ) {
-                                        insert(mediaItem, Song::toggleLike)
+                                mediaItemToggleLike(mediaItem)
+                                Database.asyncQuery {
+                                    if(songliked(mediaItem.mediaId) != 0){
+                                        MyDownloadHelper.autoDownloadWhenLiked(context(), mediaItem)
                                     }
                                 }
-                                MyDownloadHelper.autoDownloadWhenLiked(context(),mediaItem)
+                            },
+                            onLongClick = {
+                                Database.asyncTransaction {
+                                    if (like(mediaItem.mediaId, setDisLikeState(likedAt)) == 0) {
+                                        insert(mediaItem, Song::toggleDislike)
+                                    }
+                                }
                             },
                             modifier = Modifier
                                 .padding(all = 4.dp)
