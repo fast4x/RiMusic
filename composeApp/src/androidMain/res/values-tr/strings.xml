@@ -861,9 +861,9 @@
     <string name="lyricsanimate">Animasyonlu Şarkı Sözleri</string>
     <string name="yt_playlists">YT/YTM</string>
     <string name="lyricsSizeSecondary">Boyutu değiştirmek için uzun basın</string>
-    <string name="home">Home</string>
+    <string name="home">Ana Sayfa</string>
     <string name="appearancepresets">Görünüm Ön Ayarları</string>
     <string name="appearancepresetssecondary">Önizlemeler düşük kalitede olacaktır</string>
-    <string name="yt_history">YTM History</string>
+    <string name="yt_history">YTM Geçmişi</string>
     <string name="albumCoverRotation">Arkaplan Döndürme Animasyonu</string>
 </resources>
