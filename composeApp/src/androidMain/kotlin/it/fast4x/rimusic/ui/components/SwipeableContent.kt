@@ -176,10 +176,11 @@ fun SwipeableQueueItem(
     val onFavourite: () -> Unit = {
         mediaItemToggleLike(mediaItem)
         val message: String
-        if( likedAt != null ) {
-            val mTitle: String = mediaItem.mediaMetadata.title?.toString() ?: ""
-            val mArtist: String = mediaItem.mediaMetadata.artist?.toString() ?: ""
-
+        val mTitle: String = mediaItem.mediaMetadata.title?.toString() ?: ""
+        val mArtist: String = mediaItem.mediaMetadata.artist?.toString() ?: ""
+        if(likedAt == -1L) {
+            message = "\"$mTitle - $mArtist\" ${context.resources.getString(R.string.removed_from_disliked)}"
+        } else if( likedAt != null ) {
             message = "\"$mTitle - $mArtist\" ${context.resources.getString(R.string.removed_from_favorites)}"
         } else
             message = context.resources.getString(R.string.added_to_favorites)
@@ -251,10 +252,11 @@ fun SwipeablePlaylistItem(
     val onFavourite: () -> Unit = {
         mediaItemToggleLike(mediaItem)
         val message: String
-        if( likedAt != null ) {
-            val mTitle: String = mediaItem.mediaMetadata.title?.toString() ?: ""
-            val mArtist: String = mediaItem.mediaMetadata.artist?.toString() ?: ""
-
+        val mTitle: String = mediaItem.mediaMetadata.title?.toString() ?: ""
+        val mArtist: String = mediaItem.mediaMetadata.artist?.toString() ?: ""
+        if(likedAt == -1L) {
+            message = "\"$mTitle - $mArtist\" ${context.resources.getString(R.string.removed_from_disliked)}"
+        } else if ( likedAt != null ) {
             message = "\"$mTitle - $mArtist\" ${context.resources.getString(R.string.removed_from_favorites)}"
         } else
             message = context.resources.getString(R.string.added_to_favorites)

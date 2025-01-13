@@ -1016,13 +1016,17 @@ fun HomeSongsModern(
                         if (builtInPlaylist == BuiltInPlaylist.Favorites) {
                             HeaderIconButton(
                                 icon = R.drawable.downloaded,
-                                enabled = songs.isNotEmpty(),
-                                color = colorPalette().text,
+                                enabled = (items.any { it.song.likedAt != -1L }),
+                                color = if (items.any { it.song.likedAt != -1L }) colorPalette().text else colorPalette().text,
                                 onClick = {},
                                 modifier = Modifier
                                     .combinedClickable(
                                         onClick = {
-                                            showConfirmDownloadAllDialog = true
+                                            if (items.any { it.song.likedAt != -1L }) {
+                                                showConfirmDownloadAllDialog = true
+                                            } else {
+                                                SmartMessage(context.resources.getString(R.string.disliked_this_collection),type = PopupType.Error, context = context)
+                                            }
                                         },
                                         onLongClick = {
                                             SmartMessage(
@@ -1043,8 +1047,8 @@ fun HomeSongsModern(
                                     //isRecommendationEnabled = false
                                     downloadState = Download.STATE_DOWNLOADING
                                     if (listMediaItems.isEmpty()) {
-                                        if (items.isNotEmpty() == true)
-                                            items.forEach {
+                                        if (items.any { it.song.likedAt != -1L }) {
+                                            items.filter { it.song.likedAt != -1L }.forEach {
                                                 binder?.cache?.removeResource(it.song.asMediaItem.mediaId)
                                                 manageDownload(
                                                     context = context,
@@ -1052,6 +1056,7 @@ fun HomeSongsModern(
                                                     downloadState = false
                                                 )
                                             }
+                                        }
                                     } else {
                                         listMediaItems.forEach {
                                             binder?.cache?.removeResource(it.mediaId)
@@ -1143,8 +1148,8 @@ fun HomeSongsModern(
 
                         HeaderIconButton(
                             icon = R.drawable.shuffle,
-                            enabled = items.isNotEmpty(),
-                            color = colorPalette().text,
+                            enabled = items.any { it.song.likedAt != -1L },
+                            color = if (items.any { it.song.likedAt != -1L }) colorPalette().text else colorPalette().textDisabled,
                             onClick = {},
                             modifier = Modifier
                                 .padding(horizontal = 2.dp)
@@ -1152,17 +1157,19 @@ fun HomeSongsModern(
                                     onClick = {
                                         if (builtInPlaylist == BuiltInPlaylist.OnDevice) items =
                                             filteredSongs
-                                        if (items.isNotEmpty()) {
+                                        if (items.filter { it.song.likedAt != -1L }.isNotEmpty()) {
                                             val itemsLimited =
-                                                if (items.size > maxSongsInQueue.number) items
+                                                if (items.filter { it.song.likedAt != -1L }.size > maxSongsInQueue.number) items.filter { it.song.likedAt != -1L }
                                                     .shuffled()
-                                                    .take(maxSongsInQueue.number.toInt()) else items
+                                                    .take(maxSongsInQueue.number.toInt()) else items.filter { it.song.likedAt != -1L }
                                             binder?.stopRadio()
                                             binder?.player?.forcePlayFromBeginning(
                                                 itemsLimited
                                                     .shuffled()
                                                     .map(SongEntity::asMediaItem)
                                             )
+                                        } else {
+                                            SmartMessage(context.resources.getString(R.string.disliked_this_collection),type = PopupType.Error, context = context)
                                         }
                                     },
                                     onLongClick = {
@@ -1242,10 +1249,15 @@ fun HomeSongsModern(
                                             if (builtInPlaylist == BuiltInPlaylist.OnDevice) items =
                                                 filteredSongs
                                             if (listMediaItems.isEmpty()) {
-                                                binder?.player?.addNext(
-                                                    items.map(SongEntity::asMediaItem),
-                                                    context
-                                                )
+                                                if (items.any { it.song.likedAt != -1L }) {
+                                                    binder?.player?.addNext(
+                                                        items.filter { it.song.likedAt != -1L }
+                                                            .map(SongEntity::asMediaItem),
+                                                        context
+                                                    )
+                                                } else {
+                                                    SmartMessage(context.resources.getString(R.string.disliked_this_collection),type = PopupType.Error, context = context)
+                                                }
                                             } else {
                                                 binder?.player?.addNext(listMediaItems, context)
                                                 listMediaItems.clear()
@@ -1256,10 +1268,15 @@ fun HomeSongsModern(
                                             if (builtInPlaylist == BuiltInPlaylist.OnDevice) items =
                                                 filteredSongs
                                             if (listMediaItems.isEmpty()) {
-                                                binder?.player?.enqueue(
-                                                    items.map(SongEntity::asMediaItem),
-                                                    context
-                                                )
+                                                if (items.any { it.song.likedAt != -1L }) {
+                                                    binder?.player?.enqueue(
+                                                        items.filter { it.song.likedAt != -1L }
+                                                            .map(SongEntity::asMediaItem),
+                                                        context
+                                                    )
+                                                } else {
+                                                    SmartMessage(context.resources.getString(R.string.disliked_this_collection),type = PopupType.Error, context = context)
+                                                }
                                             } else {
                                                 binder?.player?.enqueue(listMediaItems, context)
                                                 listMediaItems.clear()
@@ -1874,64 +1891,78 @@ fun HomeSongsModern(
                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                     },
                                     onClick = {
-                                        searching = false
-                                        filter = null
+                                        if (song.song.likedAt != -1L) {
+                                            searching = false
+                                            filter = null
 
-                                        val maxSongs = maxSongsInQueue.number.toInt()
-                                        val itemsRange: IntRange
-                                        val playIndex: Int
-                                        if (items.size < maxSongsInQueue.number) {
-                                            itemsRange = items.indices
-                                            playIndex = index
-                                        } else {
-                                            when (queueLimit) {
-                                                QueueSelection.START_OF_QUEUE -> {
-                                                    // tries to guarantee maxSongs many songs
-                                                    // window starting from index with maxSongs songs (if possible)
-                                                    itemsRange = index..<min(index+maxSongs, items.size)
+                                            val maxSongs = maxSongsInQueue.number.toInt()
+                                            val itemsRange: IntRange
+                                            val playIndex: Int
+                                            if (items.size < maxSongsInQueue.number) {
+                                                itemsRange = items.indices
+                                                playIndex = index
+                                            } else {
+                                                when (queueLimit) {
+                                                    QueueSelection.START_OF_QUEUE -> {
+                                                        // tries to guarantee maxSongs many songs
+                                                        // window starting from index with maxSongs songs (if possible)
+                                                        itemsRange = index..<min(
+                                                            index + maxSongs,
+                                                            items.size
+                                                        )
 
-                                                    // index is located at the first position
-                                                    playIndex = 0
-                                                }
-                                                QueueSelection.CENTERED -> {
-                                                    // tries to guarantee >= maxSongs/2 many songs
-                                                    // window with +- maxSongs/2 songs (if possible) around index
-                                                    val minIndex = max(0, index - maxSongs/2)
-                                                    val maxIndex = min(index + maxSongs/2, items.size)
-                                                    itemsRange = minIndex..<maxIndex
+                                                        // index is located at the first position
+                                                        playIndex = 0
+                                                    }
 
-                                                    // index is located at "center"
-                                                    playIndex = index - minIndex
-                                                }
-                                                QueueSelection.END_OF_QUEUE -> {
-                                                    // tries to guarantee maxSongs many songs
-                                                    // window with maxSongs songs (if possible) ending at index
-                                                    val minIndex = max(0, index - maxSongs + 1)
-                                                    val maxIndex = min(index, items.size)
-                                                    itemsRange = minIndex..maxIndex
+                                                    QueueSelection.CENTERED -> {
+                                                        // tries to guarantee >= maxSongs/2 many songs
+                                                        // window with +- maxSongs/2 songs (if possible) around index
+                                                        val minIndex = max(0, index - maxSongs / 2)
+                                                        val maxIndex =
+                                                            min(index + maxSongs / 2, items.size)
+                                                        itemsRange = minIndex..<maxIndex
 
-                                                    // index is located at end
-                                                    playIndex = index - minIndex
-                                                }
-                                                QueueSelection.END_OF_QUEUE_WINDOWED -> {
-                                                    // tries to guarantee maxSongs many songs,
-                                                    // similar to original implementation in it's valid range
-                                                    // window with maxSongs songs (if possible) before index
-                                                    val minIndex = max(0, index - maxSongs + 1)
-                                                    val maxIndex = min(minIndex+maxSongs, items.size)
-                                                    itemsRange = minIndex..<maxIndex
+                                                        // index is located at "center"
+                                                        playIndex = index - minIndex
+                                                    }
 
-                                                    // index is located at "end"
-                                                    playIndex = index - minIndex
+                                                    QueueSelection.END_OF_QUEUE -> {
+                                                        // tries to guarantee maxSongs many songs
+                                                        // window with maxSongs songs (if possible) ending at index
+                                                        val minIndex = max(0, index - maxSongs + 1)
+                                                        val maxIndex = min(index, items.size)
+                                                        itemsRange = minIndex..maxIndex
+
+                                                        // index is located at end
+                                                        playIndex = index - minIndex
+                                                    }
+
+                                                    QueueSelection.END_OF_QUEUE_WINDOWED -> {
+                                                        // tries to guarantee maxSongs many songs,
+                                                        // similar to original implementation in it's valid range
+                                                        // window with maxSongs songs (if possible) before index
+                                                        val minIndex = max(0, index - maxSongs + 1)
+                                                        val maxIndex =
+                                                            min(minIndex + maxSongs, items.size)
+                                                        itemsRange = minIndex..<maxIndex
+
+                                                        // index is located at "end"
+                                                        playIndex = index - minIndex
+                                                    }
                                                 }
                                             }
+                                            val itemsLimited = items.slice(itemsRange)
+                                            binder?.stopRadio()
+                                            binder?.player?.forcePlayAtIndex(
+                                                itemsLimited.filter { it.song.likedAt != -1L }.map(SongEntity::asMediaItem),
+                                                itemsLimited.filter { it.song.likedAt != -1L }.map(SongEntity::asMediaItem).indexOf(song.asMediaItem)
+                                            )
+                                        } else {
+                                            CoroutineScope(Dispatchers.Main).launch {
+                                                SmartMessage(context.resources.getString(R.string.disliked_this_song),type = PopupType.Error, context = context)
+                                            }
                                         }
-                                        val itemsLimited = items.slice(itemsRange)
-                                        binder?.stopRadio()
-                                        binder?.player?.forcePlayAtIndex(
-                                            itemsLimited.map(SongEntity::asMediaItem),
-                                            playIndex
-                                        )
                                     }
                                 )
                                 .animateItem(),
