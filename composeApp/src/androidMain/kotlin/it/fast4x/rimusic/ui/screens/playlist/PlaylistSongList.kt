@@ -138,6 +138,7 @@ import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.models.Song
 import it.fast4x.rimusic.typography
 import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
+import it.fast4x.rimusic.utils.mediaItemSetLiked
 import it.fast4x.rimusic.utils.setLikeState
 import timber.log.Timber
 
@@ -662,11 +663,7 @@ fun PlaylistSongList(
                                     .combinedClickable(
                                         onClick = {
                                             playlistPage!!.songsPage?.items?.forEachIndexed { _, song ->
-                                                Database.asyncTransaction {
-                                                    if ( like( song.asMediaItem.mediaId, setLikeState(song.asSong.likedAt) ) == 0 ) {
-                                                        insert(song.asMediaItem, Song::toggleLike)
-                                                    }
-                                                }
+                                                mediaItemSetLiked(song.asMediaItem)
                                             }
                                             SmartMessage(context.resources.getString(R.string.done), context = context)
                                         },

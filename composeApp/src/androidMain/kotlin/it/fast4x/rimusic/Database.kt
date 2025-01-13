@@ -194,19 +194,19 @@ interface Database {
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
-    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL ORDER BY artistsText")
+    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL AND likedAt > 0 ORDER BY artistsText")
     @RewriteQueriesToDropUnusedColumns
     fun songsFavoritesByArtistAsc(): Flow<List<SongEntity>>
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
-    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL ORDER BY artistsText DESC")
+    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL AND likedAt > 0 ORDER BY artistsText DESC")
     @RewriteQueriesToDropUnusedColumns
     fun songsFavoritesByArtistDesc(): Flow<List<SongEntity>>
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
-    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL ORDER BY totalPlayTimeMs")
+    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL AND likedAt > 0 ORDER BY totalPlayTimeMs")
     @RewriteQueriesToDropUnusedColumns
     fun songsFavoritesByPlayTimeAsc(): Flow<List<SongEntity>>
 
@@ -222,7 +222,7 @@ interface Database {
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
-    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL ORDER BY totalPlayTimeMs DESC")
+    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL AND likedAt > 0 ORDER BY totalPlayTimeMs DESC")
     @RewriteQueriesToDropUnusedColumns
     fun songsFavoritesByPlayTimeDesc(): Flow<List<SongEntity>>
 
@@ -238,63 +238,63 @@ interface Database {
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
-    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL ORDER BY title COLLATE NOCASE ASC")
+    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL AND likedAt > 0 ORDER BY title COLLATE NOCASE ASC")
     @RewriteQueriesToDropUnusedColumns
     fun songsFavoritesByTitleAsc(): Flow<List<SongEntity>>
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
-    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL ORDER BY title COLLATE NOCASE DESC")
+    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL AND likedAt > 0 ORDER BY title COLLATE NOCASE DESC")
     @RewriteQueriesToDropUnusedColumns
     fun songsFavoritesByTitleDesc(): Flow<List<SongEntity>>
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
-    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL ORDER BY ROWID")
+    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL AND likedAt > 0 ORDER BY ROWID")
     @RewriteQueriesToDropUnusedColumns
     fun songsFavoritesByRowIdAsc(): Flow<List<SongEntity>>
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
-    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL ORDER BY ROWID DESC")
+    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL AND likedAt > 0 ORDER BY ROWID DESC")
     @RewriteQueriesToDropUnusedColumns
     fun songsFavoritesByRowIdDesc(): Flow<List<SongEntity>>
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
-    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL ORDER BY likedAt")
+    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL AND likedAt > 0 ORDER BY likedAt")
     @RewriteQueriesToDropUnusedColumns
     fun songsFavoritesByLikedAtAsc(): Flow<List<SongEntity>>
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
-    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL ORDER BY likedAt DESC")
+    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL AND likedAt > 0 ORDER BY likedAt DESC")
     @RewriteQueriesToDropUnusedColumns
     fun songsFavoritesByLikedAtDesc(): Flow<List<SongEntity>>
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
     @Query("SELECT DISTINCT S.* FROM Song S LEFT JOIN Event E ON E.songId=S.id " +
-            "WHERE likedAt IS NOT NULL " +
+            "WHERE likedAt IS NOT NULL AND likedAt > 0 " +
             "ORDER BY E.timestamp DESC")
     fun songsFavoritesByDatePlayedDesc(): Flow<List<SongEntity>>
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
     @Query("SELECT DISTINCT S.* FROM Song S LEFT JOIN Event E ON E.songId=S.id " +
-            "WHERE likedAt IS NOT NULL " +
+            "WHERE likedAt IS NOT NULL AND likedAt > 0 " +
             "ORDER BY E.timestamp")
     fun songsFavoritesByDatePlayedAsc(): Flow<List<SongEntity>>
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
-    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL ORDER BY durationText")
+    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL AND likedAt > 0 ORDER BY durationText")
     @RewriteQueriesToDropUnusedColumns
     fun songsFavoritesByDurationAsc(): Flow<List<SongEntity>>
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
-    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL ORDER BY durationText DESC")
+    @Query("SELECT * FROM Song WHERE likedAt IS NOT NULL AND likedAt > 0 ORDER BY durationText DESC")
     @RewriteQueriesToDropUnusedColumns
     fun songsFavoritesByDurationDesc(): Flow<List<SongEntity>>
 
@@ -1329,7 +1329,7 @@ interface Database {
     @Query("UPDATE Playlist SET name = REPLACE(name,'${PINNED_PREFIX}','') WHERE id = :playlistId")
     fun unPinPlaylist(playlistId: Long): Int
 
-    @Query("SELECT count(id) FROM Song WHERE id = :songId and likedAt IS NOT NULL")
+    @Query("SELECT count(id) FROM Song WHERE id = :songId and likedAt IS NOT NULL and likedAt > 0")
     fun songliked(songId: String): Int
 
     @Query("SELECT * FROM Song WHERE id = :id")
@@ -1340,6 +1340,9 @@ interface Database {
 
     @Query("SELECT likedAt FROM Song WHERE id = :songId")
     fun likedAt(songId: String): Flow<Long?>
+
+    @Query("SELECT likedAt FROM Song WHERE id = :songId")
+    fun getLikedAt(songId: String): Long?
 
     @Query("UPDATE Album SET bookmarkedAt = :bookmarkedAt WHERE id = :id")
     fun bookmarkAlbum(id: String, bookmarkedAt: Long?): Int

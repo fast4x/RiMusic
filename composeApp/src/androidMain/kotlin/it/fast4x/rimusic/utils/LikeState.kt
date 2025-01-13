@@ -36,6 +36,15 @@ fun setLikeState(likedAt: Long?): Long? {
     }
     //println("mediaItem setLikeState: $current")
     return current
+}
 
+fun setDisLikeState(likedAt: Long?): Long? {
+    val current =
+        when (likedAt) {
+            -1L -> null
+            null -> -1L
+            else -> -1L
+        }
+    return current
 }
 

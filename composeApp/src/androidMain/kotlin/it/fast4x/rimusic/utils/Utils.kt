@@ -83,18 +83,28 @@ fun songToggleLike( song: Song ) {
 fun mediaItemToggleLike( mediaItem: MediaItem ) {
     Database.asyncTransaction {
         if (songExist(mediaItem.mediaId) == 0)
-            insert(mediaItem, Song::toggleLike)
-        //else {
-            if (songliked(mediaItem.mediaId) == 0)
-                like(
-                    mediaItem.mediaId,
-                    System.currentTimeMillis()
-                )
-            else like(
+            insert(mediaItem)
+        if (getLikedAt(mediaItem.mediaId) in listOf(null, -1L))
+            like(
                 mediaItem.mediaId,
-                null
+                System.currentTimeMillis()
             )
-        //}
+        else like(
+            mediaItem.mediaId,
+            null
+        )
+    }
+}
+
+fun mediaItemSetLiked( mediaItem: MediaItem ) {
+    Database.asyncTransaction {
+        if (songExist(mediaItem.mediaId) == 0)
+            insert(mediaItem)
+        if (getLikedAt(mediaItem.mediaId) in listOf(null, -1L))
+            like(
+                mediaItem.mediaId,
+                System.currentTimeMillis()
+            )
     }
 }
 
