@@ -850,22 +850,28 @@ fun LocalPlaylistSongsModern(
                         Spacer(modifier = Modifier.height(10.dp))
                         HeaderIconButton(
                             icon = R.drawable.shuffle,
-                            enabled = playlistSongs.isNotEmpty() == true,
-                            color = if (playlistSongs.isNotEmpty() == true) colorPalette.text else colorPalette.textDisabled,
+                            enabled = playlistSongs.any { it.song.likedAt != -1L },
+                            color = if (playlistSongs.any { it.song.likedAt != -1L }) colorPalette.text else colorPalette.textDisabled,
                             onClick = {},
                             modifier = Modifier
                                 .combinedClickable(
                                     onClick = {
-                                        playlistSongs.let { songs ->
-                                            if (songs.isNotEmpty()) {
-                                                val itemsLimited =
-                                                    if (songs.size > maxSongsInQueue.number) songs.shuffled()
-                                                        .take(maxSongsInQueue.number.toInt()) else songs
-                                                binder?.stopRadio()
-                                                binder?.player?.forcePlayFromBeginning(
-                                                    itemsLimited.shuffled().map(SongEntity::asMediaItem)
-                                                )
-                                            }
+                                        if (playlistSongs.any { it.song.likedAt != -1L }) {
+                                            playlistSongs.filter { it.song.likedAt != -1L }
+                                                .let { songs ->
+                                                    if (songs.isNotEmpty()) {
+                                                        val itemsLimited =
+                                                            if (songs.size > maxSongsInQueue.number) songs.shuffled()
+                                                                .take(maxSongsInQueue.number.toInt()) else songs
+                                                        binder?.stopRadio()
+                                                        binder?.player?.forcePlayFromBeginning(
+                                                            itemsLimited.shuffled()
+                                                                .map(SongEntity::asMediaItem)
+                                                        )
+                                                    }
+                                                }
+                                        } else {
+                                            SmartMessage(context.resources.getString(R.string.disliked_this_collection),type = PopupType.Error, context = context)
                                         }
                                     },
                                     onLongClick = {
@@ -956,13 +962,17 @@ fun LocalPlaylistSongsModern(
 
                     HeaderIconButton(
                         icon = R.drawable.downloaded,
-                        enabled = playlistSongs.isNotEmpty(),
-                        color = if (playlistSongs.isNotEmpty()) colorPalette.text else colorPalette.textDisabled,
+                        enabled = playlistSongs.any { it.song.likedAt != -1L },
+                        color = if (playlistSongs.any { it.song.likedAt != -1L }) colorPalette.text else colorPalette.textDisabled,
                         onClick = {},
                         modifier = Modifier
                             .combinedClickable(
                                 onClick = {
-                                    showConfirmDownloadAllDialog = true
+                                    if (playlistSongs.any { it.song.likedAt != -1L }) {
+                                        showConfirmDownloadAllDialog = true
+                                    } else {
+                                        SmartMessage(context.resources.getString(R.string.disliked_this_collection),type = PopupType.Error, context = context)
+                                    }
                                 },
                                 onLongClick = {
                                     SmartMessage(context.resources.getString(R.string.info_download_all_songs), context = context)
@@ -980,8 +990,8 @@ fun LocalPlaylistSongsModern(
                                 isRecommendationEnabled = false
                                 downloadState = Download.STATE_DOWNLOADING
                                 if (listMediaItems.isEmpty()) {
-                                    if (playlistSongs.isNotEmpty() == true)
-                                        playlistSongs.forEach {
+                                    if (playlistSongs.any { it.song.likedAt != -1L }) {
+                                        playlistSongs.filter { it.song.likedAt != -1L }.forEach {
                                             binder?.cache?.removeResource(it.asMediaItem.mediaId)
                                             Database.asyncTransaction {
                                                 Database.insert(
@@ -1000,6 +1010,7 @@ fun LocalPlaylistSongsModern(
                                                 downloadState = false
                                             )
                                         }
+                                    }
                                 } else {
                                     listMediaItems.forEach {
                                         binder?.cache?.removeResource(it.mediaId)
@@ -1132,10 +1143,11 @@ fun LocalPlaylistSongsModern(
                                         playlist = playlistPreview,
                                         onEnqueue = {
                                             if (listMediaItems.isEmpty()) {
-                                                binder?.player?.enqueue(
-                                                    playlistSongs.map(SongEntity::asMediaItem),
-                                                    context
-                                                )
+                                                if (playlistSongs.any { it.song.likedAt != -1L }) {
+                                                    binder?.player?.enqueue(playlistSongs.filter { it.song.likedAt != -1L }.map(SongEntity::asMediaItem),context)
+                                                } else {
+                                                    SmartMessage(context.resources.getString(R.string.disliked_this_collection),type = PopupType.Error, context = context)
+                                                }
                                             } else {
                                                 binder?.player?.enqueue(listMediaItems, context)
                                                 listMediaItems.clear()
@@ -1144,10 +1156,11 @@ fun LocalPlaylistSongsModern(
                                         },
                                         onPlayNext = {
                                             if (listMediaItems.isEmpty()) {
-                                                binder?.player?.addNext(
-                                                    playlistSongs.map(SongEntity::asMediaItem),
-                                                    context
-                                                )
+                                                if (playlistSongs.any { it.song.likedAt != -1L }) {
+                                                    binder?.player?.addNext(playlistSongs.filter { it.song.likedAt != -1L }.map(SongEntity::asMediaItem),context)
+                                                } else {
+                                                    SmartMessage(context.resources.getString(R.string.disliked_this_collection),type = PopupType.Error, context = context)
+                                                }
                                             } else {
                                                 binder?.player?.addNext(listMediaItems, context)
                                                 listMediaItems.clear()
@@ -1825,17 +1838,23 @@ fun LocalPlaylistSongsModern(
                                     },
                                     onClick = {
                                         if (!selectItems) {
-                                            searching = false
-                                            filter = null
-                                            playlistSongs
-                                                .map(SongEntity::asMediaItem)
-                                                .let { mediaItems ->
-                                                    binder?.stopRadio()
-                                                    binder?.player?.forcePlayAtIndex(
-                                                        mediaItems,
-                                                        index
-                                                    )
+                                            if (song.song.likedAt != -1L) {
+                                                searching = false
+                                                filter = null
+                                                playlistSongs.filter { it.song.likedAt != -1L }
+                                                    .map(SongEntity::asMediaItem)
+                                                    .let { mediaItems ->
+                                                        binder?.stopRadio()
+                                                        binder?.player?.forcePlayAtIndex(
+                                                            mediaItems,
+                                                            mediaItems.indexOf(song.asMediaItem)
+                                                        )
+                                                    }
+                                            } else {
+                                                CoroutineScope(Dispatchers.Main).launch {
+                                                    SmartMessage(context.resources.getString(R.string.disliked_this_song),type = PopupType.Error, context = context)
                                                 }
+                                            }
                                         } else checkedState.value = !checkedState.value
                                     }
                                 )
@@ -1866,13 +1885,17 @@ fun LocalPlaylistSongsModern(
                 iconId = R.drawable.shuffle,
                 visible = !reorderingState.isDragging,
                 onClick = {
-                    playlistSongs.let { songs ->
-                        if (songs.isNotEmpty()) {
-                            binder?.stopRadio()
-                            binder?.player?.forcePlayFromBeginning(
-                                songs.shuffled().map(SongEntity::asMediaItem)
-                            )
+                    if (playlistSongs.any { it.song.likedAt != -1L }) {
+                        playlistSongs.filter { it.song.likedAt != -1L }.let { songs ->
+                            if (songs.isNotEmpty()) {
+                                binder?.stopRadio()
+                                binder?.player?.forcePlayFromBeginning(
+                                    songs.shuffled().map(SongEntity::asMediaItem)
+                                )
+                            }
                         }
+                    } else {
+                        SmartMessage(context.resources.getString(R.string.disliked_this_collection),type = PopupType.Error, context = context)
                     }
                 }
             )

@@ -2220,7 +2220,7 @@ fun Player(
                              if (showthumbnail) {
                                  if (!isShowingVisualizer) {
                                      val fling = PagerDefaults.flingBehavior(state = pagerState,snapPositionalThreshold = 0.25f)
-                                     val pageSpacing = thumbnailSpacing.toInt()*0.01*(screenWidth) - (2.5*playerThumbnailSize.size.dp)
+                                     val pageSpacing = thumbnailSpacingL.toInt()*0.01*(screenWidth) - (2.5*playerThumbnailSizeL.size.dp)
 
                                      LaunchedEffect(pagerState, binder.player.currentMediaItemIndex) {
                                          if (appRunningInBackground || isShowingLyrics) {
