@@ -101,14 +101,6 @@ fun About() {
         )
 
         SettingsEntry(
-            title = stringResource(R.string.social_discord),
-            text = stringResource(R.string.social_discord_info),
-            onClick = {
-                uriHandler.openUri("https://discord.gg/y7NJwdwXEM")
-            }
-        )
-
-        SettingsEntry(
             title = stringResource(R.string.social_github),
             text = stringResource(R.string.view_the_source_code),
             onClick = {
