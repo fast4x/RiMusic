@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.onPlaced
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
@@ -54,6 +55,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
@@ -1685,6 +1687,172 @@ fun MediaItemMenu(
                         onClick = {
                             onDismiss()
                             onRemoveFromQuickPicks()
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@ExperimentalTextApi
+@SuppressLint("SuspiciousIndentation")
+@UnstableApi
+@ExperimentalAnimationApi
+@Composable
+fun AddToPlaylistItemMenu(
+    navController: NavController,
+    onDismiss: () -> Unit,
+    onAddToPlaylist: ((Playlist, Int) -> Unit),
+    onRemoveFromPlaylist: ((Playlist) -> Unit),
+    mediaItem: MediaItem,
+    onGoToPlaylist: ((Long) -> Unit)? = null,
+) {
+    var isCreatingNewPlaylist by rememberSaveable {
+        mutableStateOf(false)
+    }
+    val configuration = LocalConfiguration.current
+
+    val screenHeight = configuration.screenHeightDp.dp
+
+    if (isCreatingNewPlaylist) {
+        InputTextDialog(
+            onDismiss = { isCreatingNewPlaylist = false },
+            title = stringResource(R.string.enter_the_playlist_name),
+            value = "",
+            placeholder = stringResource(R.string.enter_the_playlist_name),
+            setValue = { text ->
+                onDismiss()
+                onAddToPlaylist(Playlist(name = text), 0)
+            }
+        )
+    }
+    val sortBy by rememberPreference(playlistSortByKey, PlaylistSortBy.DateAdded)
+    val sortOrder by rememberPreference(playlistSortOrderKey, SortOrder.Descending)
+    val playlistPreviews by remember {
+        Database.playlistPreviews(sortBy, sortOrder)
+    }.collectAsState(initial = emptyList(), context = Dispatchers.IO)
+
+    val playlistIds by remember {
+        Database.getPlaylistsWithSong(mediaItem.mediaId)
+    }.collectAsState(initial = emptyList(), context = Dispatchers.IO)
+
+    val pinnedPlaylists = playlistPreviews.filter {
+        it.playlist.name.startsWith(PINNED_PREFIX, 0, true)
+    }
+
+    val unpinnedPlaylists = playlistPreviews.filter {
+        !it.playlist.name.startsWith(PINNED_PREFIX, 0, true) &&
+                !it.playlist.name.startsWith(MONTHLY_PREFIX, 0, true)
+    }
+
+    Menu(
+        modifier = Modifier
+            .requiredHeight(0.75*screenHeight)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .fillMaxWidth()
+        ) {
+            IconButton(
+                onClick = onDismiss,
+                icon = R.drawable.chevron_back,
+                color = colorPalette().textSecondary,
+                modifier = Modifier
+                    .padding(all = 4.dp)
+                    .size(20.dp)
+            )
+
+            SecondaryTextButton(
+                text = stringResource(R.string.new_playlist),
+                onClick = { isCreatingNewPlaylist = true },
+                alternative = true
+            )
+        }
+
+        if (pinnedPlaylists.isNotEmpty()) {
+            BasicText(
+                text = stringResource(R.string.pinned_playlists),
+                style = typography().m.semiBold,
+                modifier = Modifier.padding(start = 20.dp, top = 5.dp)
+            )
+
+            onAddToPlaylist.let { onAddToPlaylist ->
+                pinnedPlaylists.forEach { playlistPreview ->
+                    MenuEntry(
+                        icon = if (playlistIds.contains(playlistPreview.playlist.id)) R.drawable.checkmark else R.drawable.add_in_playlist,
+                        text = playlistPreview.playlist.name.substringAfter(PINNED_PREFIX),
+                        secondaryText = "${playlistPreview.songCount} " + stringResource(R.string.songs),
+                        onClick = {
+                            if (playlistIds.contains(playlistPreview.playlist.id)){
+                                onRemoveFromPlaylist(playlistPreview.playlist)
+                            } else onAddToPlaylist(playlistPreview.playlist, playlistPreview.songCount)
+                        },
+                        trailingContent = {
+                            IconButton(
+                                icon = R.drawable.open,
+                                color = colorPalette().text,
+                                onClick = {
+                                    if (onGoToPlaylist != null) {
+                                        onGoToPlaylist(playlistPreview.playlist.id)
+                                        onDismiss()
+                                    }
+                                    navController.navigate(route = "${NavRoutes.localPlaylist.name}/${playlistPreview.playlist.id}")
+                                },
+                                modifier = Modifier
+                                    .size(24.dp)
+                            )
+                        }
+                    )
+                }
+            }
+        }
+
+        if (unpinnedPlaylists.isNotEmpty()) {
+            BasicText(
+                text = stringResource(R.string.playlists),
+                style = typography().m.semiBold,
+                modifier = Modifier.padding(start = 20.dp, top = 5.dp)
+            )
+
+            onAddToPlaylist.let { onAddToPlaylist ->
+                unpinnedPlaylists.forEach { playlistPreview ->
+                    MenuEntry(
+                        icon = if (playlistIds.contains(playlistPreview.playlist.id)) R.drawable.checkmark else R.drawable.add_in_playlist,
+                        text = cleanPrefix(playlistPreview.playlist.name),
+                        secondaryText = "${playlistPreview.songCount} " + stringResource(R.string.songs),
+                        onClick = {
+                            if (playlistIds.contains(playlistPreview.playlist.id)){
+                                onRemoveFromPlaylist(playlistPreview.playlist)
+                            } else onAddToPlaylist(playlistPreview.playlist, playlistPreview.songCount)
+                        },
+                        trailingContent = {
+                            if (playlistPreview.playlist.name.startsWith(PIPED_PREFIX, 0, true))
+                                Image(
+                                    painter = painterResource(R.drawable.piped_logo),
+                                    contentDescription = null,
+                                    colorFilter = ColorFilter.tint(colorPalette().red),
+                                    modifier = Modifier
+                                        .size(18.dp)
+                                )
+
+                            IconButton(
+                                icon = R.drawable.open,
+                                color = colorPalette().text,
+                                onClick = {
+                                    if (onGoToPlaylist != null) {
+                                        onGoToPlaylist(playlistPreview.playlist.id)
+                                        onDismiss()
+                                    }
+                                    navController.navigate(route = "${NavRoutes.localPlaylist.name}/${playlistPreview.playlist.id}")
+                                },
+                                modifier = Modifier
+                                    .size(24.dp)
+                            )
+
                         }
                     )
                 }

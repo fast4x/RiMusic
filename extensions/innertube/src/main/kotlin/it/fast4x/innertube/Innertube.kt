@@ -2,6 +2,8 @@ package it.fast4x.innertube
 
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlHandler
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlParser
+import com.zionhuang.innertube.pages.LibraryContinuationPage
+import com.zionhuang.innertube.pages.LibraryPage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
@@ -46,6 +48,7 @@ import it.fast4x.innertube.models.Context.Companion.DefaultAndroid
 import it.fast4x.innertube.models.Context.Companion.DefaultIOS
 import it.fast4x.innertube.models.Context.Companion.DefaultWeb
 import it.fast4x.innertube.models.Context.Companion.DefaultWebCreator
+import it.fast4x.innertube.models.GridRenderer
 import it.fast4x.innertube.models.MediaType
 import it.fast4x.innertube.models.PipedResponse
 import it.fast4x.innertube.models.PlayerResponse
@@ -57,6 +60,9 @@ import it.fast4x.innertube.models.bodies.CreatePlaylistBody
 import it.fast4x.innertube.models.bodies.EditPlaylistBody
 import it.fast4x.innertube.models.bodies.PlayerBody
 import it.fast4x.innertube.models.bodies.PlaylistDeleteBody
+import it.fast4x.innertube.models.MusicShelfRenderer
+import it.fast4x.innertube.models.bodies.LikeBody
+import it.fast4x.innertube.models.bodies.SubscribeBody
 import it.fast4x.innertube.utils.NewPipeUtils
 import it.fast4x.innertube.utils.NewPipeUtils.decodeSignatureCipher
 import it.fast4x.innertube.utils.ProxyPreferences
@@ -80,8 +86,6 @@ import kotlin.random.Random
 object Innertube {
 
     private const val VISITOR_DATA_PREFIX = "Cgt"
-
-    //const val DEFAULT_VISITOR_DATA = "CgtsZG1ySnZiQWtSbyiMjuGSBg%3D%3D"
     const val DEFAULT_VISITOR_DATA = "CgtMN0FkbDFaWERfdyi8t4u7BjIKCgJWThIEGgAgWQ%3D%3D"
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -204,6 +208,11 @@ object Innertube {
     internal const val playlistCreate = "/youtubei/v1/playlist/create"
     internal const val playlistDelete = "/youtubei/v1/playlist/delete"
     internal const val playlistEdit = "/youtubei/v1/browse/edit_playlist"
+    internal const val subscribe = "/youtubei/v1/subscription/subscribe"
+    internal const val unsubscribe = "/youtubei/v1/subscription/unsubscribe"
+    internal const val like = "/youtubei/v1/like/like"
+    internal const val removelike = "/youtubei/v1/like/removelike"
+
 
 
     internal const val musicResponsiveListItemRendererMask = "musicResponsiveListItemRenderer(flexColumns,fixedColumns,thumbnail,navigationEndpoint,badges)"
@@ -295,6 +304,7 @@ object Innertube {
         val info: Info<NavigationEndpoint.Endpoint.Browse>?,
         val authors: List<Info<NavigationEndpoint.Endpoint.Browse>>?,
         val year: String?,
+        val playlistId: String? = null,
         override val thumbnail: Thumbnail?
     ) : Item() {
         override val key get() = info!!.endpoint!!.browseId!!
@@ -307,6 +317,7 @@ object Innertube {
     data class ArtistItem(
         val info: Info<NavigationEndpoint.Endpoint.Browse>?,
         val subscribersCountText: String?,
+        val channelId: String? = null,
         override val thumbnail: Thumbnail?
     ) : Item() {
         override val key get() = info!!.endpoint!!.browseId!!
@@ -502,10 +513,9 @@ object Innertube {
     fun HttpRequestBuilder.setLogin(clientType: Client = DefaultWeb.client, setLogin: Boolean = false) {
         contentType(ContentType.Application.Json)
         headers {
-            //            append("X-Goog-Api-Format-Version", "1")
             append("X-YouTube-Client-Name", "${clientType.xClientName ?: 1}")
             append("X-YouTube-Client-Version", clientType.clientVersion)
-            append("x-origin", "https://music.youtube.com")
+            append("X-Origin", "https://music.youtube.com")
             if (clientType.referer != null) {
                 append("Referer", clientType.referer)
             }
@@ -568,7 +578,7 @@ object Innertube {
         setLogin(ytClient, true)
         setBody(
             CreatePlaylistBody(
-                context = ytClient.toContext(locale, visitorData),
+                context = Context.DefaultWebWithLocale,
                 title = title
             )
         )
@@ -582,7 +592,7 @@ object Innertube {
         setLogin(ytClient, setLogin = true)
         setBody(
             PlaylistDeleteBody(
-                context = ytClient.toContext(locale, visitorData),
+                context = Context.DefaultWebWithLocale,
                 playlistId = playlistId
             )
         )
@@ -596,7 +606,7 @@ object Innertube {
         setLogin(ytClient, setLogin = true)
         setBody(
             EditPlaylistBody(
-                context = ytClient.toContext(locale, visitorData),
+                context = Context.DefaultWebWithLocale,
                 playlistId = playlistId,
                 actions = listOf(
                     Action.RenamePlaylistAction(
@@ -615,7 +625,7 @@ object Innertube {
         setLogin(ytClient, setLogin = true)
         setBody(
             EditPlaylistBody(
-                context = ytClient.toContext(locale, visitorData),
+                context = Context.DefaultWebWithLocale,
                 playlistId = playlistId.removePrefix("VL"),
                 actions = listOf(
                     Action.AddVideoAction(addedVideoId = videoId)
@@ -633,7 +643,7 @@ object Innertube {
         setLogin(ytClient, setLogin = true)
         setBody(
             EditPlaylistBody(
-                context = ytClient.toContext(locale, visitorData),
+                context = Context.DefaultWebWithLocale,
                 playlistId = playlistId.removePrefix("VL"),
                 actions = listOf(
                     Action.RemoveVideoAction(
@@ -644,6 +654,81 @@ object Innertube {
             )
         )
     }
+
+    suspend fun subscribeChannel(
+        channelId: String,
+    ) = client.post(subscribe) {
+        setLogin(setLogin = true)
+        setBody(
+            SubscribeBody(
+                context = Context.DefaultWeb,
+                channelIds = listOf(channelId)
+            )
+        )
+    }
+
+    suspend fun unsubscribeChannel(
+        channelId: String,
+    ) = client.post(unsubscribe) {
+        setLogin(setLogin = true)
+        setBody(
+            SubscribeBody(
+                context = Context.DefaultWeb,
+                channelIds = listOf(channelId)
+            )
+        )
+    }
+
+
+    suspend fun likePlaylistOrAlbum(
+        playlistId: String,
+    ) = client.post(like) {
+        setLogin(setLogin = true)
+        setBody(
+            LikeBody(
+                context = Context.DefaultWeb,
+                target = LikeBody.Target.PlaylistTarget(playlistId = playlistId)
+            )
+        )
+    }
+
+    suspend fun removelikePlaylistOrAlbum(
+        playlistId: String,
+    ) = client.post(removelike) {
+        setLogin(setLogin = true)
+        setBody(
+            LikeBody(
+                context = Context.DefaultWeb,
+                target = LikeBody.Target.PlaylistTarget(playlistId = playlistId)
+            )
+        )
+    }
+
+    suspend fun likeVideoOrSong(
+        videoId: String,
+    ) = client.post(like) {
+        setLogin(setLogin = true)
+        setBody(
+            LikeBody(
+                context = Context.DefaultWeb,
+                target = LikeBody.Target.VideoTarget(videoId = videoId)
+            )
+        )
+    }
+
+    suspend fun removelikeVideoOrSong(
+        videoId: String,
+    ) = client.post(removelike) {
+        setLogin(setLogin = true)
+        setBody(
+            LikeBody(
+                context = Context.DefaultWeb,
+                target = LikeBody.Target.VideoTarget(videoId = videoId)
+            )
+        )
+    }
+
+
 
     suspend fun browse(
         ytClient: Client = Context.DefaultWeb.client,
@@ -702,6 +787,7 @@ object Innertube {
         cpn: String?,
         poToken: String? = null,
         signatureTimestamp: Int? = null,
+        params: String? = null,
     ) = client.post(player) {
         setLogin(setLogin = true)
         setBody(
@@ -709,6 +795,7 @@ object Innertube {
                 videoId = videoId,
                 playlistId = playlistId,
                 cpn = cpn,
+                params = params,
                 playbackContext =
                 PlayerBody.PlaybackContext(
                     contentPlaybackContext =
@@ -929,30 +1016,32 @@ object Innertube {
                             ),
                         ]
                     }.joinToString("")
-
-            if (!withLogin) {
-                println("PLAYERADVANCED player listUrlSig EMPTY")
-                val (tempCookie, visitorData, playbackTracking) = getVisitorData(videoId, playlistId)
-                val now = System.currentTimeMillis()
-                val poToken =
-                    if (now < poTokenObject.second) {
-                        println("PLAYERADVANCED player Use saved PoToken")
-                        poTokenObject.first
-                    } else {
-                        createPoTokenChallenge()
-                            .bodyAsText()
-                            .let { challenge ->
-                                val listChallenge = poTokenJsonDeserializer.decodeFromString<List<String?>>(challenge)
-                                listChallenge.filterIsInstance<String>().firstOrNull()
-                            }?.let { poTokenChallenge ->
-                                generatePoToken(poTokenChallenge).bodyAsText().getPoToken().also { poToken ->
-                                    if (poToken != null) {
-                                        poTokenObject = Pair(poToken, now + 21600000)
-                                    }
+            val now = System.currentTimeMillis()
+            val poToken =
+                if (now < poTokenObject.second) {
+                    println("PLAYERADVANCED player Use saved PoToken")
+                    poTokenObject.first
+                } else {
+                    createPoTokenChallenge()
+                        .bodyAsText()
+                        .let { challenge ->
+                            val listChallenge = poTokenJsonDeserializer.decodeFromString<List<String?>>(challenge)
+                            listChallenge.filterIsInstance<String>().firstOrNull()
+                        }?.let { poTokenChallenge ->
+                            generatePoToken(poTokenChallenge).bodyAsText().getPoToken().also { poToken ->
+                                if (poToken != null) {
+                                    poTokenObject = Pair(poToken, now + 21600000)
                                 }
                             }
-                    }
-                println("PLAYERADVANCED player PoToken $poToken")
+                        }
+                }
+            println("PLAYERADVANCED player PoToken $poToken")
+
+            // temporaly use of player with no login
+//            if (!withLogin) {
+                println("PLAYERADVANCED player listUrlSig EMPTY")
+                val (tempCookie, visitorData, playbackTracking) = getVisitorData(videoId, playlistId)
+
                 val playerResponse = noLogInPlayer(videoId, tempCookie, visitorData, poToken ?: "").body<PlayerResponse>()
                 println("PLAYERADVANCED player Player Response $playerResponse")
                 println("PLAYERADVANCED player Thumbnails " + playerResponse.videoDetails?.thumbnail)
@@ -1006,76 +1095,83 @@ object Innertube {
                     }
                 }
                 throw Exception(playerResponse.playabilityStatus?.status ?: "PLAYERADVANCED player ERROR Unknown error")
-            } else {
-
-                val sigTimestamp = NewPipeUtils.getSignatureTimestamp(videoId).getOrNull()
-                println("PLAYERADVANCED player sigTimestamp $sigTimestamp")
-
-                val sigResponse = playerWithPotoken(videoId, playlistId, cpn, signatureTimestamp = sigTimestamp).body<PlayerResponse>()
-                println("PLAYERADVANCED player sigResponse $sigResponse")
-
-                val decodedSigResponse =
-                    sigResponse.copy(
-                        streamingData =
-                        sigResponse.streamingData?.copy(
-                            formats =
-                            sigResponse.streamingData.formats?.map { format ->
-                                format.copy(
-                                    url = format.signatureCipher?.let {
-                                        decodeSignatureCipher(
-                                            videoId,
-                                            it
-                                        )
-                                    },
-                                )
-                            },
-                            adaptiveFormats =
-                            sigResponse.streamingData.adaptiveFormats?.map { adaptiveFormats ->
-                                adaptiveFormats.copy(
-                                    url = adaptiveFormats.signatureCipher?.let {
-                                        decodeSignatureCipher(
-                                            videoId,
-                                            it
-                                        )
-                                    },
-                                )
-                            },
-                        ),
-                    )
-
-
-
-//            listUrlSig = decodedSigResponse.streamingData
-//                            ?.adaptiveFormats
-//                            ?.mapNotNull { it.url }
-//                            ?.toMutableList() ?: mutableListOf<String>()
-//                            .apply {
-//                                decodedSigResponse.streamingData
-//                                    ?.formats
-//                                    ?.mapNotNull { it.url }
-//                                    ?.let { addAll(it) }
-//                            }
-
-
-                val firstThumb =
-                    decodedSigResponse.videoDetails
-                        ?.thumbnail
-                        ?.thumbnails
-                        ?.firstOrNull()
-                val thumbnails =
-                    if (firstThumb?.height == firstThumb?.width && firstThumb != null) MediaType.Song else MediaType.Video
-
-                println("PLAYERADVANCED player return Triple")
-                
-                return@runCatching Triple(
-                    cpn,
-                    decodedSigResponse?.copy(
-                        videoDetails = decodedSigResponse.videoDetails?.copy(),
-                        playbackTracking = decodedSigResponse.playbackTracking,
-                    ),
-                    thumbnails,
-                )
-            }
+//            } else {
+//
+//                val sigTimestamp = NewPipeUtils.getSignatureTimestamp(videoId).getOrNull()
+//                println("PLAYERADVANCED player sigTimestamp $sigTimestamp")
+//
+//                val sigResponse = playerWithPotoken(
+//                    videoId = videoId,
+//                    playlistId = playlistId,
+//                    cpn = cpn,
+//                    signatureTimestamp = sigTimestamp,
+//                    poToken = poToken,
+//                    params = null
+//                ).body<PlayerResponse>()
+//                println("PLAYERADVANCED player sigResponse $sigResponse")
+//
+//                val decodedSigResponse =
+//                    sigResponse.copy(
+//                        streamingData =
+//                        sigResponse.streamingData?.copy(
+//                            formats =
+//                            sigResponse.streamingData.formats?.map { format ->
+//                                format.copy(
+//                                    url = format.signatureCipher?.let {
+//                                        decodeSignatureCipher(
+//                                            videoId,
+//                                            it
+//                                        )
+//                                    },
+//                                )
+//                            },
+//                            adaptiveFormats =
+//                            sigResponse.streamingData.adaptiveFormats?.map { adaptiveFormats ->
+//                                adaptiveFormats.copy(
+//                                    url = adaptiveFormats.signatureCipher?.let {
+//                                        decodeSignatureCipher(
+//                                            videoId,
+//                                            it
+//                                        )
+//                                    },
+//                                )
+//                            },
+//                        ),
+//                    )
+//
+//
+//
+////            listUrlSig = decodedSigResponse.streamingData
+////                            ?.adaptiveFormats
+////                            ?.mapNotNull { it.url }
+////                            ?.toMutableList() ?: mutableListOf<String>()
+////                            .apply {
+////                                decodedSigResponse.streamingData
+////                                    ?.formats
+////                                    ?.mapNotNull { it.url }
+////                                    ?.let { addAll(it) }
+////                            }
+//
+//
+//                val firstThumb =
+//                    decodedSigResponse.videoDetails
+//                        ?.thumbnail
+//                        ?.thumbnails
+//                        ?.firstOrNull()
+//                val thumbnails =
+//                    if (firstThumb?.height == firstThumb?.width && firstThumb != null) MediaType.Song else MediaType.Video
+//
+//                println("PLAYERADVANCED player return Triple")
+//
+//                return@runCatching Triple(
+//                    cpn,
+//                    decodedSigResponse?.copy(
+//                        videoDetails = decodedSigResponse.videoDetails?.copy(),
+//                        playbackTracking = decodedSigResponse.playbackTracking,
+//                    ),
+//                    thumbnails,
+//                )
+//            }
         }.onFailure {
             println("PLAYERADVANCED player ERROR ${it.stackTraceToString()}")
         }
@@ -1109,6 +1205,77 @@ object Innertube {
         }
 
         return list
+    }
+
+    suspend fun library(browseId: String, tabIndex: Int = 0) = runCatching {
+        val response = browse(
+            browseId = browseId,
+            setLogin = true
+        ).body<BrowseResponse>()
+
+        val tabs = response.contents?.singleColumnBrowseResultsRenderer?.tabs
+
+        val contents = if (tabs != null && tabs.size >= tabIndex) {
+            tabs[tabIndex].tabRenderer?.content?.sectionListRenderer?.contents?.firstOrNull()
+        }
+        else {
+            null
+        }
+
+        when {
+            contents?.gridRenderer != null -> {
+                contents.gridRenderer.items
+                    ?.mapNotNull (GridRenderer.Item::musicTwoRowItemRenderer)
+                    ?.mapNotNull { LibraryPage.fromMusicTwoRowItemRenderer(it) }?.let {
+                        LibraryPage(
+                            items = it,
+                            continuation = contents.gridRenderer.continuations?.firstOrNull()?.nextContinuationData?.continuation
+                        )
+                    }
+            }
+
+            else -> {
+                LibraryPage(
+                    items = contents?.musicShelfRenderer?.contents!!
+                        .mapNotNull (MusicShelfRenderer.Content::musicResponsiveListItemRenderer)
+                        .mapNotNull { LibraryPage.fromMusicResponsiveListItemRenderer(it) },
+                    continuation = contents.musicShelfRenderer.continuations?.firstOrNull()?.
+                    nextContinuationData?.continuation
+                )
+            }
+        }
+    }
+
+    suspend fun libraryContinuation(continuation: String) = runCatching {
+        val response = browse(
+            continuation = continuation,
+            setLogin = true
+        ).body<BrowseResponse>()
+
+        val contents = response.continuationContents
+
+        when {
+            contents?.gridContinuation != null -> {
+                contents.gridContinuation.items
+                    ?.mapNotNull (GridRenderer.Item::musicTwoRowItemRenderer)
+                    ?.mapNotNull { LibraryPage.fromMusicTwoRowItemRenderer(it) }?.let {
+                        LibraryContinuationPage(
+                            items = it,
+                            continuation = contents.gridContinuation.continuations?.firstOrNull()?.nextContinuationData?.continuation
+                        )
+                    }
+            }
+
+            else -> {
+                LibraryContinuationPage(
+                    items = contents?.musicShelfContinuation?.contents!!
+                        .mapNotNull (MusicShelfRenderer.Content::musicResponsiveListItemRenderer)
+                        .mapNotNull { LibraryPage.fromMusicResponsiveListItemRenderer(it) },
+                    continuation = contents.musicShelfContinuation.continuations?.firstOrNull()?.
+                    nextContinuationData?.continuation
+                )
+            }
+        }
     }
 
 }

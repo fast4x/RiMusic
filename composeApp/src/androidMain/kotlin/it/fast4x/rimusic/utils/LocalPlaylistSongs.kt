@@ -119,19 +119,6 @@ class PositionLock private constructor(
     }
 }
 
-@Composable
-fun playlistSync(): MenuIcon = object : MenuIcon, DynamicColor, Descriptive {
-
-    override var isFirstColor: Boolean by rememberPreference( autosyncKey, false )
-    override val iconId: Int = R.drawable.sync
-    override val messageId: Int = R.string.autosync
-    override val menuIconTitle: String
-        @Composable
-        get() = stringResource( messageId )
-
-    override fun onShortClick() { isFirstColor = !isFirstColor }
-}
-
 class PlaylistSongsSort private constructor(
     sortOrderState: MutableState<SortOrder>,
     sortByState: MutableState<PlaylistSongSortBy>,

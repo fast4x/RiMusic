@@ -88,6 +88,7 @@ data class AlbumPage(
         }
 
         fun getSong(renderer: MusicResponsiveListItemRenderer, album: Innertube.AlbumItem? = null): Innertube.SongItem {
+            println("mediaItem getSong ${renderer.flexColumns.get(1).musicResponsiveListItemFlexColumnRenderer?.text?.runs}")
             return Innertube.SongItem(
                 info = Info(
                     name = PageHelper.extractRuns(renderer.flexColumns, "MUSIC_VIDEO")
@@ -96,14 +97,19 @@ data class AlbumPage(
                         videoId = renderer.playlistItemData?.videoId
                     )
                 ),
-                authors = PageHelper.extractRuns(renderer.flexColumns, "MUSIC_PAGE_TYPE_ARTIST")
-                    .map {
+//                authors = PageHelper.extractRuns(renderer.flexColumns, "MUSIC_PAGE_TYPE_ARTIST")
+//                    .map {
+//                        Info(
+//                            name = it.text,
+//                            endpoint = it.navigationEndpoint?.browseEndpoint
+//
+//                        )
+//                    },
+                authors = renderer.flexColumns.getOrNull(1)?.musicResponsiveListItemFlexColumnRenderer?.text?.runs
+                    ?.map {
                         Info(
                             name = it.text,
-                            endpoint = NavigationEndpoint.Endpoint.Browse(
-                                browseId = it.navigationEndpoint?.browseEndpoint?.browseId
-                            )
-
+                            endpoint = it.navigationEndpoint?.browseEndpoint
                         )
                     },
                 album = album?.info
@@ -111,9 +117,7 @@ data class AlbumPage(
                         ?.firstOrNull()?.let {
                             Info(
                                 name = it.text,
-                                endpoint = NavigationEndpoint.Endpoint.Browse(
-                                    browseId = it.navigationEndpoint?.browseEndpoint?.browseId
-                                )
+                                endpoint = it.navigationEndpoint?.browseEndpoint
                             )
                         },
                 durationText = renderer.fixedColumns?.firstOrNull()

@@ -11,7 +11,8 @@ data class PlayerBody(
     val contentCheckOk: Boolean = true,
     val racyCheckOk: Boolean = true,
     val playbackContext: PlaybackContext? = null,
-    val cpn: String? = "wzf9Y0nqz6AUe2Vr",
+    val cpn: String? = "dPK7AEPTvFz8geNI",
+    val params: String? = null,
     val serviceIntegrityDimensions: ServiceIntegrityDimensions? = ServiceIntegrityDimensions(),
 ) {
     @Serializable
@@ -26,7 +27,7 @@ data class PlayerBody(
         @Serializable
         data class ContentPlaybackContext(
             val html5Preference: String = "HTML5_PREF_WANTS",
-            val signatureTimestamp: Int = 20073,
+            val signatureTimestamp: Int = 20110,
         )
     }
 }

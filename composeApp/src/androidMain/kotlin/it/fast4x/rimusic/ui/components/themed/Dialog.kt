@@ -2017,7 +2017,7 @@ fun SongMatchingDialog(
                                         Database.asyncTransaction {
                                             deleteSongFromPlaylist(songToRematch.id, playlistId)
                                             if (songExist(song.asSong.id) == 0) {
-                                                Database.insert(song.asSong)
+                                                Database.insert(song.asMediaItem)
                                             }
                                             insert(
                                                 SongPlaylistMap(

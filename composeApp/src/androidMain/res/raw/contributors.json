@@ -19,7 +19,7 @@
     "type": "User",
     "user_view_type": "public",
     "site_admin": false,
-    "contributions": 9863
+    "contributions": 10154
   },
   {
     "login": "vfsfitvnm",
@@ -63,7 +63,7 @@
     "type": "User",
     "user_view_type": "public",
     "site_admin": false,
-    "contributions": 377
+    "contributions": 427
   },
   {
     "login": "knighthat",
@@ -107,7 +107,7 @@
     "type": "User",
     "user_view_type": "public",
     "site_admin": false,
-    "contributions": 93
+    "contributions": 100
   },
   {
     "login": "martkol",
@@ -286,6 +286,28 @@
     "contributions": 13
   },
   {
+    "login": "KyNarec",
+    "id": 113847208,
+    "node_id": "U_kgDOBskrqA",
+    "avatar_url": "https://avatars.githubusercontent.com/u/113847208?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/KyNarec",
+    "html_url": "https://github.com/KyNarec",
+    "followers_url": "https://api.github.com/users/KyNarec/followers",
+    "following_url": "https://api.github.com/users/KyNarec/following{/other_user}",
+    "gists_url": "https://api.github.com/users/KyNarec/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/KyNarec/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/KyNarec/subscriptions",
+    "organizations_url": "https://api.github.com/users/KyNarec/orgs",
+    "repos_url": "https://api.github.com/users/KyNarec/repos",
+    "events_url": "https://api.github.com/users/KyNarec/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/KyNarec/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false,
+    "contributions": 9
+  },
+  {
     "login": "dependabot[bot]",
     "id": 49699333,
     "node_id": "MDM6Qm90NDk2OTkzMzM=",
@@ -327,7 +349,7 @@
     "type": "Bot",
     "user_view_type": "public",
     "site_admin": false,
-    "contributions": 4
+    "contributions": 5
   },
   {
     "login": "kaanelloed",
@@ -456,28 +478,6 @@
     "repos_url": "https://api.github.com/users/S0nter/repos",
     "events_url": "https://api.github.com/users/S0nter/events{/privacy}",
     "received_events_url": "https://api.github.com/users/S0nter/received_events",
-    "type": "User",
-    "user_view_type": "public",
-    "site_admin": false,
-    "contributions": 3
-  },
-  {
-    "login": "KyNarec",
-    "id": 113847208,
-    "node_id": "U_kgDOBskrqA",
-    "avatar_url": "https://avatars.githubusercontent.com/u/113847208?v=4",
-    "gravatar_id": "",
-    "url": "https://api.github.com/users/KyNarec",
-    "html_url": "https://github.com/KyNarec",
-    "followers_url": "https://api.github.com/users/KyNarec/followers",
-    "following_url": "https://api.github.com/users/KyNarec/following{/other_user}",
-    "gists_url": "https://api.github.com/users/KyNarec/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/KyNarec/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/KyNarec/subscriptions",
-    "organizations_url": "https://api.github.com/users/KyNarec/orgs",
-    "repos_url": "https://api.github.com/users/KyNarec/repos",
-    "events_url": "https://api.github.com/users/KyNarec/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/KyNarec/received_events",
     "type": "User",
     "user_view_type": "public",
     "site_admin": false,

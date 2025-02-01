@@ -76,6 +76,7 @@ import it.fast4x.rimusic.ui.items.AlbumItemPlaceholder
 import it.fast4x.rimusic.ui.screens.searchresult.ItemsPage
 import it.fast4x.rimusic.ui.styling.px
 import it.fast4x.rimusic.utils.asMediaItem
+import it.fast4x.rimusic.utils.asSong
 import it.fast4x.rimusic.utils.disableScrollingTextKey
 import it.fast4x.rimusic.utils.playerPositionKey
 import it.fast4x.rimusic.utils.rememberPreference
@@ -132,6 +133,7 @@ fun AlbumScreen(
                         YtMusic.getAlbum(browseId)
                             .onSuccess { currentAlbumPage ->
                                 albumPage = currentAlbumPage
+
                                 println("AlbumScreen otherVersion ${currentAlbumPage.otherVersions}")
                                 Database.upsert(
                                     Album(
@@ -146,18 +148,18 @@ fun AlbumScreen(
                                                 MODIFIED_PREFIX
                                             ) == true
                                         ) album?.authorsText else currentAlbumPage.album.authors
-                                            ?.joinToString("") { it.name ?: "" },
+                                            ?.joinToString(", ") { it.name ?: "" },
                                         shareUrl = currentAlbumPage.url,
                                         timestamp = System.currentTimeMillis(),
                                         bookmarkedAt = album?.bookmarkedAt
                                     ),
                                     currentAlbumPage
                                         .songs.distinct()
-                                        .map(Innertube.SongItem::asMediaItem)
+                                        .map(Innertube.SongItem::asSong)
                                         .onEach(Database::insert)
-                                        .mapIndexed { position, mediaItem ->
+                                        .mapIndexed { position, song ->
                                             SongAlbumMap(
-                                                songId = mediaItem.mediaId,
+                                                songId = song.id,
                                                 albumId = browseId,
                                                 position = position
                                             )

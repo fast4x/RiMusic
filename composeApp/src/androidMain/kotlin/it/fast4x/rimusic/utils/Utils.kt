@@ -24,6 +24,7 @@ import androidx.core.os.bundleOf
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
+import com.zionhuang.innertube.pages.LibraryPage
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.UserAgent
 import it.fast4x.innertube.Innertube
@@ -478,6 +479,27 @@ suspend fun Result<Innertube.PlaylistOrAlbumPage>.completed(
     println("Innertube PlaylistOrAlbumPage>.completed ${it.stackTraceToString()}")
 }
 
+//@JvmName("completedPlaylist")
+suspend fun Result<LibraryPage?>.completed(): Result<LibraryPage> = runCatching {
+    val page = getOrThrow()
+    val items = page?.items?.toMutableList()
+    var continuation = page?.continuation
+    while (continuation != null) {
+        val continuationPage = Innertube.libraryContinuation(continuation).getOrNull()
+        if (continuationPage != null)
+            if (items != null) {
+                items += continuationPage.items
+            }
+
+        continuation = continuationPage?.continuation
+    }
+    LibraryPage(
+        items = items ?: emptyList(),
+        continuation = page?.continuation
+    )
+}
+
+
 @Composable
 fun CheckAvailableNewVersion(
     onDismiss: () -> Unit,
@@ -511,6 +533,25 @@ fun CheckAvailableNewVersion(
     } else {
         updateAvailable(false)
         onDismiss()
+    }
+}
+
+fun isNetworkConnected(context: Context): Boolean {
+    val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    if (isAtLeastAndroid6) {
+        val networkInfo = cm.getNetworkCapabilities(cm.activeNetwork)
+        return networkInfo?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true &&
+                networkInfo.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
+    } else {
+        return try {
+            if (cm.activeNetworkInfo == null) {
+                false
+            } else {
+                cm.activeNetworkInfo?.isConnected!!
+            }
+        } catch (e: Exception) {
+            false
+        }
     }
 }
 
@@ -737,7 +778,7 @@ suspend fun getAlbumVersionFromVideo(song: Song,playlistId : Long, position : In
             deleteSongFromPlaylist(song.id, playlistId)
             if (matchedSong != null) {
                 if (songExist(matchedSong.asSong.id) == 0) {
-                    Database.insert(matchedSong.asSong)
+                    Database.insert(matchedSong.asMediaItem)
                 }
                 insert(
                     SongPlaylistMap(
@@ -766,9 +807,9 @@ suspend fun getAlbumVersionFromVideo(song: Song,playlistId : Long, position : In
                         }
                     }
                 }
-                if (isExtPlaylist) Database.delete(song)
+                if (song.thumbnailUrl == "") Database.delete(song)
             }
-        } else if (isExtPlaylist && (song.id == ((cleanPrefix(song.title)+song.artistsText).filter {it.isLetterOrDigit()}))){
+        } else if (song.id == ((cleanPrefix(song.title)+song.artistsText).filter {it.isLetterOrDigit()})){
             songNotFound = song.copy(id = shuffle(song.artistsText+random4Digit+cleanPrefix(song.title)+"56Music").filter{it.isLetterOrDigit()})
             Database.delete(song)
             Database.insert(songNotFound)
@@ -844,7 +885,7 @@ fun DownloadSyncedLyrics(it : SongEntity, coroutineScope : CoroutineScope){
                 .collect { currentLyrics ->
                     if (currentLyrics?.synced == null) {
                         lyrics = null
-                        kotlin.runCatching {
+                        runCatching {
                             LrcLib.lyrics(
                                 artist = it.song.artistsText
                                     ?: "",
@@ -863,7 +904,7 @@ fun DownloadSyncedLyrics(it : SongEntity, coroutineScope : CoroutineScope){
                                     )
                                 )
                             }?.onFailure { lyrics ->
-                                kotlin.runCatching {
+                                runCatching {
                                     KuGou.lyrics(
                                         artist = it.song.artistsText
                                             ?: "",

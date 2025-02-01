@@ -743,6 +743,7 @@ Volume BAS : titre précédent</string>
     <string name="social_reddit_info">Rejoignez la communauté sur Reddit</string>
     <string name="sleep_timer_ended">Minuterie de veille terminée</string>
     <string name="social_discord">Discord</string>
+    <string name="social_discord_info">Rejoignez la communauté sur Discord</string>
     <string name="discord_enable_rich_presence">Activer Rich Presence (Discord)</string>
     <string name="discord_disconnect">Déconnecté</string>
     <string name="discord_connect">Se connecter</string>
@@ -896,4 +897,6 @@ Volume BAS : titre précédent</string>
     <string name="filter_by">Filtrer par</string>
     <string name="updating_playlist">Mise à jour de la playlist. Veuillez patienter. Ne réduisez pas l\'application et ne la quittez pas.</string>
     <string name="updating_playlist_message">Mettre à jour les titres avec l\'ID d\'album manquant</string>
+    <string name="syncing">Syncing...</string>
+    <string name="autosync_channels">Auto Sync Subscribed Channels</string>
 </resources>

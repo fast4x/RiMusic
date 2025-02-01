@@ -741,6 +741,7 @@ CC-BY-SA 3.0</string>
     <string name="social_reddit_info">Join the community on Reddit</string>
     <string name="sleep_timer_ended">Sleep timer ended</string>
     <string name="social_discord">Discord</string>
+    <string name="social_discord_info">Join the community on Discord</string>
     <string name="discord_enable_rich_presence">Enable Rich Presence</string>
     <string name="discord_disconnect">Disconnect</string>
     <string name="discord_connect">Connect</string>
@@ -894,4 +895,6 @@ CC-BY-SA 3.0</string>
     <string name="filter_by">Filter By</string>
     <string name="updating_playlist">Updating the Playlist. Please Wait. Do not Minimize or Exit the App</string>
     <string name="updating_playlist_message">Update the Songs with the Missing Album ID</string>
+    <string name="syncing">Syncing...</string>
+    <string name="autosync_channels">Auto Sync Subscribed Channels</string>
 </resources>

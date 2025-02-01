@@ -351,6 +351,11 @@ const val landscapeControlsKey = "landscapeControls"
 const val swipeAnimationsNoThumbnailKey = "swipeAnimationsNoThumbnail"
 const val playlistSongsTypeFilterKey = "playlistSongsTypeFilter"
 
+const val ytVisitorDataKey = "ytVisitorData"
+const val ytCookieKey = "ytCookie"
+const val ytAccountChannelHandleKey = "ytAccountChannelHandle"
+const val ytAccountThumbnailKey = "ytAccountThumbnail"
+
 /*
 @PublishedApi
 internal val defaultJson = Json {

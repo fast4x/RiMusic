@@ -80,12 +80,13 @@ internal fun MyDownloadHelper.createDataSourceFactory(): DataSource.Factory {
             }
     ) { dataSpec: DataSpec ->
         try {
+
             return@Factory runBlocking {
                 dataSpecProcess(dataSpec, appContext(), appContext().isConnectionMetered())
             }
         }
         catch (e: Throwable) {
-            println("MyDownloadHelper DataSourcefactory Error: ${e.message}")
+            println("MyDownloadHelper DataSourcefactory Error: ${e.stackTraceToString()}")
             throw IOException(e)
         }
     }

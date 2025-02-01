@@ -294,7 +294,7 @@ fun ArtistOverviewItems(
                                     thumbnailContent = {
                                         NowPlayingSongIndicator(item.asMediaItem.mediaId, binder?.player)
                                     },
-                                    downloadState = downloadState,
+                                    downloadState = getDownloadState(item.asMediaItem.mediaId),
                                     thumbnailSizeDp = songThumbnailSizeDp,
                                     thumbnailSizePx = songThumbnailSizePx,
                                     modifier = Modifier

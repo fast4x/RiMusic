@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,6 +78,9 @@ import it.fast4x.rimusic.ui.components.tab.toolbar.SongsShuffle
 import it.fast4x.rimusic.utils.Preference.HOME_ALBUM_ITEM_SIZE
 import it.fast4x.rimusic.thumbnailShape
 import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
+import it.fast4x.rimusic.utils.autoSyncToolbutton
+import it.fast4x.rimusic.utils.importYTMLikedAlbums
+import it.fast4x.rimusic.utils.importYTMSubscribedChannels
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -147,6 +151,16 @@ fun HomeAlbums(
         lazyGridState.scrollToItem( scrollIndex, scrollOffset )
     }
 
+    val sync = autoSyncToolbutton(R.string.autosync_channels)
+
+    var justSynced by rememberSaveable { mutableStateOf(false) }
+
+    // START: Import YTM subscribed channels
+    LaunchedEffect(Unit) {
+        if (!justSynced && importYTMLikedAlbums())
+            justSynced = true
+    }
+
     Box(
         modifier = Modifier
             .background(colorPalette().background0)
@@ -165,7 +179,7 @@ fun HomeAlbums(
             }
 
             // Sticky tab's tool bar
-            TabToolBar.Buttons( sort, search, randomizer, shuffle, itemSize )
+            TabToolBar.Buttons( sort, sync, search, randomizer, shuffle, itemSize )
 
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,

@@ -55,6 +55,7 @@ import coil.compose.AsyncImage
 import dev.chrisbanes.haze.hazeChild
 import it.fast4x.compose.persist.persist
 import it.fast4x.innertube.Innertube
+import it.fast4x.innertube.YtMusic
 import it.fast4x.innertube.requests.ArtistPage
 import it.fast4x.innertube.requests.ArtistSection
 import it.fast4x.rimusic.Database
@@ -89,6 +90,7 @@ import it.fast4x.rimusic.ui.items.SongItem
 import it.fast4x.rimusic.ui.items.SongItemPlaceholder
 import it.fast4x.rimusic.ui.items.VideoItem
 import it.fast4x.rimusic.ui.screens.player.Queue
+import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
 import it.fast4x.rimusic.ui.styling.Dimensions
 import it.fast4x.rimusic.ui.styling.px
 import it.fast4x.rimusic.utils.align
@@ -106,6 +108,9 @@ import it.fast4x.rimusic.utils.secondary
 import it.fast4x.rimusic.utils.semiBold
 import it.fast4x.rimusic.utils.showFloatingIconKey
 import it.fast4x.rimusic.utils.thumbnailRoundnessKey
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -307,12 +312,27 @@ fun ArtistOverviewModern(
                             onClick = {
                                 val bookmarkedAt =
                                     if (artist?.bookmarkedAt == null) System.currentTimeMillis() else null
-                                //CoroutineScope(Dispatchers.IO).launch {
+
                                 Database.asyncTransaction {
                                     artist?.copy(bookmarkedAt = bookmarkedAt)
                                         ?.let(::update)
                                 }
-                                //}
+                                if (isYouTubeSyncEnabled())
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        if (bookmarkedAt == null)
+                                            artistPage.artist.channelId.let {
+                                                if (it != null) {
+                                                    YtMusic.unsubscribeChannel(it)
+                                                }
+                                            }
+                                        else
+                                            artistPage.artist.channelId.let {
+                                                if (it != null) {
+                                                    YtMusic.subscribeChannel(it)
+                                                }
+                                            }
+                                    }
+
                             },
                             alternative = artist?.bookmarkedAt == null,
                             modifier = Modifier.padding(end = 30.dp)

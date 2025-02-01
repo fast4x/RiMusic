@@ -27,6 +27,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -40,7 +41,7 @@ import it.fast4x.rimusic.MONTHLY_PREFIX
 import it.fast4x.rimusic.PINNED_PREFIX
 import it.fast4x.rimusic.PIPED_PREFIX
 import it.fast4x.rimusic.R
-import it.fast4x.rimusic.YT_PREFIX
+import it.fast4x.rimusic.YTP_PREFIX
 import it.fast4x.rimusic.enums.NavigationBarPosition
 import it.fast4x.rimusic.enums.PlaylistSortBy
 import it.fast4x.rimusic.enums.PlaylistsType
@@ -78,7 +79,6 @@ import it.fast4x.rimusic.models.SongArtistMap
 import it.fast4x.rimusic.ui.components.themed.IDialog
 import it.fast4x.rimusic.ui.components.themed.Search
 import it.fast4x.rimusic.ui.components.navigation.header.TabToolBar
-import it.fast4x.rimusic.utils.playlistSync
 import it.fast4x.rimusic.ui.components.tab.ImportSongsFromCSV
 import it.fast4x.rimusic.ui.components.tab.ItemSize
 import it.fast4x.rimusic.ui.components.tab.Sort
@@ -87,7 +87,9 @@ import it.fast4x.rimusic.ui.components.tab.toolbar.Descriptive
 import it.fast4x.rimusic.ui.components.tab.toolbar.MenuIcon
 import it.fast4x.rimusic.ui.components.tab.toolbar.SongsShuffle
 import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
+import it.fast4x.rimusic.utils.importYTMPrivatePlaylists
 import it.fast4x.rimusic.utils.Preference.HOME_LIBRARY_ITEM_SIZE
+import it.fast4x.rimusic.utils.autoSyncToolbutton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -142,7 +144,7 @@ fun HomeLibrary(
             PlaylistsType.PinnedPlaylist -> Database.songsInAllPinnedPlaylists()
             PlaylistsType.MonthlyPlaylist -> Database.songsInAllMonthlyPlaylists()
             PlaylistsType.PipedPlaylist -> Database.songsInAllPipedPlaylists()
-            PlaylistsType.YTPlaylist -> Database.songsInAllYTPlaylists()
+            PlaylistsType.YTPlaylist -> Database.songsInAllYTPrivatePlaylists()
         }.map { it.map( Song::asMediaItem ) }
     }
     //<editor-fold desc="New playlist dialog">
@@ -254,7 +256,19 @@ fun HomeLibrary(
             }
         }
     )
-    val sync = playlistSync()
+    val sync = autoSyncToolbutton(R.string.autosync)
+
+    var justSynced by rememberSaveable { mutableStateOf(false) }
+
+    // START: Import YTM private playlists
+    LaunchedEffect(Unit) {
+        if (!justSynced && importYTMPrivatePlaylists())
+            justSynced = true
+    }
+
+    // START: Import Piped playlists
+    if (isPipedEnabled)
+        ImportPipedPlaylists()
 
     LaunchedEffect( sort.sortBy, sort.sortOrder ) {
         Database.playlistPreviews( sort.sortBy, sort.sortOrder ).collect { items = it }
@@ -276,7 +290,7 @@ fun HomeLibrary(
     val showPipedPlaylists by rememberPreference(showPipedPlaylistsKey, true)
 
     val buttonsList = mutableListOf(PlaylistsType.Playlist to stringResource(R.string.playlists))
-    //buttonsList += PlaylistsType.YTPlaylist to stringResource(R.string.yt_playlists)
+    buttonsList += PlaylistsType.YTPlaylist to stringResource(R.string.yt_playlists)
     if (showPipedPlaylists) buttonsList +=
         PlaylistsType.PipedPlaylist to stringResource(R.string.piped_playlists)
     if (showPinnedPlaylists) buttonsList +=
@@ -285,10 +299,6 @@ fun HomeLibrary(
         PlaylistsType.MonthlyPlaylist to stringResource(R.string.monthly_playlists)
     // END - Additional playlists
 
-    // START - Piped
-    if (isPipedEnabled)
-        ImportPipedPlaylists()
-    // END - Piped
 
     // START - New playlist
     newPlaylistDialog.Render()
@@ -348,9 +358,12 @@ fun HomeLibrary(
                         PlaylistsType.PinnedPlaylist -> PINNED_PREFIX
                         PlaylistsType.MonthlyPlaylist -> MONTHLY_PREFIX
                         PlaylistsType.PipedPlaylist -> PIPED_PREFIX
-                        PlaylistsType.YTPlaylist -> YT_PREFIX
+                        PlaylistsType.YTPlaylist -> YTP_PREFIX
                     }
                 val condition: (PlaylistPreview) -> Boolean = {
+                    if (playlistType == PlaylistsType.YTPlaylist)
+                        it.playlist.browseId?.startsWith(listPrefix) ?: false
+                    else
                     it.playlist.name.startsWith( listPrefix, true )
                 }
                 items(

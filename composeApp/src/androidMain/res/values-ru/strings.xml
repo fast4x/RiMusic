@@ -742,6 +742,7 @@
     <string name="social_reddit_info">Присоединиться к сообществу на Reddit</string>
     <string name="sleep_timer_ended">Таймер сна завершен</string>
     <string name="social_discord">Discord</string>
+    <string name="social_discord_info">Join the community on Discord</string>
     <string name="discord_enable_rich_presence">Включить Rich Presence</string>
     <string name="discord_disconnect">Отключиться</string>
     <string name="discord_connect">Подключиться</string>
@@ -895,4 +896,6 @@
     <string name="filter_by">Фильтровать по</string>
     <string name="updating_playlist">Обновление плейлиста. Пожалуйста, подождите. Не сворачивайте и не выходите из приложения</string>
     <string name="updating_playlist_message">Обновить песни с отсутствующим идентификатором альбома</string>
+    <string name="syncing">Syncing...</string>
+    <string name="autosync_channels">Auto Sync Subscribed Channels</string>
 </resources>

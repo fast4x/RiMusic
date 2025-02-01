@@ -1,5 +1,6 @@
 package it.fast4x.rimusic.ui.items
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
@@ -31,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -38,6 +40,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadService
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import it.fast4x.innertube.Innertube
 import it.fast4x.rimusic.Database
@@ -52,6 +55,8 @@ import it.fast4x.rimusic.service.MyDownloadService
 import it.fast4x.rimusic.service.isLocal
 import it.fast4x.rimusic.thumbnailShape
 import it.fast4x.rimusic.typography
+import it.fast4x.rimusic.ui.components.LocalMenuState
+import it.fast4x.rimusic.ui.components.themed.AddToPlaylistPlayerMenu
 import it.fast4x.rimusic.ui.components.themed.HeaderIconButton
 import it.fast4x.rimusic.ui.components.themed.IconButton
 import it.fast4x.rimusic.ui.components.themed.NowPlayingSongIndicator
@@ -324,7 +329,9 @@ fun SongItem(
 }
 */
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalTextApi::class,
+    ExperimentalAnimationApi::class
+)
 @UnstableApi
 @Composable
 fun SongItem(
@@ -433,6 +440,9 @@ fun SongItem(
 
         ItemInfoContainer {
             trailingContent?.let {
+                val menuState = LocalMenuState.current
+                val navController = rememberNavController()
+                val binder = LocalPlayerServiceBinder.current
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (isRecommended)
                         IconButton(
@@ -454,7 +464,24 @@ fun SongItem(
                                 .size(14.dp)
                                 .background(colorPalette().accent, CircleShape)
                                 .padding(all = 3.dp)
-                                .combinedClickable(onClick = {}, onLongClick = {
+                                .combinedClickable(onClick = {
+                                    menuState.display {
+                                        if (binder != null) {
+                                            AddToPlaylistPlayerMenu(
+                                                navController = navController,
+                                                onDismiss = {
+                                                    menuState.hide()
+                                                    Database.asyncTransaction {
+                                                        songPlaylist = songUsedInPlaylists(mediaItem.mediaId)
+                                                    }
+                                                },
+                                                mediaItem = mediaItem,
+                                                binder = binder,
+                                                onClosePlayer = {},
+                                            )
+                                        }
+                                    }
+                                }, onLongClick = {
                                     SmartMessage(
                                         context.resources.getString(R.string.playlistindicatorinfo2),
                                         context = context
@@ -512,6 +539,9 @@ fun SongItem(
                     it()
                 }
             } ?: Row(verticalAlignment = Alignment.CenterVertically) {
+                val menuState = LocalMenuState.current
+                val navController = rememberNavController()
+                val binder = LocalPlayerServiceBinder.current
                     if (isRecommended)
                         IconButton(
                             icon = R.drawable.smart_shuffle,
@@ -550,7 +580,24 @@ fun SongItem(
                             .size(18.dp)
                             .background(colorPalette().accent, CircleShape)
                             .padding(all = 3.dp)
-                            .combinedClickable(onClick = {}, onLongClick = {
+                            .combinedClickable(onClick = {
+                                menuState.display {
+                                    if (binder != null) {
+                                        AddToPlaylistPlayerMenu(
+                                            navController = navController,
+                                            onDismiss = {
+                                                menuState.hide()
+                                                Database.asyncTransaction {
+                                                    songPlaylist = songUsedInPlaylists(mediaItem.mediaId)
+                                                }
+                                            },
+                                            mediaItem = mediaItem,
+                                            binder = binder,
+                                            onClosePlayer = {},
+                                        )
+                                    }
+                                }
+                            }, onLongClick = {
                                 SmartMessage(
                                     context.resources.getString(R.string.playlistindicatorinfo2),
                                     context = context

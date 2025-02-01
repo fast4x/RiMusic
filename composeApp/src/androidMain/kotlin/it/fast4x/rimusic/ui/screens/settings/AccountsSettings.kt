@@ -176,15 +176,15 @@ fun AccountsSettings() {
         //TODO MANAGE LOGIN
         /****** YOUTUBE LOGIN ******/
 
-        var useYtLoginOnlyForBrowse by rememberPreference(useYtLoginOnlyForBrowseKey, false)
+        //var useYtLoginOnlyForBrowse by rememberPreference(useYtLoginOnlyForBrowseKey, false)
         var isYouTubeLoginEnabled by rememberPreference(enableYouTubeLoginKey, false)
         var isYouTubeSyncEnabled by rememberPreference(enableYouTubeSyncKey, false)
         var loginYouTube by remember { mutableStateOf(false) }
-        var visitorData by rememberEncryptedPreference(key = ytVisitorDataKey, defaultValue = "")
-        var cookie by rememberEncryptedPreference(key = ytCookieKey, defaultValue = "")
+        var visitorData by rememberPreference(key = ytVisitorDataKey, defaultValue = "")
+        var cookie by rememberPreference(key = ytCookieKey, defaultValue = "")
         var accountName by rememberPreference(key = ytAccountNameKey, defaultValue = "")
         var accountEmail by rememberPreference(key = ytAccountEmailKey, defaultValue = "")
-        var accountChannelHandle by rememberEncryptedPreference(
+        var accountChannelHandle by rememberPreference(
             key = ytAccountChannelHandleKey,
             defaultValue = ""
         )
@@ -219,7 +219,7 @@ fun AccountsSettings() {
             Column(
                 modifier = Modifier.padding(start = 25.dp)
             ) {
-                if (isAtLeastAndroid7) {
+                //if (isAtLeastAndroid7) {
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -317,26 +317,26 @@ fun AccountsSettings() {
 
                     }
 
-                }
-
-                SwitchSettingEntry(
-                    title = stringResource(R.string.use_ytm_login_only_for_browse),
-                    text = stringResource(R.string.info_use_ytm_login_only_for_browse),
-                    isChecked = useYtLoginOnlyForBrowse,
-                    onCheckedChange = {
-                        useYtLoginOnlyForBrowse = it
-                    }
-                )
+                //}
 
 //                SwitchSettingEntry(
-//                    isEnabled = false,
-//                    title = "Sync with your YouTube Music Account",
-//                    text = "",
-//                    isChecked = isYouTubeSyncEnabled,
+//                    title = stringResource(R.string.use_ytm_login_only_for_browse),
+//                    text = stringResource(R.string.info_use_ytm_login_only_for_browse),
+//                    isChecked = useYtLoginOnlyForBrowse,
 //                    onCheckedChange = {
-//                        isYouTubeSyncEnabled = it
+//                        useYtLoginOnlyForBrowse = it
 //                    }
 //                )
+
+                SwitchSettingEntry(
+                    //isEnabled = false,
+                    title = "Sync data with YTM account",
+                    text = "Playlists, albums, artists, history, like, etc.",
+                    isChecked = isYouTubeSyncEnabled,
+                    onCheckedChange = {
+                        isYouTubeSyncEnabled = it
+                    }
+                )
 
             }
         }
@@ -663,7 +663,7 @@ fun isYouTubeSyncEnabled(): Boolean {
 }
 
 fun isYouTubeLoggedIn(): Boolean {
-    val cookie = appContext().encryptedPreferences.getString(ytCookieKey, "")
+    val cookie = appContext().preferences.getString(ytCookieKey, "")
     val isLoggedIn = cookie?.let { parseCookieString(it) }?.contains("SAPISID") == true
     return isLoggedIn
 }

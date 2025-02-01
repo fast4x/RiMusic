@@ -32,6 +32,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteQuery
+import it.fast4x.innertube.Innertube
 import it.fast4x.rimusic.enums.AlbumSortBy
 import it.fast4x.rimusic.enums.ArtistSortBy
 import it.fast4x.rimusic.enums.BuiltInPlaylist
@@ -59,6 +60,7 @@ import it.fast4x.rimusic.models.SongPlaylistMap
 import it.fast4x.rimusic.models.SongWithContentLength
 import it.fast4x.rimusic.models.SortedSongPlaylistMap
 import it.fast4x.rimusic.service.LOCAL_KEY_PREFIX
+import it.fast4x.rimusic.utils.isExplicit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.intellij.lang.annotations.MagicConstant
@@ -557,6 +559,9 @@ interface Database {
     @RewriteQueriesToDropUnusedColumns
     fun eventWithSongByPeriod(date: Long, limit:Long = Long.MAX_VALUE): Flow<List<EventWithSong>>
 
+    @Transaction
+    @Query("SELECT * FROM Playlist WHERE browseId LIKE '${YTP_PREFIX}' || '%'")
+    fun ytmPrivatePlaylists(): Flow<List<Playlist?>>
 
     @Transaction
     @Query("SELECT * FROM Song WHERE totalPlayTimeMs > 0 ORDER BY totalPlayTimeMs DESC LIMIT :count")
@@ -571,6 +576,10 @@ interface Database {
     @Transaction
     @Query("SELECT playlistId, position FROM SongPlaylistMap WHERE songId = :id")
     fun playlistsUsedForSong(id: String): List<PlayListIdPosition>
+
+    @Transaction
+    @Query("SELECT position FROM SongPlaylistMap WHERE playlistId = :playlistId AND songId = :id")
+    fun positionInPlaylist(id: String, playlistId: Long): Int
 
     @Query("SELECT COUNT(1) FROM Song WHERE likedAt IS NOT NULL")
     fun likedSongsCount(): Flow<Int>
@@ -1818,6 +1827,10 @@ interface Database {
     fun playlistWithSongs(name: String): Flow<PlaylistWithSongs?>
 
     @Transaction
+    @Query("SELECT * FROM Playlist WHERE browseId = :browseId")
+    fun playlistWithSongsByBrowseId(browseId: String): Flow<PlaylistWithSongs?>
+
+    @Transaction
     @Query("SELECT * FROM Playlist WHERE name LIKE '${MONTHLY_PREFIX}' || :name || '%'  ")
     fun monthlyPlaylists(name: String?): Flow<List<PlaylistWithSongs?>>
 
@@ -1866,8 +1879,8 @@ interface Database {
 
     @Transaction
     @Query("SELECT DISTINCT S.* FROM Song S INNER JOIN songplaylistmap SM ON S.id=SM.songId " +
-            "INNER JOIN Playlist P ON P.id=SM.playlistId WHERE P.browseId IS NOT NULL")
-    fun songsInAllYTPlaylists(): Flow<List<Song>>
+            "INNER JOIN Playlist P ON P.id=SM.playlistId WHERE P.browseId LIKE '${YTP_PREFIX}' || '%'")
+    fun songsInAllYTPrivatePlaylists(): Flow<List<Song>>
 
     @Transaction
     @Query("SELECT DISTINCT S.* FROM Song S INNER JOIN songplaylistmap SM ON S.id=SM.songId " +
@@ -2073,6 +2086,11 @@ interface Database {
     @Transaction
     @Query("SELECT id FROM SONG WHERE likedAt IS NOT NULL AND likedAt < 0")
     fun dislikedSongsById(): Flow<List<String>>
+
+    @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
+    @Transaction
+    @Query("SELECT * FROM Playlist WHERE browseId = :browseId")
+    fun playlist(browseId: String): Flow<Playlist?>
 
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Transaction
@@ -2305,6 +2323,12 @@ interface Database {
     fun insert(format: Format)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(artist: Artist)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(album: Album)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(searchQuery: SearchQuery)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -2333,9 +2357,13 @@ interface Database {
 
     @Transaction
     fun insert(mediaItem: MediaItem, block: (Song) -> Song = { it }) {
+        var title = mediaItem.mediaMetadata.title!!.toString()
+        if(!title.startsWith(EXPLICIT_PREFIX, true) && mediaItem.isExplicit){
+            title = EXPLICIT_PREFIX + title
+        }
         val song = Song(
             id = mediaItem.mediaId,
-            title = mediaItem.mediaMetadata.title!!.toString(),
+            title = title,
             artistsText = mediaItem.mediaMetadata.artist?.toString(),
             durationText = mediaItem.mediaMetadata.extras?.getString("durationText"),
             thumbnailUrl = mediaItem.mediaMetadata.artworkUri?.toString()
@@ -2374,6 +2402,14 @@ interface Database {
 
     @Update
     fun update(playlist: Playlist)
+
+    @Update
+    fun update(playlist: Playlist, playlistItem: Innertube.PlaylistItem) {
+        update(playlist.copy(
+            name = playlistItem.title ?: "",
+            browseId = playlistItem.key
+        ))
+    }
 
     @Upsert
     fun upsert(lyrics: Lyrics)

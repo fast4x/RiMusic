@@ -740,6 +740,7 @@
     <string name="social_reddit_info">레딧 커뮤니티에 참여하세요!</string>
     <string name="sleep_timer_ended">수면 타이머 종료됨</string>
     <string name="social_discord">디스코드</string>
+    <string name="social_discord_info">Join the community on Discord</string>
     <string name="discord_enable_rich_presence">재생 정보 표시 활성화</string>
     <string name="discord_disconnect">연결 끊기</string>
     <string name="discord_connect">연결</string>
@@ -893,4 +894,6 @@
     <string name="filter_by">Filter By</string>
     <string name="updating_playlist">Updating the Playlist. Please Wait. Do not Minimize or Exit the App</string>
     <string name="updating_playlist_message">Update the Songs with the Missing Album ID</string>
+    <string name="syncing">Syncing...</string>
+    <string name="autosync_channels">Auto Sync Subscribed Channels</string>
 </resources>

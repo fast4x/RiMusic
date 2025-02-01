@@ -739,6 +739,7 @@
     <string name="social_reddit_info">Join the community on Reddit</string>
     <string name="sleep_timer_ended">Sleep timer ended</string>
     <string name="social_discord">Discord</string>
+    <string name="social_discord_info">Join the community on Discord</string>
     <string name="discord_enable_rich_presence">Enable Rich Presence</string>
     <string name="discord_disconnect">Disconnect</string>
     <string name="discord_connect">Connect</string>
@@ -886,4 +887,13 @@
     <string name="match_song">Rematch this Song</string>
     <string name="match_song_grid">Rematch Song</string>
     <string name="songsnotfound">Songs Not Found</string>
+    <string name="swipe_Animation_No_Thumbnail">Swipe Animation</string>
+    <string name="do_you_really_want_to_match_all">Do you really want to replace all the videos/unmatched songs with the matched songs? This action is irreversible</string>
+    <string name="online_songs">Online Songs</string>
+    <string name="explicit">Explicit</string>
+    <string name="filter_by">Filter By</string>
+    <string name="updating_playlist">Updating the Playlist. Please Wait. Do not Minimize or Exit the App</string>
+    <string name="updating_playlist_message">Update the Songs with the Missing Album ID</string>
+    <string name="syncing">Syncing...</string>
+    <string name="autosync_channels">Auto Sync Subscribed Channels</string>
 </resources>

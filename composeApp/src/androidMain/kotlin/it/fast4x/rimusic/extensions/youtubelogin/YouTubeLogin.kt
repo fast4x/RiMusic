@@ -55,11 +55,11 @@ fun YouTubeLogin(
 
     val scope = rememberCoroutineScope()
 
-    var visitorData by rememberEncryptedPreference(key = ytVisitorDataKey, defaultValue = Innertube.DEFAULT_VISITOR_DATA)
-    var cookie by rememberEncryptedPreference(key = ytCookieKey, defaultValue = "")
+    var visitorData by rememberPreference(key = ytVisitorDataKey, defaultValue = Innertube.DEFAULT_VISITOR_DATA)
+    var cookie by rememberPreference(key = ytCookieKey, defaultValue = "")
     var accountName by rememberPreference(key = ytAccountNameKey, defaultValue = "")
     var accountEmail by rememberPreference(key = ytAccountEmailKey, defaultValue = "")
-    var accountChannelHandle by rememberEncryptedPreference(key = ytAccountChannelHandleKey, defaultValue = "")
+    var accountChannelHandle by rememberPreference(key = ytAccountChannelHandleKey, defaultValue = "")
     var accountThumbnail by rememberPreference(key = ytAccountThumbnailKey, defaultValue = "")
 
     var webView: WebView? = null

@@ -740,6 +740,7 @@
     <string name="social_reddit_info">Reddit\'te topluluğa katılın</string>
     <string name="sleep_timer_ended">Uyku zamanlayıcısı sona erdi</string>
     <string name="social_discord">Discord</string>
+    <string name="social_discord_info">Join the community on Discord</string>
     <string name="discord_enable_rich_presence">\"Rich presence\"ı etkinleştir</string>
     <string name="discord_disconnect">Bağlantıyı Kes</string>
     <string name="discord_connect">Bağlan</string>
@@ -893,4 +894,6 @@
     <string name="filter_by">Filtrele</string>
     <string name="updating_playlist">Oynatma Listesi Güncelleniyor. Lütfen Bekleyin. Uygulamayı Küçültmeyin veya Uygulamadan Çıkmayın</string>
     <string name="updating_playlist_message">Eksik Albüm Kimliğine Sahip Şarkıları Güncelleyin</string>
+    <string name="syncing">Syncing...</string>
+    <string name="autosync_channels">Auto Sync Subscribed Channels</string>
 </resources>
