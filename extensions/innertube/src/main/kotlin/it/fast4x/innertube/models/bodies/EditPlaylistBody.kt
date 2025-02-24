@@ -15,13 +15,15 @@ sealed class Action {
     @Serializable
     data class AddVideoAction(
         val action: String = "ACTION_ADD_VIDEO",
-        val addedVideoId: String
+        val addedVideoId: String,
+        val dedupeOption: String = "DEDUPE_OPTION_DROP_DUPLICATE"
     ) : Action()
 
     @Serializable
     data class AddPlaylistAction(
         val action: String = "ACTION_ADD_PLAYLIST",
-        val addedFullListId: String
+        val addedFullListId: String,
+        val dedupeOption: String = "DEDUPE_OPTION_DROP_DUPLICATE"
     ) : Action()
 
     @Serializable

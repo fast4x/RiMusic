@@ -15,6 +15,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import it.fast4x.rimusic.appContext
+import it.fast4x.rimusic.utils.ConditionalCacheDataSourceFactory
+import it.fast4x.rimusic.utils.asDataSource
+import it.fast4x.rimusic.utils.defaultDataSourceFactory
+import it.fast4x.rimusic.utils.readOnlyWhen
 import java.io.IOException
 
 @OptIn(UnstableApi::class)
@@ -31,6 +35,12 @@ internal fun PlayerServiceModern.createDataSourceFactory(): DataSource.Factory {
             )
             .setCacheWriteDataSinkFactory(null)
             .setFlags(FLAG_IGNORE_CACHE_ON_ERROR)
+//        ConditionalCacheDataSourceFactory(
+//            cacheDataSourceFactory = cache.asDataSource, //.readOnlyWhen { PlayerPreferences.pauseCache }.asDataSource,
+//            upstreamDataSourceFactory = appContext().defaultDataSourceFactory,
+//            shouldCache = { !it.isLocal }
+//        )
+
     ) { dataSpec: DataSpec ->
         try {
 

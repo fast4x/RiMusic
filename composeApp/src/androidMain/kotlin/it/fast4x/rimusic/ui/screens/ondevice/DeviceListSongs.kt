@@ -78,6 +78,7 @@ import it.fast4x.innertube.YtMusic
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
+import it.fast4x.rimusic.cleanPrefix
 import it.fast4x.rimusic.enums.DeviceLists
 import it.fast4x.rimusic.enums.NavRoutes
 import it.fast4x.rimusic.enums.NavigationBarPosition
@@ -709,13 +710,9 @@ fun DeviceListSongs(
                                                             songId = song.asMediaItem.mediaId,
                                                             playlistId = playlistPreview.playlist.id,
                                                             position = position + index
-                                                        )
+                                                        ).default()
                                                     )
                                                 }
-                                                if(isYouTubeSyncEnabled())
-                                                    CoroutineScope(Dispatchers.IO).launch {
-                                                        playlistPreview.playlist.browseId?.let { YtMusic.addToPlaylist(it, song.asMediaItem.mediaId) }
-                                                    }
                                             }
                                         } else {
                                             listMediaItems.forEachIndexed { index, song ->
@@ -727,13 +724,9 @@ fun DeviceListSongs(
                                                             songId = song.mediaId,
                                                             playlistId = playlistPreview.playlist.id,
                                                             position = position + index
-                                                        )
+                                                        ).default()
                                                     )
                                                 }
-                                                if(isYouTubeSyncEnabled())
-                                                    CoroutineScope(Dispatchers.IO).launch {
-                                                        playlistPreview.playlist.browseId?.let { YtMusic.addToPlaylist(it, song.mediaId) }
-                                                    }
                                             }
                                             listMediaItems.clear()
                                             selectItems = false

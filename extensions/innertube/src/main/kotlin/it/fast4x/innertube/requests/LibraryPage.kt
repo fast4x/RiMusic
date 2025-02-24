@@ -13,6 +13,8 @@ data class LibraryPage(
 ) {
     companion object {
         fun fromMusicTwoRowItemRenderer(renderer: MusicTwoRowItemRenderer): Innertube.Item? {
+            if (renderer.isPlaylist)
+                println("LibraryPage renderer ${renderer.menu?.menuRenderer?.items?.map { it.menuServiceItemRenderer?.text }}")
             return when {
                 renderer.isAlbum -> Innertube.AlbumItem(
                     info = Innertube.Info(
@@ -46,6 +48,9 @@ data class LibraryPage(
                     songCount = null,
                     thumbnail = renderer.thumbnailRenderer?.musicThumbnailRenderer?.thumbnail?.thumbnails?.getBestQuality(),
                     channel = null,
+                    isEditable = renderer.menu?.menuRenderer?.items?.find {
+                        it.menuNavigationItemRenderer?.icon?.iconType == "EDIT"
+                    } != null,
 //                    id = renderer.navigationEndpoint.browseEndpoint?.browseId?.removePrefix("VL")
 //                        ?: return null,
 //                    title = renderer.title.runs?.firstOrNull()?.text ?: return null,
@@ -72,9 +77,7 @@ data class LibraryPage(
 //                    radioEndpoint = renderer.menu?.menuRenderer?.items?.find {
 //                        it.menuNavigationItemRenderer?.icon?.iconType == "MIX"
 //                    }?.menuNavigationItemRenderer?.navigationEndpoint?.watchPlaylistEndpoint,
-//                    isEditable = renderer.menu?.menuRenderer?.items?.find {
-//                        it.menuNavigationItemRenderer?.icon?.iconType == "EDIT"
-//                    } != null
+
                 )
 
                 renderer.isArtist -> Innertube.ArtistItem(

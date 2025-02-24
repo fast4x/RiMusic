@@ -1,6 +1,6 @@
 name: 🐛 Bug report
 description: Something isn't working, uh?
-title: Short and concise description of your bug
+title: Short description
 labels: [bug]
 body:
   - type: markdown

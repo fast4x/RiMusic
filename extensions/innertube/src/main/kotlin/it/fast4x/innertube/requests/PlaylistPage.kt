@@ -22,12 +22,15 @@ import it.fast4x.innertube.utils.runCatchingNonCancellable
 
 data class PlaylistPage(
     val playlist: Innertube.PlaylistItem,
+    val description: String?,
     var songs: List<Innertube.SongItem>,
     val songsContinuation: String?,
     val continuation: String?,
+    val isEditable: Boolean? = false,
 ) {
     companion object {
         fun fromMusicResponsiveListItemRenderer(renderer: MusicResponsiveListItemRenderer): Innertube.SongItem {
+            println("YtMusic getPlaylist PlaylistPage setVideoId ${renderer.playlistItemData?.playlistSetVideoId}")
             return Innertube.SongItem(
                 info = Innertube.Info(
                     name = renderer.flexColumns.firstOrNull()
@@ -56,8 +59,9 @@ data class PlaylistPage(
                 explicit = renderer.badges?.find {
                     it.musicInlineBadgeRenderer?.icon?.iconType == "MUSIC_EXPLICIT_BADGE"
                 } != null,
+                setVideoId = renderer.playlistItemData?.playlistSetVideoId,
 //                endpoint = renderer.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint?.watchEndpoint,
-//                setVideoId = renderer.playlistItemData.playlistSetVideoId ?: return null
+
             )
         }
     }

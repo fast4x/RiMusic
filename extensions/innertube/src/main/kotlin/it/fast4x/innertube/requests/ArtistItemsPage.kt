@@ -86,7 +86,8 @@ data class ArtistItemsPage(
                     ),
                     songCount = renderer.subtitle?.runs?.getOrNull(4)?.text?.toInt(),
                     thumbnail = renderer.thumbnailRenderer?.musicThumbnailRenderer?.thumbnail?.thumbnails?.lastOrNull(),
-                    channel = null
+                    channel = null,
+                    isEditable = false
                 )
                 else -> null
             }

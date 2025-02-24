@@ -14,8 +14,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -97,6 +100,12 @@ fun GetSeekBar(
             .padding(horizontal = 10.dp)
             .fillMaxWidth()
     ) {
+
+        if (duration == C.TIME_UNSET)
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth(),
+                color = colorPalette().collapsedPlayerProgressBar
+            )
 
         if (playerTimelineType != PlayerTimelineType.Default
             && playerTimelineType != PlayerTimelineType.Wavy
@@ -358,32 +367,6 @@ fun GetSeekBar(
                         modifier = Modifier
                             .padding(horizontal = 5.dp)
                     )
-
-
-
-                /*
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.time),
-                        colorFilter = ColorFilter.tint(colorPalette().accent),
-                        modifier = Modifier
-                            .size(20.dp)
-                            .padding(horizontal = 5.dp),
-                        contentDescription = "Background Image",
-                        contentScale = ContentScale.Fit
-                    )
-                    BasicText(
-                        text = " ${formatAsTime(totalPlayTimes)}",
-                        style = typography().xxs.semiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-                 */
 
             } else {
                /* Image(

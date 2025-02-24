@@ -103,7 +103,8 @@ data class HomePage(
                             ),
                             songCount = null,
                             thumbnail = renderer.thumbnailRenderer?.musicThumbnailRenderer?.thumbnail?.thumbnails?.lastOrNull(),
-                            channel = null
+                            channel = null,
+                            isEditable = false
                         )
                     }
 

@@ -229,6 +229,7 @@ import it.fast4x.rimusic.utils.thumbnailRoundnessKey
 import it.fast4x.rimusic.utils.transitionEffectKey
 import it.fast4x.rimusic.utils.useSystemFontKey
 import it.fast4x.rimusic.utils.ytCookieKey
+import it.fast4x.rimusic.utils.ytDataSyncIdKey
 import it.fast4x.rimusic.utils.ytVisitorDataKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -528,7 +529,7 @@ class MainActivity :
                     //gl = "US" // US IMPORTANT
                 )
                 //TODO Manage login
-            if (preferences.getBoolean(enableYouTubeLoginKey, false)) {
+            //if (preferences.getBoolean(enableYouTubeLoginKey, false)) {
                     var visitorData by rememberPreference(
                         key = ytVisitorDataKey,
                         defaultValue = Innertube.DEFAULT_VISITOR_DATA
@@ -545,10 +546,11 @@ class MainActivity :
                             cookie = preferences.getString(ytCookieKey, ""),
                             visitordata = visitorData
                                 .takeIf { it != "null" }
-                                ?: Innertube.DEFAULT_VISITOR_DATA
+                                ?: Innertube.DEFAULT_VISITOR_DATA,
+                            dataSyncId = preferences.getString(ytDataSyncIdKey, "")
 
                         )
-            }
+            //}
 
             preferences.getEnum(audioQualityFormatKey, AudioQualityFormat.Auto)
 

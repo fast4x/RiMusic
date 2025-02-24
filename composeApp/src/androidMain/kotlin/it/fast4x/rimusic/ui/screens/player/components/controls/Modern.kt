@@ -59,6 +59,7 @@ import it.fast4x.rimusic.enums.NavRoutes
 import it.fast4x.rimusic.enums.PlayerBackgroundColors
 import it.fast4x.rimusic.enums.PlayerControlsType
 import it.fast4x.rimusic.enums.PlayerPlayButtonType
+import it.fast4x.rimusic.enums.PopupType
 import it.fast4x.rimusic.models.Info
 import it.fast4x.rimusic.models.Song
 import it.fast4x.rimusic.models.ui.UiMedia
@@ -68,8 +69,11 @@ import it.fast4x.rimusic.typography
 import it.fast4x.rimusic.ui.components.themed.CustomElevatedButton
 import it.fast4x.rimusic.ui.components.themed.IconButton
 import it.fast4x.rimusic.ui.components.themed.SelectorArtistsDialog
+import it.fast4x.rimusic.ui.components.themed.SmartMessage
 import it.fast4x.rimusic.ui.screens.player.bounceClick
+import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
 import it.fast4x.rimusic.ui.styling.favoritesIcon
+import it.fast4x.rimusic.utils.addToYtLikedSong
 import it.fast4x.rimusic.utils.bold
 import it.fast4x.rimusic.utils.colorPaletteModeKey
 import it.fast4x.rimusic.utils.doubleShadowDrop
@@ -77,6 +81,7 @@ import it.fast4x.rimusic.utils.dropShadow
 import it.fast4x.rimusic.utils.effectRotationKey
 import it.fast4x.rimusic.utils.getLikeState
 import it.fast4x.rimusic.utils.getUnlikedIcon
+import it.fast4x.rimusic.utils.isNetworkConnected
 import it.fast4x.rimusic.utils.jumpPreviousKey
 import it.fast4x.rimusic.utils.playNext
 import it.fast4x.rimusic.utils.playPrevious
@@ -89,6 +94,9 @@ import it.fast4x.rimusic.utils.setLikeState
 import it.fast4x.rimusic.utils.showthumbnailKey
 import it.fast4x.rimusic.utils.textCopyToClipboard
 import it.fast4x.rimusic.utils.textoutlineKey
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @UnstableApi
@@ -116,6 +124,7 @@ fun InfoAlbumAndArtistModern(
     var showSelectDialog by remember { mutableStateOf(false) }
     val playerBackgroundColors by rememberPreference(playerBackgroundColorsKey,PlayerBackgroundColors.BlurredCoverColor)
     val playerInfoShowIcon by rememberPreference(playerInfoShowIconsKey, true)
+    val currentMediaItem = binder.player.currentMediaItem
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -233,18 +242,32 @@ fun InfoAlbumAndArtistModern(
                         color = colorPalette().favoritesIcon,
                         icon = getLikeState(mediaId),
                         onClick = {
-                            val currentMediaItem = binder.player.currentMediaItem
-                            Database.asyncTransaction {
-                                if ( like( mediaId, setLikeState(likedAt) ) == 0 ) {
-                                    currentMediaItem
-                                        ?.takeIf { it.mediaId == mediaId }
-                                        ?.let {
-                                            insert(currentMediaItem, Song::toggleLike)
+                            if (!isNetworkConnected(appContext()) && isYouTubeSyncEnabled()) {
+                                SmartMessage(appContext().resources.getString(R.string.no_connection), context = appContext(), type = PopupType.Error)
+                            } else if (!isYouTubeSyncEnabled()){
+                                Database.asyncTransaction {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        if (like(mediaId, setLikeState(likedAt)) == 0) {
+                                            currentMediaItem
+                                                ?.takeIf { it.mediaId == mediaId }
+                                                ?.let {
+                                                    insert(currentMediaItem, Song::toggleLike)
+                                                }
                                         }
-                                    if (currentMediaItem != null) {
-                                        MyDownloadHelper.autoDownloadWhenLiked(context(),currentMediaItem)
                                     }
                                 }
+                            } else {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    if (currentMediaItem != null) {
+                                        addToYtLikedSong(currentMediaItem)
+                                    }
+                                }
+                            }
+                            if (currentMediaItem != null) {
+                                MyDownloadHelper.autoDownloadWhenLiked(
+                                    context(),
+                                    currentMediaItem
+                                )
                             }
                             if (effectRotationEnabled) isRotated = !isRotated
                         },

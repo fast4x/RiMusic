@@ -159,6 +159,7 @@ inline fun StringListValueSelectorSettingsEntry(
 inline fun <reified T : Enum<T>> EnumValueSelectorSettingsEntry(
     title: String,
     titleSecondary: String? = null,
+    text: String? = null,
     selectedValue: T,
     noinline onValueSelected: (T) -> Unit,
     modifier: Modifier = Modifier,
@@ -169,6 +170,7 @@ inline fun <reified T : Enum<T>> EnumValueSelectorSettingsEntry(
     ValueSelectorSettingsEntry(
         title = title,
         titleSecondary = titleSecondary,
+        text = text,
         selectedValue = selectedValue,
         values = enumValues<T>().toList(),
         onValueSelected = onValueSelected,
@@ -183,6 +185,7 @@ inline fun <reified T : Enum<T>> EnumValueSelectorSettingsEntry(
 fun <T> ValueSelectorSettingsEntry(
     title: String,
     titleSecondary: String? = null,
+    text: String? = null,
     selectedValue: T,
     values: List<T>,
     onValueSelected: (T) -> Unit,
@@ -215,6 +218,15 @@ fun <T> ValueSelectorSettingsEntry(
         onClick = { isShowingDialog = true },
         trailingContent = trailingContent
     )
+
+    text?.let {
+        BasicText(
+            text = it,
+            style = typography().xs.semiBold.copy(color = colorPalette().textSecondary),
+            modifier = Modifier
+                .padding(start = 12.dp)
+        )
+    }
 }
 
 @Composable

@@ -26,6 +26,8 @@ import java.util.TimeZone
 data class Context(
     val client: Client,
     val thirdParty: ThirdParty? = null,
+    private val request: Request = Request(),
+    val user: User? = User()
 ) {
 
     @Serializable
@@ -85,7 +87,8 @@ data class Context(
 
     @Serializable
     data class Request(
-        val useSsl: Boolean = true
+        val internalExperimentFlags: Array<String> = emptyArray(),
+        val useSsl: Boolean = true,
     )
 
     fun apply() {
@@ -108,14 +111,12 @@ data class Context(
 
     companion object {
 
-        //const val USER_AGENT_WEB = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
-        //const val USER_AGENT_WEB = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0"
         const val USER_AGENT_WEB = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0,gzip(gfe)"
         private const val USER_AGENT_ANDROID = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Mobile Safari/537.36"
         private const val USER_AGENT_ANDROID_MUSIC = "com.google.android.youtube/19.29.1  (Linux; U; Android 11) gzip"
-        private const val USER_AGENT_PLAYSTATION = "Mozilla/5.0 (PlayStation 4 5.55) AppleWebKit/601.2 (KHTML, like Gecko)"
+        private const val USER_AGENT_PLAYSTATION = "Mozilla/5.0 (PlayStation; PlayStation 4/12.00) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15"
         private const val USER_AGENT_DESKTOP = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36"
-        private const val USER_AGENT_IOS = "com.google.ios.youtube/19.29.1 (iPhone16,2; U; CPU iOS 17_5_1 like Mac OS X;)"
+        private const val USER_AGENT_IOS = "com.google.ios.youtube/20.03.02 (iPhone16,2; U; CPU iOS 18_2_1 like Mac OS X;)"
 
         private const val REFERER_YOUTUBE_MUSIC = "https://music.youtube.com/"
         private const val REFERER_YOUTUBE = "https://www.youtube.com/"
@@ -145,21 +146,7 @@ data class Context(
             client = DefaultWeb.client.copy(hl = hl)
         )
 
-//        val DefaultWebRemix = Context(
-//            client = Client(
-//                clientName = "WEB_REMIX",
-//                clientVersion = "1.20220606.03.00",
-//                //clientVersion = "1.20230731.00.00",
-//                //clientVersion = "1.20241218.01.00",
-//                //platform = "DESKTOP",
-//                userAgent = USER_AGENT_WEB,
-//                referer = REFERER_YOUTUBE_MUSIC,
-//                //hl = hl,
-//                //visitorData = Innertube.visitorData,
-//                api_key = "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30",
-//            )
-//        )
-//
+
         val DefaultWebCreator = Context(
             client = Client(
                 clientName = "WEB_CREATOR",
@@ -192,11 +179,11 @@ data class Context(
         val DefaultIOS = Context(
             client = Client(
                 clientName = "IOS",
-                clientVersion = "19.29.1",
+                clientVersion = "20.03.02",
                 deviceMake = "Apple",
                 deviceModel = "iPhone16,2",
                 osName = "iOS",
-                osVersion = "17.5.1.21F90",
+                osVersion = "18.2.1.22C161",
                 acceptHeader = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
                 userAgent = USER_AGENT_IOS,
                 api_key = "AIzaSyB-63vPrdThhKuerbB2N_l7Kwwcxj6yUAc",
@@ -204,10 +191,11 @@ data class Context(
             )
         )
 
-        val DefaultRestrictionBypass = Context(
+        val DefaultTVEmbedded = Context(
             client = Client(
                 clientName = "TVHTML5_SIMPLY_EMBEDDED_PLAYER",
                 clientVersion = "2.0",
+                xClientName = 85,
                 api_key = "AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8",
                 platform = "TV",
                 userAgent = USER_AGENT_PLAYSTATION,

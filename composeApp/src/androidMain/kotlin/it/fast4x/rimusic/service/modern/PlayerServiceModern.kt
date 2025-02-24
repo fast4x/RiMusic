@@ -22,7 +22,9 @@ import android.media.AudioDeviceCallback
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.audiofx.AudioEffect
+import android.media.audiofx.BassBoost
 import android.media.audiofx.LoudnessEnhancer
+import android.media.audiofx.PresetReverb
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -35,6 +37,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.text.isDigitsOnly
 import androidx.media3.common.AudioAttributes
+import androidx.media3.common.AuxEffectInfo
 import androidx.media3.common.C
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.MediaItem
@@ -192,8 +195,13 @@ import kotlinx.coroutines.plus
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import it.fast4x.rimusic.appContext
+import it.fast4x.rimusic.enums.PresetsReverb
+import it.fast4x.rimusic.isHandleAudioFocusEnabled
 import it.fast4x.rimusic.utils.asMediaItem
+import it.fast4x.rimusic.utils.audioReverbPresetKey
 import it.fast4x.rimusic.utils.autoDownloadSongWhenLikedKey
+import it.fast4x.rimusic.utils.bassboostEnabledKey
+import it.fast4x.rimusic.utils.bassboostLevelKey
 import timber.log.Timber
 import java.io.IOException
 import java.io.ObjectInputStream
@@ -239,6 +247,8 @@ class PlayerServiceModern : MediaLibraryService(),
 
     var loudnessEnhancer: LoudnessEnhancer? = null
     private var binder = Binder()
+    private var bassBoost: BassBoost? = null
+    private var reverbPreset: PresetReverb? = null
     private var showLikeButton = true
     private var showDownloadButton = true
 
@@ -250,15 +260,14 @@ class PlayerServiceModern : MediaLibraryService(),
     val currentMediaItem = MutableStateFlow<MediaItem?>(null)
 
     @kotlin.OptIn(ExperimentalCoroutinesApi::class)
-
     private val currentSong = currentMediaItem.flatMapLatest { mediaItem ->
         Database.song(mediaItem?.mediaId)
     }.stateIn(coroutineScope, SharingStarted.Lazily, null)
 
-    @kotlin.OptIn(ExperimentalCoroutinesApi::class)
-    private val currentFormat = currentMediaItem.flatMapLatest { mediaItem ->
-        mediaItem?.mediaId?.let { Database.format(it) }!!
-    }
+//    @kotlin.OptIn(ExperimentalCoroutinesApi::class)
+//    private val currentFormat = currentMediaItem.flatMapLatest { mediaItem ->
+//        mediaItem?.mediaId?.let { Database.format(it) }!!
+//    }
 
     var currentSongStateDownload = MutableStateFlow(Download.STATE_STOPPED)
 
@@ -394,8 +403,10 @@ class PlayerServiceModern : MediaLibraryService(),
                 AudioAttributes.Builder()
                     .setUsage(C.USAGE_MEDIA)
                     .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
-                    .build(), true
+                    .build(),
+                isHandleAudioFocusEnabled()
             )
+            .setUsePlatformDiagnostics(false)
             .setSeekBackIncrementMs(5000)
             .setSeekForwardIncrementMs(5000)
             .build()
@@ -527,6 +538,10 @@ class PlayerServiceModern : MediaLibraryService(),
         maybeRestorePlayerQueue()
 
         maybeResumePlaybackWhenDeviceConnected()
+
+        maybeBassBoost()
+
+        maybeReverb()
 
         /* Queue is saved in events without scheduling it (remove this in future)*/
         // Load persistent queue when start activity and save periodically in background
@@ -678,6 +693,9 @@ class PlayerServiceModern : MediaLibraryService(),
                     sharedPreferences?.getEnum(queueLoopTypeKey, QueueLoopType.Default)?.type
                         ?: QueueLoopType.Default.type
             }
+
+            bassboostLevelKey, bassboostEnabledKey -> maybeBassBoost()
+            audioReverbPresetKey -> maybeReverb()
         }
     }
 
@@ -882,6 +900,56 @@ class PlayerServiceModern : MediaLibraryService(),
         }
     }
 
+    private fun maybeBassBoost() {
+        if (!preferences.getBoolean(bassboostEnabledKey, false)) {
+            runCatching {
+                bassBoost?.enabled = false
+                bassBoost?.release()
+            }
+            bassBoost = null
+            maybeNormalizeVolume()
+            return
+        }
+
+        runCatching {
+            if (bassBoost == null) bassBoost = BassBoost(0, player.audioSessionId)
+            val bassboostLevel =
+                (preferences.getFloat(bassboostLevelKey, 0.5f) * 1000f).toInt().toShort()
+            println("PlayerServiceModern maybeBassBoost bassboostLevel $bassboostLevel")
+            bassBoost?.enabled = false
+            bassBoost?.setStrength(bassboostLevel)
+            bassBoost?.enabled = true
+        }.onFailure {
+            SmartMessage(
+                "Can't enable bass boost",
+                context = this@PlayerServiceModern
+            )
+        }
+    }
+
+    private fun maybeReverb() {
+        val presetType = preferences.getEnum(audioReverbPresetKey, PresetsReverb.NONE)
+        println("PlayerServiceModern maybeReverb presetType $presetType")
+        if (presetType == PresetsReverb.NONE) {
+            runCatching {
+                reverbPreset?.enabled = false
+                player.clearAuxEffectInfo()
+                reverbPreset?.release()
+            }
+                reverbPreset = null
+            return
+        }
+
+        runCatching {
+            if (reverbPreset == null) reverbPreset = PresetReverb(1, player.audioSessionId)
+
+            reverbPreset?.enabled = false
+            reverbPreset?.preset = presetType.preset
+            reverbPreset?.enabled = true
+            reverbPreset?.id?.let { player.setAuxEffectInfo(AuxEffectInfo(it, 1f)) }
+        }
+    }
+
     @UnstableApi
     private fun maybeNormalizeVolume() {
         if (!preferences.getBoolean(volumeNormalizationKey, false)) {
@@ -889,7 +957,6 @@ class PlayerServiceModern : MediaLibraryService(),
             loudnessEnhancer?.release()
             loudnessEnhancer = null
             volumeNormalizationJob?.cancel()
-            player.volume = 1f
             return
         }
 

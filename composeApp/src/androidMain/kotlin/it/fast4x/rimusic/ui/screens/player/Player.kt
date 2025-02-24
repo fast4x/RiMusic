@@ -314,6 +314,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.unit.LayoutDirection
 import it.fast4x.rimusic.ui.components.themed.AddToPlaylistPlayerMenu
+import it.fast4x.rimusic.utils.conditional
 import kotlin.math.sqrt
 
 
@@ -1475,9 +1476,12 @@ fun Player(
                                     modifier = Modifier
                                         .padding(vertical = 7.5.dp)
                                         .weight(0.07f)
+                                        .conditional(pagerStateQueue.currentPage == binder.player.currentMediaItemIndex){padding(horizontal = 3.dp)}
                                 ) {
                                     Icon(
-                                        painter = painterResource(id = if (pagerStateQueue.settledPage >= binder.player.currentMediaItemIndex) R.drawable.chevron_forward else R.drawable.chevron_back),
+                                        painter = painterResource(id = if (pagerStateQueue.currentPage > binder.player.currentMediaItemIndex) R.drawable.chevron_forward
+                                                                       else if (pagerStateQueue.currentPage == binder.player.currentMediaItemIndex) R.drawable.play
+                                                                       else R.drawable.chevron_back),
                                         contentDescription = null,
                                         modifier = Modifier
                                             .size(25.dp)
@@ -1525,8 +1529,15 @@ fun Player(
                                                 onLongClick = {
                                                     if (index < mediaItems.size) {
                                                         binder.player.addNext(
-                                                            binder.player.getMediaItemAt(index + 1)
+                                                            binder.player.getMediaItemAt(index)
                                                         )
+                                                        scope.launch {
+                                                            if (!appRunningInBackground) {
+                                                                pagerStateQueue.animateScrollToPage(binder.player.currentMediaItemIndex + 1)
+                                                            } else {
+                                                                pagerStateQueue.scrollToPage(binder.player.currentMediaItemIndex + 1)
+                                                            }
+                                                        }
                                                         SmartMessage(
                                                             context.resources.getString(R.string.addednext),
                                                             type = PopupType.Info,
@@ -1564,6 +1575,7 @@ fun Player(
                                             horizontalAlignment = Alignment.CenterHorizontally,
                                             modifier = Modifier
                                                 .height(40.dp)
+                                                .fillMaxWidth()
                                         ) {
                                             Box(
 

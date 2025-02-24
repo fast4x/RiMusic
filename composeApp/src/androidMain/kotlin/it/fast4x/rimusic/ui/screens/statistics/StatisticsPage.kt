@@ -53,6 +53,7 @@ import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerAwareWindowInsets
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
+import it.fast4x.rimusic.cleanPrefix
 import it.fast4x.rimusic.enums.MaxStatisticsItems
 import it.fast4x.rimusic.enums.NavRoutes
 import it.fast4x.rimusic.enums.NavigationBarPosition
@@ -512,7 +513,7 @@ fun StatisticsPage(
                                     val playlistId: String = playlists[it].playlist.id.toString()
                                     if ( playlistId.isEmpty() ) return@clickable    // Fail-safe??
 
-                                    val pBrowseId: String = playlists[it].playlist.browseId ?: ""
+                                    val pBrowseId: String = cleanPrefix(playlists[it].playlist.browseId ?: "")
                                     val route: String =
                                         if ( pBrowseId.isNotEmpty() )
                                             "${NavRoutes.playlist.name}/$pBrowseId"

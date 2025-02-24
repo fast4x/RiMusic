@@ -48,6 +48,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -86,6 +87,8 @@ import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.EXPLICIT_PREFIX
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
+import it.fast4x.rimusic.appContext
+import it.fast4x.rimusic.cleanPrefix
 import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.enums.BuiltInPlaylist
 import it.fast4x.rimusic.enums.CacheType
@@ -195,10 +198,15 @@ import it.fast4x.rimusic.ui.components.SwipeablePlaylistItem
 import it.fast4x.rimusic.ui.components.themed.CacheSpaceIndicator
 import it.fast4x.rimusic.ui.components.themed.InProgressDialog
 import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
+import it.fast4x.rimusic.utils.addToYtLikedSongs
+import it.fast4x.rimusic.utils.addToYtPlaylist
 import it.fast4x.rimusic.utils.asSong
 import it.fast4x.rimusic.utils.formatAsDuration
 import it.fast4x.rimusic.utils.isDownloadedSong
+import it.fast4x.rimusic.utils.isNetworkConnected
 import it.fast4x.rimusic.utils.isNowPlaying
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.system.exitProcess
 
@@ -318,6 +326,10 @@ fun HomeSongsModern(
     }
 
     var deleteProgressDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var checkCheck by remember {
         mutableStateOf(false)
     }
 
@@ -790,7 +802,18 @@ fun HomeSongsModern(
         mutableStateOf(false)
     }
 
+    var showRiMusicLikeYoutubeLikeConfirmDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var showYoutubeLikeConfirmDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var totalMinutesToLike by remember { mutableStateOf("") }
+
     val queueLimit by remember { mutableStateOf(QueueSelection.END_OF_QUEUE_WINDOWED) }
+    var songItemsToLike = remember { mutableStateListOf<MediaItem>() }
 
     Box(
         modifier = Modifier
@@ -1115,17 +1138,107 @@ fun HomeSongsModern(
                             )
                         }
 
+                        if (showRiMusicLikeYoutubeLikeConfirmDialog) {
+                            Database.asyncTransaction {
+                            totalMinutesToLike = formatAsDuration((if (listMediaItems.isNotEmpty()) (listMediaItems.filter { Database.getLikedAt(it.mediaId) !in listOf(-1L,null)}).size
+                                else (items.filter { Database.getLikedAt(it.asMediaItem.mediaId) !in listOf(-1L,null) }).size)*1000.toLong())
+                                }
+                            ConfirmationDialog(
+                                text = "$totalMinutesToLike "+stringResource(R.string.do_you_really_want_to_like_all_rimusictoytmusic),
+                                onDismiss = { showRiMusicLikeYoutubeLikeConfirmDialog = false },
+                                onConfirm = {
+                                    showRiMusicLikeYoutubeLikeConfirmDialog = false
+
+                                    if (listMediaItems.isNotEmpty()) {
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            addToYtLikedSongs(listMediaItems.filter { Database.getLikedAt(it.mediaId) !in listOf(-1L,null) }.map { it })
+                                        }
+                                    } else {
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            addToYtLikedSongs(items.filter { Database.getLikedAt(it.asMediaItem.mediaId) !in listOf(-1L,null) }.map { it.asMediaItem })
+                                        }
+                                    }
+                                }
+                            )
+                        }
+
+                        if (showYoutubeLikeConfirmDialog) {
+                            songItemsToLike.clear()
+                            if (listMediaItems.isEmpty()) {
+                                items.forEachIndexed { index, song ->
+                                    if (song.song.likedAt in listOf(-1L,null)) {
+                                        songItemsToLike.add(song.asMediaItem)
+                                    }
+                                }
+                            } else {
+                                Database.asyncTransaction {
+                                    listMediaItems.forEachIndexed { index, song ->
+                                        if (Database.getLikedAt(song.mediaId) in listOf(-1L,null)) {
+                                            songItemsToLike.add(song)
+                                        }
+                                    }
+                                }
+                            }
+                            totalMinutesToLike = formatAsDuration(((songItemsToLike).size*1000).toLong())
+                            ConfirmationDialog(
+                                text = "$totalMinutesToLike "+stringResource(R.string.do_you_really_want_to_like_all),
+                                onDismiss = { showYoutubeLikeConfirmDialog = false },
+                                onConfirm = {
+                                    showYoutubeLikeConfirmDialog = false
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        addToYtLikedSongs(songItemsToLike)
+                                    }
+                                }
+                            )
+                        }
+
                         if (deleteProgressDialog){
                             InProgressDialog(total = totalSongsToDelete, done = songsDeleted, text = stringResource(R.string.delete_in_process))
                         }
-
-                        Database.asyncTransaction {
-                            totalSongsToDelete = (itemsAll.filter {
-                                !it.song.id.startsWith(LOCAL_KEY_PREFIX)
-                                        && it.song.likedAt == null
-                                        && songUsedInPlaylists(it.song.id) == 0
-                                        && albumBookmarked(songAlbumInfo(it.song.id)?.id ?: "") == 0
-                            }).size
+                        LaunchedEffect(checkCheck) {
+                            if(!checkCheck) {
+                                return@LaunchedEffect
+                            }
+                            SmartMessage(
+                                context.resources.getString(R.string.please_wait),
+                                type = PopupType.Info, context = context
+                            )
+                            deleteProgressDialog = true
+                            withContext(Dispatchers.IO) {
+                                Database.asyncTransaction {
+                                    totalSongsToDelete = (itemsAll.filter {
+                                        !it.song.id.startsWith(LOCAL_KEY_PREFIX)
+                                                && it.song.likedAt == null
+                                                && songUsedInPlaylists(it.song.id) == 0
+                                                && albumBookmarked(
+                                            songAlbumInfo(it.song.id)?.id ?: "" ) == 0
+                                    }).size
+                                    if (totalSongsToDelete == 0) {
+                                        SmartMessage(
+                                            context.resources.getString(R.string.nothing_to_delete),
+                                            type = PopupType.Info, context = context
+                                        )
+                                        deleteProgressDialog = false
+                                    } else {
+                                        songsDeleted = 0
+                                        itemsAll.filter {!it.song.id.startsWith(LOCAL_KEY_PREFIX)}.forEach { song ->
+                                            Database.asyncTransaction {
+                                                if ((song.song.likedAt == null) && (Database.songUsedInPlaylists(song.song.id) == 0) && (Database.albumBookmarked(Database.songAlbumInfo(song.song.id)?.id?: "") == 0)) {
+                                                    binder?.cache?.removeResource(song.song.id)
+                                                    binder?.downloadCache?.removeResource(song.song.id)
+                                                    Database.delete(song.song)
+                                                    songsDeleted++
+                                                    if (songsDeleted == totalSongsToDelete) {
+                                                        deleteProgressDialog = false
+                                                        exitProcess(0)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    checkCheck = false
+                                }
+                            }
                         }
 
                         if (builtInPlaylist == BuiltInPlaylist.Favorites || builtInPlaylist == BuiltInPlaylist.Downloaded) {
@@ -1339,24 +1452,40 @@ fun HomeSongsModern(
                                             }
                                         },
                                         onAddToPreferites = {
-                                            if (listMediaItems.isNotEmpty()) {
-                                                listMediaItems.map {
+                                            if (!isNetworkConnected(appContext()) && isYouTubeSyncEnabled()) {
+                                                SmartMessage(appContext().resources.getString(R.string.no_connection), context = appContext(), type = PopupType.Error)
+                                            } else if (!isYouTubeSyncEnabled()){
+                                                if (listMediaItems.isNotEmpty()) {
                                                     Database.asyncTransaction {
-                                                        Database.like(
-                                                            it.mediaId,
-                                                            System.currentTimeMillis()
-                                                        )
+                                                        listMediaItems.filter{getLikedAt(it.mediaId) in listOf(-1L,null)}.map {
+                                                            Database.like(
+                                                                it.mediaId,
+                                                                System.currentTimeMillis()
+                                                            )
+                                                        }
+                                                    }
+                                                } else {
+                                                    Database.asyncTransaction {
+                                                        items.filter {
+                                                            getLikedAt(it.asMediaItem.mediaId) in listOf(-1L,null)
+                                                        }.map {
+                                                            Database.like(
+                                                                it.asMediaItem.mediaId,
+                                                                System.currentTimeMillis()
+                                                            )
+                                                        }
                                                     }
                                                 }
                                             } else {
-                                                items.map {
-                                                    Database.asyncTransaction {
-                                                        Database.like(
-                                                            it.asMediaItem.mediaId,
-                                                            System.currentTimeMillis()
-                                                        )
-                                                    }
-                                                }
+                                                showYoutubeLikeConfirmDialog = true
+                                            }
+                                        },
+                                        showonAddToPreferitesYoutube = isYouTubeSyncEnabled(),
+                                        onAddToPreferitesYoutube = {
+                                            if (!isNetworkConnected(appContext())) {
+                                                SmartMessage(appContext().resources.getString(R.string.no_connection), context = appContext(), type = PopupType.Error)
+                                            } else {
+                                                showRiMusicLikeYoutubeLikeConfirmDialog = true
                                             }
                                         },
                                         onAddToPlaylist = { playlistPreview ->
@@ -1366,59 +1495,41 @@ fun HomeSongsModern(
                                                 playlistPreview.songCount.minus(1) ?: 0
                                             if (position > 0) position++ else position = 0
 
-                                            items.forEachIndexed { index, song ->
-                                                runCatching {
-                                                    CoroutineScope(Dispatchers.IO).launch {
-                                                        Database.insert(song.song.asMediaItem)
-                                                        Database.insert(
-                                                            SongPlaylistMap(
-                                                                songId = song.song.asMediaItem.mediaId,
-                                                                playlistId = playlistPreview.playlist.id,
-                                                                position = position + index
+                                            val filteredItems = items.filterNot {it.asMediaItem.mediaId.startsWith(LOCAL_KEY_PREFIX) || it.song.thumbnailUrl == ""}
+                                            if ((filteredItems.size + playlistPreview.songCount) > 5000 && playlistPreview.playlist.isYoutubePlaylist && isYouTubeSyncEnabled()){
+                                                SmartMessage(context.resources.getString(R.string.yt_playlist_limited), context = context, type = PopupType.Error)
+                                            } else if (!isYouTubeSyncEnabled() || !playlistPreview.playlist.isYoutubePlaylist) {
+                                                items.forEachIndexed { index, song ->
+                                                    runCatching {
+                                                        CoroutineScope(Dispatchers.IO).launch {
+                                                            Database.insert(song.song.asMediaItem)
+                                                            Database.insert(
+                                                                SongPlaylistMap(
+                                                                    songId = song.song.asMediaItem.mediaId,
+                                                                    playlistId = playlistPreview.playlist.id,
+                                                                    position = position + index
+                                                                ).default()
                                                             )
-                                                        )
+                                                        }
+                                                    }.onFailure {
+                                                        Timber.e("Failed addToPlaylist in HomeSongsModern ${it.stackTraceToString()}")
+                                                        println("Failed addToPlaylist in HomeSongsModern ${it.stackTraceToString()}")
                                                     }
-                                                }.onFailure {
-                                                    Timber.e("Failed addToPlaylist in HomeSongsModern ${it.stackTraceToString()}")
-                                                    println("Failed addToPlaylist in HomeSongsModern ${it.stackTraceToString()}")
                                                 }
-                                                if(isYouTubeSyncEnabled() && !song.song.id.startsWith(
-                                                        LOCAL_KEY_PREFIX))
-                                                    CoroutineScope(Dispatchers.IO).launch {
-                                                        playlistPreview.playlist.browseId?.let { YtMusic.addToPlaylist(it, song.song.asMediaItem.mediaId) }
-                                                    }
-                                            }
-                                            CoroutineScope(Dispatchers.Main).launch {
-                                                SmartMessage(
-                                                    context.resources.getString(R.string.done),
-                                                    type = PopupType.Success, context = context
-                                                )
+                                                CoroutineScope(Dispatchers.Main).launch {
+                                                    SmartMessage(context.resources.getString(R.string.done), type = PopupType.Success, context = context)
+                                                }
+                                            } else {
+                                                CoroutineScope(Dispatchers.IO).launch {
+                                                    addToYtPlaylist(playlistPreview.playlist.id,
+                                                        position,
+                                                        playlistPreview.playlist.browseId ?: "",
+                                                        filteredItems.map { it.asMediaItem })
+                                                }
                                             }
                                         },
                                         onDeleteSongsNotInLibrary = {
-                                            if (totalSongsToDelete == 0) {
-                                                SmartMessage(
-                                                    context.resources.getString(R.string.nothing_to_delete),
-                                                    type = PopupType.Info, context = context
-                                                )
-                                            } else {
-                                                songsDeleted = 0
-                                                deleteProgressDialog = true
-                                                itemsAll.filter {!it.song.id.startsWith(LOCAL_KEY_PREFIX)}.forEach { song ->
-                                                    Database.asyncTransaction {
-                                                        if ((song.song.likedAt == null) && (Database.songUsedInPlaylists(song.song.id) == 0) && (Database.albumBookmarked(Database.songAlbumInfo(song.song.id)?.id?: "") == 0)) {
-                                                            binder?.cache?.removeResource(song.song.id)
-                                                            binder?.downloadCache?.removeResource(song.song.id)
-                                                            Database.delete(song.song)
-                                                            songsDeleted++
-                                                            if (songsDeleted == totalSongsToDelete) {
-                                                                deleteProgressDialog = false
-                                                                exitProcess(0)
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
+                                            checkCheck = true
                                         },
                                         onExport = {
                                             isExporting = true

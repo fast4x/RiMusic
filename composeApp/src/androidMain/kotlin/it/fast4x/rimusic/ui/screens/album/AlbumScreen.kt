@@ -83,6 +83,7 @@ import it.fast4x.rimusic.utils.rememberPreference
 import it.fast4x.rimusic.utils.thumbnailRoundnessKey
 import it.fast4x.rimusic.utils.transitionEffectKey
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -127,8 +128,9 @@ fun AlbumScreen(
     LaunchedEffect(Unit) {
         Database
             .album(browseId).collect { currentAlbum ->
+                println("AlbumScreen collect ${currentAlbum?.title}")
                 album = currentAlbum
-                withContext(Dispatchers.IO) {
+                runBlocking(Dispatchers.IO) {
                     if (albumPage == null)
                         YtMusic.getAlbum(browseId)
                             .onSuccess { currentAlbumPage ->
@@ -138,7 +140,7 @@ fun AlbumScreen(
                                 Database.upsert(
                                     Album(
                                         id = browseId,
-                                        title = if (album?.title?.startsWith(MODIFIED_PREFIX) == true) album?.title else currentAlbumPage.album.title,
+                                        title = album?.title ?: currentAlbumPage.album.title,
                                         thumbnailUrl = if (album?.thumbnailUrl?.startsWith(
                                                 MODIFIED_PREFIX
                                             ) == true
@@ -151,15 +153,16 @@ fun AlbumScreen(
                                             ?.joinToString(", ") { it.name ?: "" },
                                         shareUrl = currentAlbumPage.url,
                                         timestamp = System.currentTimeMillis(),
-                                        bookmarkedAt = album?.bookmarkedAt
+                                        bookmarkedAt = album?.bookmarkedAt,
+                                        isYoutubeAlbum = album?.isYoutubeAlbum == true
                                     ),
                                     currentAlbumPage
                                         .songs.distinct()
-                                        .map(Innertube.SongItem::asSong)
+                                        .map(Innertube.SongItem::asMediaItem)
                                         .onEach(Database::insert)
-                                        .mapIndexed { position, song ->
+                                        .mapIndexed { position, mediaItem ->
                                             SongAlbumMap(
-                                                songId = song.id,
+                                                songId = mediaItem.mediaId,
                                                 albumId = browseId,
                                                 position = position
                                             )

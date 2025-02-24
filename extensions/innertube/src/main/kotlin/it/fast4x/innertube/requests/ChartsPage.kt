@@ -89,7 +89,8 @@ fun Innertube.PlaylistItem.Companion.from(renderer: MusicCarouselShelfRenderer):
         channel = null,
         songCount = renderer
             .contents?.size,
-        thumbnail = thumbnail0 ?: thumbnail1
+        thumbnail = thumbnail0 ?: thumbnail1,
+        isEditable = false
     ).takeIf { it.info?.endpoint?.browseId != null }
 }
 

@@ -35,10 +35,12 @@ suspend fun Innertube.player(body: PlayerBody, withLogin: Boolean = false, signa
 }
 
 suspend fun Innertube.playerAdvanced(body: PlayerBody, withLogin: Boolean = false,): Result<Pair<String?, PlayerResponse?>> = runCatching {
-    val response = player(body.videoId, body.playlistId, withLogin = withLogin).getOrNull()
+    val response = player(body.videoId, body.playlistId,
+        withLogin = false //withLogin
+    ).getOrNull()
 
     println("Innertube newPlayer response adaptiveFormats ${response?.second?.streamingData?.adaptiveFormats}")
-    println("Innertube newPlayer response Formats ${response?.second?.streamingData?.formats}")
+    //println("Innertube newPlayer response Formats ${response?.second?.streamingData?.formats}")
     println("Innertube newPlayer response expire ${response?.second?.streamingData?.expiresInSeconds}")
 
     return@runCatching Pair(response?.first, response?.second)

@@ -40,6 +40,7 @@ import it.fast4x.rimusic.utils.ytAccountChannelHandleKey
 import it.fast4x.rimusic.utils.rememberEncryptedPreference
 import it.fast4x.rimusic.utils.rememberPreference
 import it.fast4x.rimusic.utils.ytAccountThumbnailKey
+import it.fast4x.rimusic.utils.ytDataSyncIdKey
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -56,6 +57,7 @@ fun YouTubeLogin(
     val scope = rememberCoroutineScope()
 
     var visitorData by rememberPreference(key = ytVisitorDataKey, defaultValue = Innertube.DEFAULT_VISITOR_DATA)
+    var dataSyncId by rememberPreference(key = ytDataSyncIdKey, defaultValue = "")
     var cookie by rememberPreference(key = ytCookieKey, defaultValue = "")
     var accountName by rememberPreference(key = ytAccountNameKey, defaultValue = "")
     var accountEmail by rememberPreference(key = ytAccountEmailKey, defaultValue = "")
@@ -106,6 +108,7 @@ fun YouTubeLogin(
 
                         override fun onPageFinished(view: WebView, url: String?) {
                             loadUrl("javascript:Android.onRetrieveVisitorData(window.yt.config_.VISITOR_DATA)")
+                            loadUrl("javascript:Android.onRetrieveDataSyncId(window.yt.config_.DATASYNC_ID)")
                         }
 
 
@@ -121,6 +124,12 @@ fun YouTubeLogin(
                         fun onRetrieveVisitorData(newVisitorData: String?) {
                             if (newVisitorData != null) {
                                 visitorData = newVisitorData
+                            }
+                        }
+                        @JavascriptInterface
+                        fun onRetrieveDataSyncId(newDataSyncId: String?) {
+                            if (newDataSyncId != null) {
+                                dataSyncId = newDataSyncId
                             }
                         }
                     }, "Android")

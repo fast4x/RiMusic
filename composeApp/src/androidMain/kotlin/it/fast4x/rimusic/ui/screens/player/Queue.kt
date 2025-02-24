@@ -87,9 +87,11 @@ import com.valentinilk.shimmer.shimmer
 import it.fast4x.compose.reordering.draggedItem
 import it.fast4x.compose.reordering.rememberReorderingState
 import it.fast4x.compose.reordering.reorder
+import it.fast4x.innertube.YtMusic
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
+import it.fast4x.rimusic.cleanPrefix
 import it.fast4x.rimusic.enums.NavRoutes
 import it.fast4x.rimusic.enums.PopupType
 import it.fast4x.rimusic.enums.QueueLoopType
@@ -140,12 +142,16 @@ import it.fast4x.rimusic.utils.thumbnailRoundnessKey
 import it.fast4x.rimusic.utils.windows
 import kotlinx.coroutines.launch
 import it.fast4x.rimusic.colorPalette
+import it.fast4x.rimusic.service.LOCAL_KEY_PREFIX
 import it.fast4x.rimusic.thumbnailShape
 import it.fast4x.rimusic.typography
+import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
+import it.fast4x.rimusic.utils.addToYtPlaylist
 import it.fast4x.rimusic.utils.asMediaItem
 import it.fast4x.rimusic.utils.asSong
 import it.fast4x.rimusic.utils.enqueue
 import it.fast4x.rimusic.utils.formatAsDuration
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -614,7 +620,7 @@ fun Queue(
                                                 downloadState = isDownloaded
                                             )
                                     },
-                                    downloadState = downloadState,
+                                    downloadState = getDownloadState(window.mediaItem.mediaId),
                                     thumbnailSizePx = thumbnailSizePx,
                                     thumbnailSizeDp = thumbnailSizeDp,
                                     onThumbnailContent = {
@@ -1001,33 +1007,57 @@ fun Queue(
                                         if (position > 0) position++ else position = 0
                                         //Log.d("mediaItem", "next initial pos ${position}")
                                         if (listMediaItems.isEmpty()) {
-                                            windows.forEachIndexed { index, song ->
-                                                Database.asyncTransaction {
-                                                    insert(song.mediaItem)
-                                                    insert(
-                                                        SongPlaylistMap(
-                                                            songId = song.mediaItem.mediaId,
-                                                            playlistId = playlistPreview.playlist.id,
-                                                            position = position + index
+                                            if (!isYouTubeSyncEnabled() || !playlistPreview.playlist.isYoutubePlaylist) {
+                                                windows.forEachIndexed { index, song ->
+                                                    Database.asyncTransaction {
+                                                        insert(song.mediaItem)
+                                                        insert(
+                                                            SongPlaylistMap(
+                                                                songId = song.mediaItem.mediaId,
+                                                                playlistId = playlistPreview.playlist.id,
+                                                                position = position + index
+                                                            ).default()
                                                         )
-                                                    )
+                                                    }
                                                 }
-                                                //Log.d("mediaItemPos", "added position ${position + index}")
+                                            } else {
+                                                CoroutineScope(Dispatchers.IO).launch {
+                                                    playlistPreview.playlist.browseId.let { id ->
+                                                        addToYtPlaylist(
+                                                            playlistPreview.playlist.id,
+                                                            position,
+                                                            cleanPrefix(id ?: ""),windows
+                                                                .filterNot {it.mediaItem.mediaId.startsWith(LOCAL_KEY_PREFIX)}
+                                                                .map { it.mediaItem })
+                                                    }
+                                                }
                                             }
                                         } else {
-                                            listMediaItems.forEachIndexed { index, song ->
-                                                //Log.d("mediaItemMaxPos", position.toString())
-                                                Database.asyncTransaction {
-                                                    insert(song)
-                                                    insert(
-                                                        SongPlaylistMap(
-                                                            songId = song.mediaId,
-                                                            playlistId = playlistPreview.playlist.id,
-                                                            position = position + index
+                                            if (!isYouTubeSyncEnabled() || !playlistPreview.playlist.isYoutubePlaylist) {
+                                                listMediaItems.forEachIndexed { index, song ->
+                                                    //Log.d("mediaItemMaxPos", position.toString())
+                                                    Database.asyncTransaction {
+                                                        insert(song)
+                                                        insert(
+                                                            SongPlaylistMap(
+                                                                songId = song.mediaId,
+                                                                playlistId = playlistPreview.playlist.id,
+                                                                position = position + index
+                                                            ).default()
                                                         )
-                                                    )
+                                                    }
+                                                    //Log.d("mediaItemPos", "add position $position")
                                                 }
-                                                //Log.d("mediaItemPos", "add position $position")
+                                            } else {
+                                                CoroutineScope(Dispatchers.IO).launch {
+                                                    playlistPreview.playlist.browseId.let { id ->
+                                                        addToYtPlaylist(
+                                                            playlistPreview.playlist.id,
+                                                            position,
+                                                            cleanPrefix(id ?: ""),
+                                                            listMediaItems.filterNot {it.mediaId.startsWith(LOCAL_KEY_PREFIX)})
+                                                    }
+                                                }
                                             }
                                             listMediaItems.clear()
                                             listMediaItemsIndex.clear()

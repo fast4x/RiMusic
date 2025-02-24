@@ -300,7 +300,13 @@ object MyDownloadHelper {
 
     fun autoDownloadWhenLiked(context: Context, mediaItem: MediaItem) {
         if (context.preferences.getBoolean(autoDownloadSongWhenLikedKey, false)) {
-            autoDownload(context, mediaItem)
+            Database.asyncQuery {
+                if (getLikedAt(mediaItem.mediaId) !in listOf(-1L,null)) {
+                    autoDownload(context, mediaItem)
+                } else {
+                    removeDownload(context, mediaItem)
+                }
+            }
         }
     }
 

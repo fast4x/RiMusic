@@ -945,7 +945,9 @@ fun HomeQuickPicks(
                                             )
                                             .fillMaxSize()
                                             .clickable(onClick = { navController.navigate(route = "${NavRoutes.localPlaylist.name}/${playlist.playlist.id}") }),
-                                        disableScrollingText = disableScrollingText
+                                        disableScrollingText = disableScrollingText,
+                                        isYoutubePlaylist = playlist.playlist.isYoutubePlaylist,
+                                        isEditable = playlist.playlist.isEditable
                                     )
                                 }
                             }

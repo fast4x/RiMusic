@@ -145,6 +145,7 @@ fun Innertube.PlaylistItem.Companion.from(content: MusicShelfRenderer.Content): 
             ?.firstOrNull()
             ?.toIntOrNull(),
         thumbnail = content
-            .thumbnail
+            .thumbnail,
+        isEditable = false
     ).takeIf { it.info?.endpoint?.browseId != null }
 }

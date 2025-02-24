@@ -6,5 +6,6 @@ object YoutubePreferences {
 
 data class YoutubePreferenceItem(
     var cookie: String?,
-    var visitordata: String?
+    var visitordata: String?,
+    var dataSyncId: String?
 )

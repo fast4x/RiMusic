@@ -10,8 +10,10 @@ import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.enums.AudioQualityFormat
 import it.fast4x.rimusic.models.Format
 import it.fast4x.rimusic.service.modern.PlayerServiceModern
+import it.fast4x.rimusic.service.modern.getAvancedInnerTubeStream
 import it.fast4x.rimusic.service.modern.getInnerTubeFormatUrl
 import it.fast4x.rimusic.service.modern.getInnerTubeStream
+import it.fast4x.rimusic.ui.screens.settings.isYouTubeLoggedIn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import me.knighthat.piped.Piped
@@ -122,19 +124,23 @@ internal suspend fun MyDownloadHelper.dataSpecProcess(
         return dataSpec.withUri(Uri.parse(dataSpec.uri.toString()))
     }
 
-    var dataSpecReturn: DataSpec = dataSpec
+
     try {
-        runBlocking(Dispatchers.IO) {
-            val format = getInnerTubeStream(videoId, audioQualityFormat, connectionMetered)
-            dataSpecReturn = dataSpec.withUri(Uri.parse(format?.url))
-        }
-        return dataSpecReturn
+        //runBlocking(Dispatchers.IO) {
+            //if loggedin use advanced player with webPotoken and new newpipe extractor
+            val format = if (!isYouTubeLoggedIn()) getInnerTubeStream(videoId, audioQualityFormat, connectionMetered)
+            else getAvancedInnerTubeStream(videoId, audioQualityFormat, connectionMetered)
+            return dataSpec.withUri(Uri.parse(format?.url))
+        //}
+
 
     } catch ( e: Exception ) {
         println("MyDownloadHelper DataSpecProcess Error: ${e.stackTraceToString()}")
-        println("MyDownloadHelper DataSpecProcess Playing song $videoId from ALTERNATIVE url")
-        val alternativeUrl = "https://jossred.josprox.com/yt/stream/$videoId"
-        return dataSpec.withUri(alternativeUrl.toUri())
+        val format = getInnerTubeStream(videoId, audioQualityFormat, connectionMetered)
+        return dataSpec.withUri(Uri.parse(format?.url))
+//        println("MyDownloadHelper DataSpecProcess Playing song $videoId from ALTERNATIVE url")
+//        val alternativeUrl = "https://jossred.josprox.com/yt/stream/$videoId"
+//        return dataSpec.withUri(alternativeUrl.toUri())
 
     } catch ( e: Exception ) {
         // Rethrow exception if it's not handled

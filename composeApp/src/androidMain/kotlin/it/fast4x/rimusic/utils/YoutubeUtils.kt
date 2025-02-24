@@ -19,10 +19,14 @@ fun getStreamUrl(
     format: PlayerResponse.StreamingData.Format,
     videoId: String
 ): String? {
-    return NewPipeUtils.getStreamUrl(format, videoId)
+    val streamUrl =  NewPipeUtils.getStreamUrl(format, videoId)
         .onFailure {
             Timber.e("NewPipeUtils getStreamUrlOrNull Error while getting stream url ${it.stackTraceToString()}")
             println("NewPipeUtils getStreamUrlOrNull Error while getting stream url ${it.stackTraceToString()}")
         }
         .getOrNull()
+
+    println("NewPipeUtils getStreamUrlOrNull streamUrl $streamUrl")
+
+    return streamUrl
 }

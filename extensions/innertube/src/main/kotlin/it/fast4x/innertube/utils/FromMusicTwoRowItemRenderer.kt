@@ -91,6 +91,7 @@ fun Innertube.PlaylistItem.Companion.from(renderer: MusicTwoRowItemRenderer): In
             ?.musicThumbnailRenderer
             ?.thumbnail
             ?.thumbnails
-            ?.firstOrNull()
+            ?.firstOrNull(),
+        isEditable = false
     ).takeIf { it.info?.endpoint?.browseId != null }
 }

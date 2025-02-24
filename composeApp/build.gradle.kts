@@ -72,6 +72,9 @@ kotlin {
             implementation(libs.navigation)
             implementation(libs.media3.session)
             implementation(libs.kotlin.coroutines.guava)
+            implementation(libs.newpipe.extractor)
+            implementation(libs.nanojson)
+            implementation(libs.androidx.webkit)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -123,8 +126,8 @@ android {
         applicationId = "it.fast4x.rimusic"
         minSdk = 21
         targetSdk = 35
-        versionCode = 81
-        versionName = "0.6.69"
+        versionCode = 83
+        versionName = "0.6.71"
     }
 
     splits {

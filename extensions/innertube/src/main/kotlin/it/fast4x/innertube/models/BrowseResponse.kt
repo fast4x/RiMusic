@@ -11,8 +11,39 @@ data class BrowseResponse(
     val header: Header?,
     val microformat: Microformat?,
     val responseContext: ResponseContext?,
-    val background: ThumbnailRenderer?
+    val background: ThumbnailRenderer?,
+    val onResponseReceivedActions: List<OnResponseReceivedAction>?
 ) {
+    @Serializable
+    data class OnResponseReceivedAction (
+        val clickTrackingParams: String?,
+        val appendContinuationItemsAction: AppendContinuationItemsAction?
+    )
+    @Serializable
+    data class AppendContinuationItemsAction (
+        val continuationItems: List<ContinuationItem>?,
+    )
+    @Serializable
+    data class ContinuationItem (
+        val musicResponsiveListItemRenderer: MusicResponsiveListItemRenderer? = null,
+        val continuationItemRenderer: ContinuationItemRenderer? = null
+    )
+    @Serializable
+    data class ContinuationItemRenderer (
+        val trigger: String? = null,
+        val continuationEndpoint: ContinuationEndpoint? = null
+    )
+    @Serializable
+    data class ContinuationEndpoint (
+        val clickTrackingParams: String? = null,
+        val continuationCommand: ContinuationCommand? = null
+    )
+    @Serializable
+    data class ContinuationCommand (
+        val token: String? = null,
+        val request: String? = null
+    )
+
     @Serializable
     data class Contents(
         val singleColumnBrowseResultsRenderer: Tabs?,

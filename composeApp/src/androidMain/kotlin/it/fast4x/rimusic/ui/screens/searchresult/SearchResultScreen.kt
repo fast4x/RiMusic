@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +40,8 @@ import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.enums.NavRoutes
 import it.fast4x.rimusic.models.Album
+import it.fast4x.rimusic.models.Artist
+import it.fast4x.rimusic.models.Playlist
 import it.fast4x.rimusic.models.SongAlbumMap
 import it.fast4x.rimusic.ui.components.LocalMenuState
 import it.fast4x.rimusic.ui.components.Skeleton
@@ -78,6 +81,7 @@ import it.fast4x.rimusic.utils.showButtonPlayerVideoKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -245,7 +249,7 @@ fun SearchResultScreen(
                                             thumbnailContent = {
                                                 NowPlayingSongIndicator(song.asMediaItem.mediaId, binder?.player)
                                             },
-                                            downloadState = downloadState,
+                                            downloadState = getDownloadState(song.asMediaItem.mediaId),
                                             thumbnailSizePx = thumbnailSizePx,
                                             thumbnailSizeDp = thumbnailSizeDp,
                                             modifier = Modifier
@@ -478,11 +482,18 @@ fun SearchResultScreen(
                                             }
                                         }
                                     ) {
+                                        var albumById by remember { mutableStateOf<Album?>(null) }
+                                        LaunchedEffect(album) {
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                albumById = Database.album(album.key).firstOrNull()
+                                            }
+                                        }
                                         AlbumItem(
                                             yearCentered = false,
                                             album = album,
                                             thumbnailSizePx = thumbnailSizePx,
                                             thumbnailSizeDp = thumbnailSizeDp,
+                                            isYoutubeAlbum = albumById?.isYoutubeAlbum == true,
                                             modifier = Modifier
                                                 .combinedClickable(
                                                     onClick = {
@@ -526,15 +537,23 @@ fun SearchResultScreen(
                                 emptyItemsText = emptyItemsText,
                                 headerContent = headerContent,
                                 itemContent = { artist ->
+                                    var artistById by remember { mutableStateOf<Artist?>(null) }
+                                    LaunchedEffect(artist) {
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            artistById = Database.artist(artist.key).firstOrNull()
+                                        }
+                                    }
                                     ArtistItem(
                                         artist = artist,
                                         thumbnailSizePx = thumbnailSizePx,
                                         thumbnailSizeDp = thumbnailSizeDp,
+                                        isYoutubeArtist = artistById?.isYoutubeArtist == true,
                                         modifier = Modifier
                                             .clickable(onClick = {
                                                 navController.navigate("${NavRoutes.artist.name}/${artist.key}")
                                             }),
-                                        disableScrollingText = disableScrollingText
+                                        disableScrollingText = disableScrollingText,
+                                        smallThumbnail = true
                                     )
                                 },
                                 itemPlaceholderContent = {
@@ -663,11 +682,18 @@ fun SearchResultScreen(
                                 emptyItemsText = emptyItemsText,
                                 headerContent = headerContent,
                                 itemContent = { playlist ->
+                                    var playlistById by remember { mutableStateOf<Playlist?>(null) }
+                                    LaunchedEffect(playlist) {
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            playlistById = Database.playlist(playlist.key.substringAfter("VL")).firstOrNull()
+                                        }
+                                    }
                                     PlaylistItem(
                                         playlist = playlist,
                                         thumbnailSizePx = thumbnailSizePx,
                                         thumbnailSizeDp = thumbnailSizeDp,
                                         showSongsCount = false,
+                                        isYoutubePlaylist = playlistById?.isYoutubePlaylist == true,
                                         modifier = Modifier
                                             .clickable(onClick = {
                                                 //playlistRoute(playlist.key)

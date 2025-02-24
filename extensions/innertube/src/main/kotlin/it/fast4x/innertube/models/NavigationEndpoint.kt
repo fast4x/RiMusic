@@ -52,6 +52,7 @@ data class NavigationEndpoint(
     val watchPlaylistEndpoint: Endpoint.WatchPlaylist?,
     val browseEndpoint: Endpoint.Browse?,
     val searchEndpoint: Endpoint.Search?,
+    val playlistEditEndpoint: PlaylistEditEndpoint? = null,
 ) {
     val endpoint: Endpoint?
         get() = watchEndpoint ?: browseEndpoint ?: watchPlaylistEndpoint ?: searchEndpoint

@@ -70,7 +70,7 @@ fun ShowDevelopers() {
 
     Box( Modifier.fillMaxWidth().height( 600.dp ) ) {
         LazyColumn( Modifier.fillMaxWidth().padding( top = 15.dp ) ) {
-            items( developersList ) { it.Draw() }
+            items( developersList.filterNot { it.username == "eddisch2010" } ) { it.Draw() }
         }
     }
 }
@@ -118,7 +118,7 @@ fun ShowTranslators() {
 
     Box( Modifier.fillMaxWidth().height( 600.dp ) ) {
         LazyColumn( Modifier.fillMaxWidth().padding( top = 15.dp ) ) {
-            items( translatorsList ) { it.Draw() }
+            items( translatorsList.filterNot { it.username == "eddisch2010" } ) { it.Draw() }
         }
     }
 }
