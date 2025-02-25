@@ -169,7 +169,7 @@ fun HomeDiscovery(
                 var newReleaseAlbumsFiltered by persistList<Innertube.AlbumItem>("discovery/newalbumsartist")
                 page.newReleaseAlbums.forEach { album ->
                     preferitesArtists.forEach { artist ->
-                        if (artist.name == album.authors?.first()?.name) {
+                        if (artist.name == album.authors?.first()?.name) { // TODO, only searches first author
                             newReleaseAlbumsFiltered += album
                             //Log.d("mediaItem","artst ok")
                         }

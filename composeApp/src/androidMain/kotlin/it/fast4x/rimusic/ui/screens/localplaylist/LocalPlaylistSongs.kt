@@ -199,6 +199,7 @@ import it.fast4x.rimusic.ui.components.themed.SongMatchingDialog
 import it.fast4x.rimusic.utils.addToYtLikedSongs
 import it.fast4x.rimusic.utils.addToYtPlaylist
 import it.fast4x.rimusic.utils.asSong
+import it.fast4x.rimusic.utils.filterSongEntities
 import it.fast4x.rimusic.utils.formatAsDuration
 import it.fast4x.rimusic.utils.getAlbumVersionFromVideo
 import it.fast4x.rimusic.utils.isExplicit
@@ -206,7 +207,6 @@ import it.fast4x.rimusic.utils.isNetworkConnected
 import it.fast4x.rimusic.utils.mediaItemToggleLike
 import it.fast4x.rimusic.utils.playlistSongsTypeFilterKey
 import it.fast4x.rimusic.utils.removeYTSongFromPlaylist
-import it.fast4x.rimusic.utils.thumbnail
 import it.fast4x.rimusic.utils.updateLocalPlaylist
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -373,21 +373,7 @@ fun LocalPlaylistSongs(
     filterCharSequence = filter.toString()
 
     if (!filter.isNullOrBlank())
-        playlistSongs =
-            playlistSongs.filter { songItem ->
-                songItem.song.title.contains(
-                    filterCharSequence,
-                    true
-                ) ?: false
-                        || songItem.song.artistsText?.contains(
-                    filterCharSequence,
-                    true
-                ) ?: false
-                        || songItem.albumTitle?.contains(
-                    filterCharSequence,
-                    true
-                ) ?: false
-            }
+        playlistSongs = filterSongEntities(playlistAllSongs, filterCharSequence)
 
     var searching by rememberSaveable { mutableStateOf(false) }
 

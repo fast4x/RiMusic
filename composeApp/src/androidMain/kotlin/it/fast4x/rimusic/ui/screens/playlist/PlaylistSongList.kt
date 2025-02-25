@@ -39,7 +39,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -77,14 +76,10 @@ import it.fast4x.compose.persist.persistList
 import it.fast4x.innertube.Innertube
 import it.fast4x.innertube.YtMusic
 import it.fast4x.innertube.models.NavigationEndpoint
-import it.fast4x.innertube.models.bodies.BrowseBody
 import it.fast4x.innertube.requests.PlaylistPage
-import it.fast4x.innertube.requests.playlistPage
 import it.fast4x.innertube.utils.completed
 import it.fast4x.rimusic.Database
-import it.fast4x.rimusic.Database.Companion.insert
 import it.fast4x.rimusic.Database.Companion.like
-import it.fast4x.rimusic.EXPLICIT_PREFIX
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.appContext
@@ -120,7 +115,6 @@ import it.fast4x.rimusic.ui.styling.px
 import it.fast4x.rimusic.utils.addNext
 import it.fast4x.rimusic.utils.asMediaItem
 import it.fast4x.rimusic.utils.asSong
-import it.fast4x.rimusic.utils.completed
 import it.fast4x.rimusic.utils.disableScrollingTextKey
 import it.fast4x.rimusic.utils.durationTextToMillis
 import it.fast4x.rimusic.utils.enqueue
@@ -153,6 +147,7 @@ import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
 import it.fast4x.rimusic.utils.addToYtLikedSongs
 import it.fast4x.rimusic.utils.align
 import it.fast4x.rimusic.utils.color
+import it.fast4x.rimusic.utils.filterInnerTubeSongs
 import it.fast4x.rimusic.utils.formatAsDuration
 import it.fast4x.rimusic.utils.getHttpClient
 import it.fast4x.rimusic.utils.isNetworkConnected
@@ -162,7 +157,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import me.bush.translator.Language
 import me.bush.translator.Translator
 import timber.log.Timber
-import java.io.File
 
 
 @ExperimentalTextApi
@@ -241,21 +235,7 @@ fun PlaylistSongList(
     filterCharSequence = filter.toString()
     //Log.d("mediaItemFilter", "<${filter}>  <${filterCharSequence}>")
     if (!filter.isNullOrBlank()) {
-        playlistPage?.songs =
-            playlistPage?.songs?.filter { songItem ->
-                songItem.asMediaItem.mediaMetadata.title?.contains(
-                    filterCharSequence,
-                    true
-                ) ?: false
-                        || songItem.asMediaItem.mediaMetadata.artist?.contains(
-                    filterCharSequence,
-                    true
-                ) ?: false
-                        || songItem.asMediaItem.mediaMetadata.albumTitle?.contains(
-                    filterCharSequence,
-                    true
-                ) ?: false
-            }!!
+        playlistPage?.songs = filterInnerTubeSongs(playlistSongs, filterCharSequence)
     } else playlistPage?.songs = playlistSongs
 
     var playlistNotLikedSongs by persistList<Innertube.SongItem>("")
