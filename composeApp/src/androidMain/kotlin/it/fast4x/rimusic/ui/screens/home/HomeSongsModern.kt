@@ -82,13 +82,11 @@ import androidx.navigation.NavController
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import it.fast4x.compose.persist.persistList
-import it.fast4x.innertube.YtMusic
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.EXPLICIT_PREFIX
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.appContext
-import it.fast4x.rimusic.cleanPrefix
 import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.enums.BuiltInPlaylist
 import it.fast4x.rimusic.enums.CacheType
@@ -153,7 +151,6 @@ import it.fast4x.rimusic.utils.center
 import it.fast4x.rimusic.utils.color
 import it.fast4x.rimusic.utils.defaultFolderKey
 import it.fast4x.rimusic.utils.disableScrollingTextKey
-import it.fast4x.rimusic.utils.downloadedStateMedia
 import it.fast4x.rimusic.utils.durationTextToMillis
 import it.fast4x.rimusic.utils.enqueue
 import it.fast4x.rimusic.utils.excludeSongsWithDurationLimitKey
@@ -194,19 +191,17 @@ import java.util.Date
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.time.Duration
-import it.fast4x.rimusic.ui.components.SwipeablePlaylistItem
 import it.fast4x.rimusic.ui.components.themed.CacheSpaceIndicator
 import it.fast4x.rimusic.ui.components.themed.InProgressDialog
 import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
 import it.fast4x.rimusic.utils.addToYtLikedSongs
 import it.fast4x.rimusic.utils.addToYtPlaylist
 import it.fast4x.rimusic.utils.asSong
+import it.fast4x.rimusic.utils.filterSongEntities
 import it.fast4x.rimusic.utils.formatAsDuration
 import it.fast4x.rimusic.utils.isDownloadedSong
 import it.fast4x.rimusic.utils.isNetworkConnected
 import it.fast4x.rimusic.utils.isNowPlaying
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.system.exitProcess
 
@@ -320,7 +315,7 @@ fun HomeSongsModern(
     var filteredSongs = songs
 
     var filteredFolders = folders
-    var currentFolder: Folder? = null;
+    var currentFolder: Folder? = null
     var currentFolderPath by remember {
         mutableStateOf(defaultFolder)
     }
@@ -647,28 +642,15 @@ fun HomeSongsModern(
     var filterCharSequence: CharSequence
     filterCharSequence = filter.toString()
     /******** OnDeviceDev */
-    if (builtInPlaylist == BuiltInPlaylist.OnDevice) {
-        if (!filter.isNullOrBlank())
-            filteredSongs = songs
-                .filter {
-                    it.song.title.contains(filterCharSequence,true) ?: false
-                            || it.song.artistsText?.contains(filterCharSequence,true) ?: false
-                            || it.albumTitle?.contains(filterCharSequence,true) ?: false
-                }
-        if (!filter.isNullOrBlank())
+    if (!filter.isNullOrBlank())
+        if (builtInPlaylist == BuiltInPlaylist.OnDevice) {
+            filteredSongs = filterSongEntities(songs, filterCharSequence)
             filteredFolders = folders
-                .filter {
+                .filter { // TODO folder filter, unsure what this is
                     it.name.contains(filterCharSequence,true)
                 }
-    } else {
-        if (!filter.isNullOrBlank())
-            items = items
-                .filter {
-                    it.song.title.contains(filterCharSequence,true) ?: false
-                            || it.song.artistsText?.contains(filterCharSequence,true) ?: false
-                            || it.albumTitle?.contains(filterCharSequence,true) ?: false
-                }
-    }
+        } else
+            items = filterSongEntities(items, filterCharSequence)
     /******** */
 
     var searching by rememberSaveable { mutableStateOf(false) }
@@ -1741,7 +1723,7 @@ fun HomeSongsModern(
                                                         thumbnailSizeDp = thumbnailSizeDp,
                                                         disableScrollingText = disableScrollingText
                                                     )
-                                                };
+                                                }
                                                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                             },
                                             onClick = {
