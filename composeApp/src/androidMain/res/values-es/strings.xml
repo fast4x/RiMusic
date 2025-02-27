@@ -925,14 +925,14 @@
     <string name="adding_yt_to_pl_failed">Se ha producido un error en las siguientes 50 canciones. Añadiendo canciones a la lista de reproducción una a una</string>
     <string name="songs_add_yt_success">Canción añadida a la lista de reproducción de YouTube</string>
     <string name="songs_add_yt_failed">Error al añadir la canción en la lista de reproducción de YouTube</string>
-    <string name="viewType">Change view type</string>
-    <string name="copy_translated_lyrics">Copy translated lyrics</string>
-    <string name="description">Description</string>
-    <string name="numbers">Numbers</string>
-    <string name="subscribers">Subscribers</string>
-    <string name="views">Views</string>
-    <string name="likes">Likes</string>
-    <string name="dislikes">Dislikes</string>
-    <string name="loudness_boost_level">Loudness boost level</string>
-    <string name="loudness_boost_level_info">Additional loudness level, to be used without overdoing it, may damage the device</string>
+    <string name="viewType">Cambiar el tipo de vista</string>
+    <string name="copy_translated_lyrics">Copiar la letra traducida</string>
+    <string name="description">Descripción</string>
+    <string name="numbers">Números</string>
+    <string name="subscribers">Suscriptores</string>
+    <string name="views">Vistas</string>
+    <string name="likes">Me gustas</string>
+    <string name="dislikes">No me gustan</string>
+    <string name="loudness_boost_level">Nivel de amplificación del volumen</string>
+    <string name="loudness_boost_level_info">Nivel de volumen adicional (si se aumenta en exceso, puede dañar el dispositivo)</string>
 </resources>
