@@ -181,7 +181,7 @@ fun Podcast(
                 songItem.asMediaItem.mediaMetadata.title?.contains(filterCharSequence,true) ?: false
                         || songItem.asMediaItem.mediaMetadata.artist?.contains(filterCharSequence,true) ?: false
             }
-    */
+    */ // TODO why is this commented
 
     var searching by rememberSaveable { mutableStateOf(false) }
 

@@ -87,7 +87,6 @@ import com.valentinilk.shimmer.shimmer
 import it.fast4x.compose.reordering.draggedItem
 import it.fast4x.compose.reordering.rememberReorderingState
 import it.fast4x.compose.reordering.reorder
-import it.fast4x.innertube.YtMusic
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
@@ -147,10 +146,9 @@ import it.fast4x.rimusic.thumbnailShape
 import it.fast4x.rimusic.typography
 import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
 import it.fast4x.rimusic.utils.addToYtPlaylist
-import it.fast4x.rimusic.utils.asMediaItem
 import it.fast4x.rimusic.utils.asSong
 import it.fast4x.rimusic.utils.enqueue
-import it.fast4x.rimusic.utils.formatAsDuration
+import it.fast4x.rimusic.utils.filterWindowSongs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import java.text.SimpleDateFormat
@@ -405,13 +403,7 @@ fun Queue(
         var filterCharSequence: CharSequence
         filterCharSequence = filter.toString()
         if (!filter.isNullOrBlank())
-            windowsFiltered = windowsFiltered
-                .filter {
-                    it.mediaItem.mediaMetadata.title?.contains(filterCharSequence, true) ?: false ||
-                            it.mediaItem.mediaMetadata.artist?.contains(filterCharSequence, true) ?: false ||
-                            it.mediaItem.mediaMetadata.albumTitle?.contains(filterCharSequence, true) ?: false ||
-                            it.mediaItem.mediaMetadata.albumArtist?.contains(filterCharSequence, true) ?: false
-                }
+            windowsFiltered = filterWindowSongs(windows, filterCharSequence)
 
         Column {
             Box(

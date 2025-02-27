@@ -74,11 +74,9 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import it.fast4x.innertube.YtMusic
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
-import it.fast4x.rimusic.cleanPrefix
 import it.fast4x.rimusic.enums.DeviceLists
 import it.fast4x.rimusic.enums.NavRoutes
 import it.fast4x.rimusic.enums.NavigationBarPosition
@@ -150,8 +148,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.typography
-import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
-import kotlinx.coroutines.launch
+import it.fast4x.rimusic.utils.filterSongEntities
 import timber.log.Timber
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
@@ -276,15 +273,11 @@ fun DeviceListSongs(
         filterCharSequence = filter.toString()
         //Log.d("mediaItemFilter", "<${filter}>  <${filterCharSequence}>")
         if (!filter.isNullOrBlank())
-            filteredSongs = songs
-                .filter {
-                    it.song.title.contains(filterCharSequence,true) ?: false
-                            || it.song.artistsText?.contains(filterCharSequence,true) ?: false
-                }
+            filteredSongs = filterSongEntities(songs, filterCharSequence)
         if (!filter.isNullOrBlank())
             filteredFolders = folders
                 .filter {
-                    it.name.contains(filterCharSequence,true)
+                    it.name.contains(filterCharSequence,true) // TODO OperatorSearch
                 }
 
         var searching by rememberSaveable { mutableStateOf(false) }
