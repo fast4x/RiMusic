@@ -165,6 +165,7 @@ import it.fast4x.rimusic.ui.components.tab.toolbar.DownloadAllDialog
 import it.fast4x.rimusic.ui.components.tab.toolbar.SongsShuffle
 import it.fast4x.rimusic.thumbnailShape
 import it.fast4x.rimusic.typography
+import it.fast4x.rimusic.utils.filterMediaMetadata
 import okhttp3.internal.filterList
 import timber.log.Timber
 import java.util.Optional
@@ -491,14 +492,9 @@ fun HomeSongs(
             items.distinctBy { it.song.id }
                 .filter( naturalFilter )
                  .filter {
-                     // Without cleaning, user can search explicit songs with "e:"
-                     // I kinda want this to be a feature, but it seems unnecessary
-                     val containsTitle = it.song.cleanTitle().contains(search.input, true)
-                     val containsArtist = it.song.artistsText?.contains(search.input, true) ?: false
-                     val containsAlbum = it.albumTitle?.contains(search.input, true) ?: false
+                     val included = filterMediaMetadata(it.song.asMediaItem.mediaMetadata, search.input)
                      val isExplicit = parentalControlEnabled && it.song.title.startsWith(EXPLICIT_PREFIX)
-
-                     containsTitle || containsArtist || containsAlbum || isExplicit
+                     included || isExplicit // TODO consolidate Explicit with new filter stuff
                  }
         }
     }

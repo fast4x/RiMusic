@@ -147,9 +147,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import it.fast4x.rimusic.colorPalette
-import it.fast4x.rimusic.service.modern.isLocal
 import it.fast4x.rimusic.thumbnailShape
 import it.fast4x.rimusic.typography
+import it.fast4x.rimusic.utils.filterSongs
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -332,11 +332,7 @@ fun BuiltInPlaylistSongs(
     filterCharSequence = filter.toString()
     //Log.d("mediaItemFilter", "<${filter}>  <${filterCharSequence}>")
     if (!filter.isNullOrBlank())
-    songs = songs
-        .filter {
-            it.title.contains(filterCharSequence,true)
-            || it.artistsText?.contains(filterCharSequence,true) ?: false
-        }
+        songs = filterSongs(songs, filterCharSequence)
 
     var searching by rememberSaveable { mutableStateOf(false) }
 
