@@ -3,6 +3,7 @@ package it.fast4x.rimusic.utils
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Timeline
 import it.fast4x.environment.Environment
+import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.models.Album
 import it.fast4x.rimusic.models.Song
 import it.fast4x.rimusic.models.SongEntity
@@ -10,10 +11,14 @@ import it.fast4x.rimusic.models.SongEntity
 enum class TokenType { REQUIRED, EXCLUDED }
 data class Token(val field: String, val value: String, val type: TokenType)
 
-// TODO explicit operator (?)
+/*
+    TODO explicit operator (?)
+    TODO consolidate filter song functions possibly
+    TODO localization support using R. Specifically, OR, song, artist, album
+*/
 fun parseSearchQuery(query: String): List<List<Token>> {
     // The search tokens can be labeled (with quotes), labeled (without quotes), and unlabeled.
-    val regex = Regex("""(-?)(title|artist|album):"([^"]+)"|(-?)(title|artist|album):(\S+)|(-?)(\S+)""")
+    val regex = Regex("""(-?)(song|artist|album):"([^"]+)"|(-?)(song|artist|album):(\S+)|(-?)(\S+)""")
     val tokens = mutableListOf<List<Token>>()
     var currentGroup = mutableListOf<Token>()
 
@@ -42,24 +47,31 @@ fun parseSearchQuery(query: String): List<List<Token>> {
     return tokens
 }
 
+var tokensCache: Pair<String, List<List<Token>>>? = null
 fun filterMediaMetadata(metadata: MediaMetadata, filter: String): Boolean {
     val filterTrim = filter.trim()
     if (filterTrim.isBlank()) return true // Default should let everything be shown.
 
-    val tokenGroups = parseSearchQuery(filterTrim) // TODO this is done more than it needs to be.
+    val tokenGroups: List<List<Token>> = when (tokensCache) {
+        null -> parseSearchQuery(filterTrim)
+        else -> when (tokensCache!!.first) {
+            filter -> tokensCache!!.second
+            else -> parseSearchQuery(filterTrim)
+        }
+    }
+    tokensCache = filter to tokenGroups
     val exclusionTokens = tokenGroups.flatten().filter { it.type == TokenType.EXCLUDED }
-    val orGroups = tokenGroups.map { group -> group.filter { it.type != TokenType.EXCLUDED } }
+    val orGroups = tokenGroups.map { group: List<Token> -> group.filter { it.type != TokenType.EXCLUDED } }
 
     val metadataFields = mapOf(
-        "title" to (metadata.title ?: ""),
+        "song" to (metadata.title ?: ""),
         "artist" to (metadata.artist ?: ""),
         "album" to (metadata.albumTitle ?: ""),
-        // TODO year / range of years.
     )
 
     // Step 1: Apply OR groups (at least one group must match)
     val matchesOrCondition = orGroups.any { group ->
-        group.all { token ->
+        group.all { token: Token ->
             val searchFields = if (metadataFields.containsKey(token.field)) {
                 listOf(metadataFields[token.field] ?: "")
             } else {
@@ -80,50 +92,31 @@ fun filterMediaMetadata(metadata: MediaMetadata, filter: String): Boolean {
 
 // Filter function for Song
 fun filterSongs(items: List<Song>, filter: String): List<Song> {
-    return items.filter { song ->
-        val metadata = MediaMetadata.Builder()
-            .setTitle(song.cleanTitle())
-            .setArtist(song.artistsText)
-            // TODO: album. use database ?
-            .build()
-        filterMediaMetadata(metadata, filter)
+    return items.filter { it -> filterMediaMetadata(it.asMediaItem.mediaMetadata, filter)
     }
 }
 
 // Filter function for InnerTube.SongItem (used in playlists)
-fun filterInnerTubeSongs(items: List<Environment.SongItem>?, filter: String): List<Environment.SongItem> {
-    return items?.filter { songItem ->
-        filterMediaMetadata(songItem.asMediaItem.mediaMetadata, filter)
-    }!!
+fun filterSongItems(items: List<Environment.SongItem>?, filter: String): List<Environment.SongItem> {
+    return items?.filter { it -> filterMediaMetadata(it.asMediaItem.mediaMetadata, filter) }!!
 }
 
 // Filter function for SongEntity
 fun filterSongEntities(items: List<SongEntity>, filter: String): List<SongEntity> {
-    return items.filter { entity ->
-        val metadata = MediaMetadata.Builder()
-            .setTitle(entity.song.title)
-            .setArtist(entity.song.artistsText)
-            .setAlbumTitle(entity.albumTitle)
-            // TODO year.
-            .build()
-        filterMediaMetadata(metadata, filter)
-    }
+    return items.filter { filterMediaMetadata(it.asMediaItem.mediaMetadata, filter) }
 }
 
 // Filter function for Timeline.Window (Queue item)
 fun filterWindowSongs(items: List<Timeline.Window>, filter: String): List<Timeline.Window> {
-    return items.filter { window ->
-        filterMediaMetadata(window.mediaItem.mediaMetadata, filter)
-    }
+    return items.filter { filterMediaMetadata(it.mediaItem.mediaMetadata, filter) }
 }
 
 // Filter function for Album
 fun filterAlbums(items: List<Album>, filter: String): List<Album> {
     return items.filter { album ->
         val metadata = MediaMetadata.Builder()
-            .setTitle(album.title)
+            .setAlbumTitle(album.title)
             .setArtist(album.authorsText)
-            .setReleaseYear(album.year?.toInt()) // TODO not yet implemented.
             .build()
         filterMediaMetadata(metadata, filter)
     }

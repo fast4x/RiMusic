@@ -147,7 +147,7 @@ import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
 import it.fast4x.rimusic.utils.addToYtLikedSongs
 import it.fast4x.rimusic.utils.align
 import it.fast4x.rimusic.utils.color
-import it.fast4x.rimusic.utils.filterInnerTubeSongs
+import it.fast4x.rimusic.utils.filterSongItems
 import it.fast4x.rimusic.utils.formatAsDuration
 import it.fast4x.rimusic.utils.getHttpClient
 import it.fast4x.rimusic.utils.isNetworkConnected
@@ -235,7 +235,7 @@ fun PlaylistSongList(
     filterCharSequence = filter.toString()
     //Log.d("mediaItemFilter", "<${filter}>  <${filterCharSequence}>")
     if (!filter.isNullOrBlank()) {
-        playlistPage?.songs = filterInnerTubeSongs(playlistSongs, filterCharSequence)
+        playlistPage?.songs = filterSongItems(playlistSongs, filterCharSequence)
     } else playlistPage?.songs = playlistSongs
 
     var playlistNotLikedSongs by persistList<Environment.SongItem>("")
