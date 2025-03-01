@@ -1,9 +1,9 @@
-package com.dd3boh.outertune.utils.potoken
+package it.fast4x.rimusic.extensions.webpotoken
 
 import android.os.Handler
 import android.os.Looper
 import android.webkit.CookieManager
-import it.fast4x.innertube.Innertube
+import it.fast4x.environment.Environment
 import it.fast4x.rimusic.context
 import it.fast4x.rimusic.isDebugModeEnabled
 import kotlinx.coroutines.runBlocking
@@ -54,12 +54,12 @@ class PoTokenGenerator {
                 val shouldRecreate = webPoTokenGenerator == null || forceRecreate || webPoTokenGenerator!!.isExpired()
 
                 if (shouldRecreate) {
-                    webPoTokenSessionIdentifier = if (Innertube.cookie != null) {
+                    webPoTokenSessionIdentifier = if (Environment.cookie != null) {
                         // signed in sessions use dataSyncId as identifier
-                        Innertube.dataSyncId
+                        Environment.dataSyncId
                     } else {
                         // signed out sessions use visitorData as identifier
-                        Innertube.visitorData
+                        Environment.visitorData
                     }
 
                     if (webPoTokenSessionIdentifier == null) {
@@ -71,8 +71,7 @@ class PoTokenGenerator {
                         webPoTokenGenerator?.let { Handler(Looper.getMainLooper()).post { it.close() } }
 
                         // create a new webPoTokenGenerator
-                        webPoTokenGenerator = PoTokenWebView
-                            .newPoTokenGenerator(context())
+                        webPoTokenGenerator = PoTokenWebView.newPoTokenGenerator(context())
 
                         // The streaming poToken needs to be generated exactly once before generating
                         // any other (player) tokens.

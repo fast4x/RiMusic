@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.ContinuationBody
-import it.fast4x.innertube.models.bodies.NextBody
-import it.fast4x.innertube.requests.nextPage
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.ContinuationBody
+import it.fast4x.environment.models.bodies.NextBody
+import it.fast4x.environment.requests.nextPage
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.enums.PopupType
@@ -15,7 +15,6 @@ import it.fast4x.rimusic.service.modern.PlayerServiceModern
 import it.fast4x.rimusic.ui.components.themed.SmartMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
@@ -39,7 +38,7 @@ data class YouTubeRadio @OptIn(UnstableApi::class) constructor
             val continuation = nextContinuation
 
             if (continuation == null) {
-                Innertube.nextPage(
+                Environment.nextPage(
                     NextBody(
                         videoId = videoId,
                         playlistId = playlistId,
@@ -54,9 +53,9 @@ data class YouTubeRadio @OptIn(UnstableApi::class) constructor
                     nextResult.itemsPage
                 }
             } else {
-                Innertube.nextPage(ContinuationBody(continuation = continuation))
+                Environment.nextPage(ContinuationBody(continuation = continuation))
             }?.getOrNull()?.let { songsPage ->
-                mediaItems = songsPage.items?.map(Innertube.SongItem::asMediaItem)
+                mediaItems = songsPage.items?.map(Environment.SongItem::asMediaItem)
                 songsPage.continuation?.takeUnless { nextContinuation == it }
             }
 

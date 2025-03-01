@@ -1,5 +1,9 @@
 package it.fast4x.rimusic.ui.screens.settings
 
+import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
@@ -27,6 +31,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
+import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
+import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.enums.BackgroundProgress
 import it.fast4x.rimusic.enums.CarouselSize
@@ -140,12 +147,16 @@ import it.fast4x.rimusic.utils.visualizerEnabledKey
 import it.fast4x.rimusic.utils.wallpaperTypeKey
 import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.enums.AnimatedGradient
+import it.fast4x.rimusic.enums.BuiltInPlaylist
 import it.fast4x.rimusic.enums.ColorPaletteMode
 import it.fast4x.rimusic.enums.ColorPaletteName
+import it.fast4x.rimusic.enums.PopupType
 import it.fast4x.rimusic.enums.SwipeAnimationNoThumbnail
+import it.fast4x.rimusic.models.Song
 import it.fast4x.rimusic.typography
 import it.fast4x.rimusic.ui.components.themed.Search
 import it.fast4x.rimusic.ui.components.themed.AppearancePresetDialog
+import it.fast4x.rimusic.ui.components.themed.InputTextDialog
 import it.fast4x.rimusic.utils.albumCoverRotationKey
 import it.fast4x.rimusic.utils.animatedGradientKey
 import it.fast4x.rimusic.utils.blurStrengthKey
@@ -158,6 +169,9 @@ import it.fast4x.rimusic.utils.thumbnailFadeExKey
 import it.fast4x.rimusic.utils.thumbnailFadeKey
 import it.fast4x.rimusic.utils.thumbnailSpacingKey
 import it.fast4x.rimusic.utils.topPaddingKey
+import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @Composable
 fun DefaultAppearanceSettings() {
@@ -352,10 +366,10 @@ fun AppearanceSettings(
     navController: NavController,
 ) {
 
-    var isShowingThumbnailInLockscreen by rememberPreference(
-        isShowingThumbnailInLockscreenKey,
-        true
-    )
+//    var isShowingThumbnailInLockscreen by rememberPreference(
+//        isShowingThumbnailInLockscreenKey,
+//        true
+//    )
 
     var showthumbnail by rememberPreference(showthumbnailKey, true)
     var transparentbar by rememberPreference(transparentbarKey, true)
@@ -519,6 +533,174 @@ fun AppearanceSettings(
     var appearanceChooser by remember{ mutableStateOf(false)}
     var albumCoverRotation by rememberPreference(albumCoverRotationKey, false)
 
+    var blurStrength by rememberPreference(blurStrengthKey, 25f)
+    var thumbnailFadeEx  by rememberPreference(thumbnailFadeExKey, 5f)
+    var thumbnailFade  by rememberPreference(thumbnailFadeKey, 5f)
+    var thumbnailSpacing  by rememberPreference(thumbnailSpacingKey, 0f)
+    var colorPaletteName by rememberPreference(colorPaletteNameKey, ColorPaletteName.Dynamic)
+    var colorPaletteMode by rememberPreference(colorPaletteModeKey, ColorPaletteMode.Dark)
+    var swipeAnimationNoThumbnail by rememberPreference(swipeAnimationsNoThumbnailKey, SwipeAnimationNoThumbnail.Sliding)
+
+    var appearanceFilename by remember {
+        mutableStateOf("")
+    }
+    val context = LocalContext.current
+    val exportLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
+            if (uri == null) return@rememberLauncherForActivityResult
+
+            context.applicationContext.contentResolver.openOutputStream(uri)
+                ?.use { outputStream ->
+                    csvWriter().open(outputStream){
+                        writeRow("SettingsType", "Name", "Parameter", "Value")
+                        writeRow("Appearance", appearanceFilename, "albumCoverRotation", albumCoverRotation)
+                        writeRow("Appearance", appearanceFilename, "showthumbnail", showthumbnail)
+                        writeRow("Appearance", appearanceFilename, "playerBackgroundColors", playerBackgroundColors.ordinal)
+                        writeRow("Appearance", appearanceFilename, "thumbnailRoundness", thumbnailRoundness.ordinal)
+                        writeRow("Appearance", appearanceFilename, "playerType", playerType.ordinal)
+                        writeRow("Appearance", appearanceFilename, "queueType", queueType.ordinal)
+                        writeRow("Appearance", appearanceFilename, "noblur", noblur)
+                        writeRow("Appearance", appearanceFilename, "fadingedge", fadingedge)
+                        writeRow("Appearance", appearanceFilename, "carousel", carousel)
+                        writeRow("Appearance", appearanceFilename, "carouselSize", carouselSize.ordinal)
+                        writeRow("Appearance", appearanceFilename, "keepPlayerMinimized", keepPlayerMinimized)
+                        writeRow("Appearance", appearanceFilename, "playerInfoShowIcons", playerInfoShowIcons)
+                        writeRow("Appearance", appearanceFilename, "showTopActionsBar", showTopActionsBar)
+                        writeRow("Appearance", appearanceFilename, "playerControlsType", playerControlsType.ordinal)
+                        writeRow("Appearance", appearanceFilename, "playerInfoType", playerInfoType.ordinal)
+                        writeRow("Appearance", appearanceFilename, "transparentBackgroundActionBarPlayer", transparentBackgroundActionBarPlayer)
+                        writeRow("Appearance", appearanceFilename, "iconLikeType", iconLikeType.ordinal)
+                        writeRow("Appearance", appearanceFilename, "playerSwapControlsWithTimeline", playerSwapControlsWithTimeline)
+                        writeRow("Appearance", appearanceFilename, "playerEnableLyricsPopupMessage", playerEnableLyricsPopupMessage)
+                        writeRow("Appearance", appearanceFilename, "actionspacedevenly", actionspacedevenly)
+                        writeRow("Appearance", appearanceFilename, "thumbnailType", thumbnailType.ordinal)
+                        writeRow("Appearance", appearanceFilename, "showvisthumbnail", showvisthumbnail)
+                        writeRow("Appearance", appearanceFilename, "buttonzoomout", buttonzoomout)
+                        writeRow("Appearance", appearanceFilename, "thumbnailpause", thumbnailpause)
+                        writeRow("Appearance", appearanceFilename, "showsongs", showsongs.ordinal)
+                        writeRow("Appearance", appearanceFilename, "showalbumcover", showalbumcover)
+                        writeRow("Appearance", appearanceFilename, "prevNextSongs", prevNextSongs.ordinal)
+                        writeRow("Appearance", appearanceFilename, "tapqueue", tapqueue)
+                        writeRow("Appearance", appearanceFilename, "swipeUpQueue", swipeUpQueue)
+                        writeRow("Appearance", appearanceFilename, "statsfornerds", statsfornerds)
+                        writeRow("Appearance", appearanceFilename, "transparentbar", transparentbar)
+                        writeRow("Appearance", appearanceFilename, "blackgradient", blackgradient)
+                        writeRow("Appearance", appearanceFilename, "showlyricsthumbnail", showlyricsthumbnail)
+                        writeRow("Appearance", appearanceFilename, "expandedplayer", expandedplayer)
+                        writeRow("Appearance", appearanceFilename, "playerPlayButtonType", playerPlayButtonType.ordinal)
+                        writeRow("Appearance", appearanceFilename, "bottomgradient", bottomgradient)
+                        writeRow("Appearance", appearanceFilename, "textoutline", textoutline)
+                        writeRow("Appearance", appearanceFilename, "effectRotationEnabled", effectRotationEnabled)
+                        writeRow("Appearance", appearanceFilename, "thumbnailTapEnabled", thumbnailTapEnabled)
+                        writeRow("Appearance", appearanceFilename, "showButtonPlayerAddToPlaylist", showButtonPlayerAddToPlaylist)
+                        writeRow("Appearance", appearanceFilename, "showButtonPlayerArrow", showButtonPlayerArrow)
+                        writeRow("Appearance", appearanceFilename, "showButtonPlayerDownload", showButtonPlayerDownload)
+                        writeRow("Appearance", appearanceFilename, "showButtonPlayerLoop", showButtonPlayerLoop)
+                        writeRow("Appearance", appearanceFilename, "showButtonPlayerLyrics", showButtonPlayerLyrics)
+                        writeRow("Appearance", appearanceFilename, "expandedplayertoggle", expandedplayertoggle)
+                        writeRow("Appearance", appearanceFilename, "showButtonPlayerShuffle", showButtonPlayerShuffle)
+                        writeRow("Appearance", appearanceFilename, "showButtonPlayerSleepTimer", showButtonPlayerSleepTimer)
+                        writeRow("Appearance", appearanceFilename, "showButtonPlayerMenu", showButtonPlayerMenu)
+                        writeRow("Appearance", appearanceFilename, "showButtonPlayerStartradio", showButtonPlayerStartradio)
+                        writeRow("Appearance", appearanceFilename, "showButtonPlayerSystemEqualizer", showButtonPlayerSystemEqualizer)
+                        writeRow("Appearance", appearanceFilename, "showButtonPlayerDiscover", showButtonPlayerDiscover)
+                        writeRow("Appearance", appearanceFilename, "showButtonPlayerVideo", showButtonPlayerVideo)
+                        writeRow("Appearance", appearanceFilename, "showBackgroundLyrics", showBackgroundLyrics)
+                        writeRow("Appearance", appearanceFilename, "showTotalTimeQueue", showTotalTimeQueue)
+                        writeRow("Appearance", appearanceFilename, "backgroundProgress", backgroundProgress.ordinal)
+                        writeRow("Appearance", appearanceFilename, "showNextSongsInPlayer", showNextSongsInPlayer)
+                        writeRow("Appearance", appearanceFilename, "showRemainingSongTime", showRemainingSongTime)
+                        writeRow("Appearance", appearanceFilename, "clickLyricsText", clickLyricsText)
+                        writeRow("Appearance", appearanceFilename, "queueDurationExpanded", queueDurationExpanded)
+                        writeRow("Appearance", appearanceFilename, "titleExpanded", titleExpanded)
+                        writeRow("Appearance", appearanceFilename, "timelineExpanded", timelineExpanded)
+                        writeRow("Appearance", appearanceFilename, "controlsExpanded", controlsExpanded)
+                        writeRow("Appearance", appearanceFilename, "miniQueueExpanded", miniQueueExpanded)
+                        writeRow("Appearance", appearanceFilename, "statsExpanded", statsExpanded)
+                        writeRow("Appearance", appearanceFilename, "actionExpanded", actionExpanded)
+                        writeRow("Appearance", appearanceFilename, "showCoverThumbnailAnimation", showCoverThumbnailAnimation)
+                        writeRow("Appearance", appearanceFilename, "coverThumbnailAnimation", coverThumbnailAnimation.ordinal)
+                        writeRow("Appearance", appearanceFilename, "notificationPlayerFirstIcon", notificationPlayerFirstIcon.ordinal)
+                        writeRow("Appearance", appearanceFilename, "notificationPlayerSecondIcon", notificationPlayerSecondIcon.ordinal)
+                        writeRow("Appearance", appearanceFilename, "enableWallpaper", enableWallpaper)
+                        writeRow("Appearance", appearanceFilename, "wallpaperType", wallpaperType.ordinal)
+                        writeRow("Appearance", appearanceFilename, "topPadding", topPadding)
+                        writeRow("Appearance", appearanceFilename, "animatedGradient", animatedGradient.ordinal)
+                        writeRow("Appearance", appearanceFilename, "albumCoverRotation", albumCoverRotation)
+                        writeRow("Appearance", appearanceFilename, "blurStrength", blurStrength)
+                        writeRow("Appearance", appearanceFilename, "thumbnailFadeEx", thumbnailFadeEx)
+                        writeRow("Appearance", appearanceFilename, "thumbnailFade", thumbnailFade)
+                        writeRow("Appearance", appearanceFilename, "thumbnailSpacing", thumbnailSpacing)
+                        writeRow("Appearance", appearanceFilename, "colorPaletteName", colorPaletteName.ordinal)
+                        writeRow("Appearance", appearanceFilename, "colorPaletteMode", colorPaletteMode.ordinal)
+                        writeRow("Appearance", appearanceFilename, "swipeAnimationNoThumbnail", swipeAnimationNoThumbnail.ordinal)
+                        writeRow("Appearance", appearanceFilename, "showLikeButtonBackgroundPlayer", showLikeButtonBackgroundPlayer)
+                        writeRow("Appearance", appearanceFilename, "showDownloadButtonBackgroundPlayer", showDownloadButtonBackgroundPlayer)
+                        writeRow("Appearance", appearanceFilename, "visualizerEnabled", visualizerEnabled)
+                    }
+                }
+
+        }
+
+    var isExporting by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+
+    if (isExporting) {
+        InputTextDialog(
+            onDismiss = {
+                isExporting = false
+            },
+            title = "Enter the name of settings export",
+            value = "RM_Appearance",
+            placeholder = "Enter the name of settings export",
+            setValue = { text ->
+                appearanceFilename = text
+                try {
+                    @SuppressLint("SimpleDateFormat")
+                    val dateFormat = SimpleDateFormat("yyyyMMddHHmmss")
+                    exportLauncher.launch("RMAppearance_${text.take(20)}_${dateFormat.format(
+                        Date()
+                    )}")
+                } catch (e: ActivityNotFoundException) {
+                    SmartMessage("Couldn't find an application to create documents",
+                        type = PopupType.Warning, context = context)
+                }
+            }
+        )
+    }
+
+    val importLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri == null) return@rememberLauncherForActivityResult
+
+            //requestPermission(activity, "Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED")
+
+            context.applicationContext.contentResolver.openInputStream(uri)
+                ?.use { inputStream ->
+                    csvReader().open(inputStream) {
+                        readAllWithHeaderAsSequence().forEachIndexed { index, row: Map<String, String> ->
+                            if (row["SettingsType"] == "Appearance") {
+                                println("Import appearance settings parameter ${row["Parameter"]}")
+                                when (row["Parameter"]) {
+                                    "animatedGradient" -> {
+                                        animatedGradient = AnimatedGradient.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "albumCoverRotation" -> {
+                                        albumCoverRotation = row["Value"]!!.toBoolean()
+                                    }
+                                    "enableWallpaper" -> {
+                                        enableWallpaper = row["Value"]!!.toBoolean()
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+        }
+
     Column(
         modifier = Modifier
             .background(colorPalette().background0)
@@ -568,13 +750,7 @@ fun AppearanceSettings(
             thumbnailpause = false
             //keepPlayerMinimized = false
         }
-        var blurStrength by rememberPreference(blurStrengthKey, 25f)
-        var thumbnailFadeEx  by rememberPreference(thumbnailFadeExKey, 5f)
-        var thumbnailFade  by rememberPreference(thumbnailFadeKey, 5f)
-        var thumbnailSpacing  by rememberPreference(thumbnailSpacingKey, 0f)
-        var colorPaletteName by rememberPreference(colorPaletteNameKey, ColorPaletteName.Dynamic)
-        var colorPaletteMode by rememberPreference(colorPaletteModeKey, ColorPaletteMode.Dark)
-        var swipeAnimationNoThumbnail by rememberPreference(swipeAnimationsNoThumbnailKey, SwipeAnimationNoThumbnail.Sliding)
+
 
         if (appearanceChooser){
             AppearancePresetDialog(
@@ -2149,7 +2325,7 @@ fun AppearanceSettings(
 
         SettingsGroupSpacer()
         var resetToDefault by remember { mutableStateOf(false) }
-        val context = LocalContext.current
+
         ButtonBarSettingEntry(
             title = stringResource(R.string.settings_reset),
             text = stringResource(R.string.settings_restore_default_settings),
@@ -2164,8 +2340,42 @@ fun AppearanceSettings(
             SmartMessage(stringResource(R.string.done), context = context)
         }
 
+//        SettingsGroupSpacer()
+//        ButtonBarSettingEntry(
+//            title = "Export appearance settings",
+//            text = "Backup or share appearance settings",
+//            icon = R.drawable.export,
+//            iconColor = colorPalette().text,
+//            onClick = { isExporting = true },
+//        )
+//
+//        ButtonBarSettingEntry(
+//            title = "Import appearance settings",
+//            text = "Restore backup or shared appearance settings",
+//            icon = R.drawable.resource_import,
+//            iconColor = colorPalette().text,
+//            onClick = {
+//                try {
+//                    importLauncher.launch(
+//                        arrayOf(
+//                            "text/*"
+//                        )
+//                    )
+//                } catch (e: ActivityNotFoundException) {
+//                    SmartMessage(
+//                        context.resources.getString(R.string.info_not_find_app_open_doc),
+//                        type = PopupType.Warning, context = context
+//                    )
+//                }
+//            },
+//        )
+
         SettingsGroupSpacer(
             modifier = Modifier.height(Dimensions.bottomSpacer)
         )
     }
+
+
+
+
 }

@@ -101,6 +101,18 @@ fun About() {
         )
 
         SettingsEntry(
+            title = stringResource(R.string.social_discord),
+            text = stringResource(R.string.social_discord_info),
+            onClick = {
+                uriHandler.openUri("https://discord.gg/h7eS2PcGeW")
+            }
+        )
+
+        SettingsGroupSpacer()
+
+        SettingsEntryGroupText(title = "Official Project Page")
+
+        SettingsEntry(
             title = stringResource(R.string.social_github),
             text = stringResource(R.string.view_the_source_code),
             onClick = {
@@ -108,7 +120,7 @@ fun About() {
             }
         )
 
-        ImportantSettingsDescription("RiMusic NO LONGER HAS A DISCORD SERVER. Do NOT access any server related to RiMusic, it’s a scam!")
+
 
         SettingsGroupSpacer()
 

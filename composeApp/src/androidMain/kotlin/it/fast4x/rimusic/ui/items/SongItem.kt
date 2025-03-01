@@ -42,7 +42,7 @@ import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import it.fast4x.innertube.Innertube
+import it.fast4x.environment.Environment
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
@@ -89,7 +89,7 @@ import kotlinx.coroutines.withContext
 @UnstableApi
 @Composable
 fun SongItem(
-    song: Innertube.SongItem,
+    song: Environment.SongItem,
     thumbnailSizePx: Int,
     thumbnailSizeDp: Dp,
     modifier: Modifier = Modifier,

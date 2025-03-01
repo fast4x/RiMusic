@@ -935,4 +935,6 @@
     <string name="dislikes">Dislikes</string>
     <string name="loudness_boost_level">Loudness boost level</string>
     <string name="loudness_boost_level_info">Additional loudness level, to be used without overdoing it, may damage the device</string>
+    <string name="export_crash_log">Export crash log</string>
+    <string name="export_log">Export log</string>
 </resources>

@@ -1,45 +1,5 @@
 package it.fast4x.rimusic.ui.screens.player.components
 
-import android.view.TextureView
-import androidx.annotation.OptIn
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.zIndex
-import androidx.core.net.toUri
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.Player
-import androidx.media3.common.VideoSize
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.PlayerBody
-import it.fast4x.innertube.requests.player
-import it.fast4x.rimusic.service.NoInternetException
-import it.fast4x.rimusic.service.TimeoutException
-import it.fast4x.rimusic.service.UnknownException
-import it.fast4x.rimusic.utils.getPipedSession
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import java.net.ConnectException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
-
 /*
 @OptIn(UnstableApi::class)
 @Composable

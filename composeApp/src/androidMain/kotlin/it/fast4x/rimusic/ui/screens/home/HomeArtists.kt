@@ -17,10 +17,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,7 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import it.fast4x.compose.persist.persistList
-import it.fast4x.innertube.YtMusic
+import it.fast4x.environment.EnvironmentExt
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.enums.ArtistSortBy
@@ -65,6 +68,8 @@ import it.fast4x.rimusic.utils.showFloatingIconKey
 import kotlinx.coroutines.flow.map
 import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.enums.FilterBy
+import it.fast4x.rimusic.enums.ViewType
+import it.fast4x.rimusic.getViewType
 import it.fast4x.rimusic.ui.components.LocalMenuState
 import it.fast4x.rimusic.ui.components.PullToRefreshBox
 import it.fast4x.rimusic.ui.components.themed.Search
@@ -84,6 +89,7 @@ import it.fast4x.rimusic.utils.autosyncKey
 import it.fast4x.rimusic.utils.filterByKey
 import it.fast4x.rimusic.utils.importYTMSubscribedChannels
 import it.fast4x.rimusic.utils.semiBold
+import it.fast4x.rimusic.utils.viewTypeToolbutton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -174,7 +180,7 @@ fun HomeArtists(
             withContext(Dispatchers.IO) {
                 items.filter { it.thumbnailUrl == null }.forEach { artist ->
                     coroutineScope.launch(Dispatchers.IO) {
-                        val artistThumbnail = YtMusic.getArtistPage(artist.id).getOrNull()?.artist?.thumbnail?.url
+                        val artistThumbnail = EnvironmentExt.getArtistPage(artist.id).getOrNull()?.artist?.thumbnail?.url
                         Database.asyncTransaction {
                             update(artist.copy(thumbnailUrl = artistThumbnail))
                         }
@@ -188,6 +194,8 @@ fun HomeArtists(
 
     val doAutoSync by rememberPreference(autosyncKey, false)
     var justSynced by rememberSaveable { mutableStateOf(!doAutoSync) }
+
+    val viewType = viewTypeToolbutton(R.string.viewType)
 
     var refreshing by remember { mutableStateOf(false) }
     val refreshScope = rememberCoroutineScope()
@@ -217,7 +225,7 @@ fun HomeArtists(
                 .background(colorPalette().background0)
                 .fillMaxHeight()
                 .fillMaxWidth(
-                    if( NavigationBarPosition.Right.isCurrent() )
+                    if (NavigationBarPosition.Right.isCurrent())
                         Dimensions.contentWidthRightBar
                     else
                         1f
@@ -230,7 +238,7 @@ fun HomeArtists(
                 }
 
                 // Sticky tab's tool bar
-                TabToolBar.Buttons( sort, sync, search, randomizer, shuffle, itemSize )
+                TabToolBar.Buttons( sort, sync, search, randomizer, shuffle, itemSize, viewType )
 
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -300,27 +308,59 @@ fun HomeArtists(
                 // Sticky search bar
                 search.SearchBar( this )
 
-                LazyVerticalGrid(
-                    state = lazyGridState,
-                    columns = GridCells.Adaptive( itemSize.size.dp ),
-                    modifier = Modifier.background( colorPalette().background0 )
-                                       .fillMaxSize(),
-                    contentPadding = PaddingValues( bottom = Dimensions.bottomSpacer )
-                ) {
-                    items(items = itemsOnDisplay, key = Artist::id) { artist ->
-                        ArtistItem(
-                            artist = artist,
-                            thumbnailSizeDp = itemSize.size.dp,
-                            thumbnailSizePx = itemSize.size.px,
-                            alternative = true,
-                            modifier = Modifier.animateItem( fadeInSpec = null, fadeOutSpec = null )
-                                               .clickable(onClick = {
-                                                   search.onItemSelected()
-                                                   onArtistClick( artist )
-                                               }),
-                            disableScrollingText = disableScrollingText,
-                            isYoutubeArtist = artist.isYoutubeArtist
-                        )
+                if (getViewType() == ViewType.List) {
+                    LazyColumn(
+                        state = rememberLazyListState(),
+                        modifier = Modifier
+                    ) {
+                        items(items = itemsOnDisplay, key = Artist::id) { artist ->
+                            ArtistItem(
+                                artist = artist,
+                                thumbnailSizeDp = itemSize.size.dp,
+                                thumbnailSizePx = itemSize.size.px,
+                                alternative = false,
+                                modifier = Modifier
+                                    .animateItem(
+                                        fadeInSpec = null,
+                                        fadeOutSpec = null
+                                    )
+                                    .clickable(onClick = {
+                                        search.onItemSelected()
+                                        onArtistClick(artist)
+                                    }),
+                                disableScrollingText = disableScrollingText,
+                                isYoutubeArtist = artist.isYoutubeArtist
+                            )
+                        }
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        state = lazyGridState,
+                        columns = GridCells.Adaptive(itemSize.size.dp),
+                        modifier = Modifier
+                            .background(colorPalette().background0)
+                            .fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = Dimensions.bottomSpacer)
+                    ) {
+                        items(items = itemsOnDisplay, key = Artist::id) { artist ->
+                            ArtistItem(
+                                artist = artist,
+                                thumbnailSizeDp = itemSize.size.dp,
+                                thumbnailSizePx = itemSize.size.px,
+                                alternative = true,
+                                modifier = Modifier
+                                    .animateItem(
+                                        fadeInSpec = null,
+                                        fadeOutSpec = null
+                                    )
+                                    .clickable(onClick = {
+                                        search.onItemSelected()
+                                        onArtistClick(artist)
+                                    }),
+                                disableScrollingText = disableScrollingText,
+                                isYoutubeArtist = artist.isYoutubeArtist
+                            )
+                        }
                     }
                 }
             }

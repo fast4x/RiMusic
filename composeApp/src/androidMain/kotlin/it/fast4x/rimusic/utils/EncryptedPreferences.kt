@@ -14,12 +14,12 @@ import androidx.security.crypto.MasterKey
 import timber.log.Timber
 
 
-const val pipedUsernameKey = "pipedUsername"
-const val pipedPasswordKey = "pipedPassword"
-const val pipedInstanceNameKey = "pipedInstanceName"
-const val pipedApiBaseUrlKey = "pipedApiBaseUrl"
-const val pipedApiTokenKey = "pipedApiToken"
-const val discordPersonalAccessTokenKey = "DiscordPersonalAccessToken"
+//const val pipedUsernameKey = "pipedUsername"
+//const val pipedPasswordKey = "pipedPassword"
+//const val pipedInstanceNameKey = "pipedInstanceName"
+//const val pipedApiBaseUrlKey = "pipedApiBaseUrl"
+//const val pipedApiTokenKey = "pipedApiToken"
+//const val discordPersonalAccessTokenKey = "DiscordPersonalAccessToken"
 
 inline fun <reified T : Enum<T>> EncryptedSharedPreferences.getEnum(
     key: String,

@@ -112,11 +112,12 @@ Thanks ❤️
 
 ## 📲 Installation
 [<img src="./assets/images/getItGithub.png" alt="GitHub" height="80">](https://github.com/fast4x/RiMusic/releases/latest)
-[<img src="./assets/images/getItIzzyOnDroid.png" alt="IzzyOnDroid" height="80">](https://apt.izzysoft.de/fdroid/index/apk/it.fast4x.rimusic/)
-[<img src="./assets/images/getItf-droid.png" alt="F-Droid" height="80">](https://f-droid.org/packages/it.fast4x.rimusic/)
 [<img src="./assets/images/getItOpenapk.png" alt="OpenAPK" height="80">](https://www.openapk.net/rimusic/it.fast4x.rimusic/)
 [<img src="./assets/images/getItAccrescent.png" alt="Accrescent" height="80">](https://accrescent.app/app/it.fast4x.rimusic)
 [<img src="./assets/images/getItObtainium.png" alt="Obtainium" height="80">](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22it.fast4x.rimusic%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Ffast4x%2Frimusic%22%2C%22author%22%3A%22fast4x%22%2C%22name%22%3A%22RiMusic%22%2C%22preferredApkIndex%22%3A0%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Afalse%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22filterReleaseTitlesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22filterReleaseNotesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22verifyLatestTag%5C%22%3Afalse%2C%5C%22dontSortReleasesList%5C%22%3Afalse%2C%5C%22useLatestAssetDateAsReleaseDate%5C%22%3Afalse%2C%5C%22trackOnly%5C%22%3Afalse%2C%5C%22versionExtractionRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22matchGroupToUse%5C%22%3A%5C%22%5C%22%2C%5C%22versionDetection%5C%22%3Atrue%2C%5C%22releaseDateAsVersion%5C%22%3Afalse%2C%5C%22useVersionCodeAsOSVersion%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22invertAPKFilter%5C%22%3Afalse%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22appName%5C%22%3A%5C%22%5C%22%2C%5C%22shizukuPretendToBeGooglePlay%5C%22%3Afalse%2C%5C%22allowInsecure%5C%22%3Afalse%2C%5C%22exemptFromBackgroundUpdates%5C%22%3Afalse%2C%5C%22skipUpdateNotifications%5C%22%3Afalse%2C%5C%22about%5C%22%3A%5C%22RiMusic%20is%20a%20multilingual%20Android%20application%20for%20streaming%20music%20from%20YouTube%20Music.%20It%20began%20as%20an%20extension%20of%20ViMusic%2C%20then%20acquired%20its%20own%20identity.%20It%20allowing%20the%20user%20to%20customize%20it%20at%20will.%5C%22%7D%22%2C%22overrideSource%22%3Anull%7D)
+
+<!-- [<img src="./assets/images/getItIzzyOnDroid.png" alt="IzzyOnDroid" height="80">](https://apt.izzysoft.de/fdroid/index/apk/it.fast4x.rimusic/)
+[<img src="./assets/images/getItf-droid.png" alt="F-Droid" height="80">](https://f-droid.org/packages/it.fast4x.rimusic/) -->
 
 ## ❗ CUSTOM VERSION
 WARNING, the custom version is **not** an official release, download only if invited by the developer!

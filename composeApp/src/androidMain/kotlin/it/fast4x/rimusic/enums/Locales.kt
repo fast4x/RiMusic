@@ -106,6 +106,61 @@ enum class Languages {
             Vietnamese -> "vi"
         }
 
+    companion object {
+        fun languageFromcode(code: String): Languages? = when (code) {
+            "system" -> System
+            "af" -> Afrikaans
+            "ar" -> Arabic
+            "ba" -> Bashkir
+            "bn" -> Bengali
+            "ca" -> Catalan
+            "zh-CN" -> ChineseSimplified
+            "zh-TW" -> ChineseTraditional
+            "da" -> Danish
+            "nl" -> Dutch
+            "en" -> English
+            "eo" -> Esperanto
+            "et" -> Estonian
+            "fil" -> Filipino
+            "fi" -> Finnish
+            "gl" -> Galician
+            "it" -> Italian
+            "in" -> Indonesian
+            "ga" -> Irish
+            "ja" -> Japanese
+            "ko" -> Korean
+            "cs" -> Czech
+            "de" -> German
+            "el" -> Greek
+            "iw" -> Hebrew //Hebrew -> "he"
+            "hi" -> Hindi
+            "hu" -> Hungarian
+            "ia" -> Interlingua
+            "es" -> Spanish
+            "fr" -> French
+            "ml" -> Malayalam
+            "no" -> Norwegian
+            "or" -> Odia
+            //"fa" -> Persian
+            "pl" -> Polish
+            "pt" -> Portuguese
+            "pt-BR" -> PortugueseBrazilian
+            "ro" -> Romanian
+            //"ro-RO" -> RomanianEmo
+            "ru" -> Russian
+            "sr" -> SerbianCyrillic
+            "sr-CS" -> SerbianLatin
+            "si" -> Sinhala
+            "sv" -> Swedish
+            "ta" -> Tamil
+            "te" -> Telugu
+            "tr" -> Turkish
+            "uk" -> Ukrainian
+            "vi" -> Vietnamese
+            else -> null
+        }
+    }
+
 
 }
 

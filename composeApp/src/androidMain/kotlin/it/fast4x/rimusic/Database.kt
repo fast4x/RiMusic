@@ -32,7 +32,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteQuery
-import it.fast4x.innertube.Innertube
+import it.fast4x.environment.Environment
 import it.fast4x.rimusic.enums.AlbumSortBy
 import it.fast4x.rimusic.enums.ArtistSortBy
 import it.fast4x.rimusic.enums.BuiltInPlaylist
@@ -2449,7 +2449,7 @@ interface Database {
     fun update(playlist: Playlist)
 
     @Update
-    fun update(playlist: Playlist, playlistItem: Innertube.PlaylistItem) {
+    fun update(playlist: Playlist, playlistItem: Environment.PlaylistItem) {
         update(playlist.copy(
             name = playlistItem.title ?: "",
             browseId = playlistItem.key

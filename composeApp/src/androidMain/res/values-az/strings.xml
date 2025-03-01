@@ -935,4 +935,6 @@
     <string name="dislikes">Bəyənməmələr</string>
     <string name="loudness_boost_level">Səs yüksəltmə dəyəri</string>
     <string name="loudness_boost_level_info">Hədsiz istifadə edilən əlavə səs dəyəri cihaza zərər verə bilər</string>
+    <string name="export_crash_log">Export crash log</string>
+    <string name="export_log">Export log</string>
 </resources>

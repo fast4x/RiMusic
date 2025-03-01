@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.valentinilk.shimmer.shimmer
 import it.fast4x.compose.persist.persist
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.requests.discoverPage
+import it.fast4x.environment.Environment
+import it.fast4x.environment.requests.discoverPage
 import it.fast4x.rimusic.LocalPlayerAwareWindowInsets
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.enums.NavRoutes
@@ -58,9 +58,9 @@ fun MoodsPage(
 ) {
     val windowInsets = LocalPlayerAwareWindowInsets.current
 
-    var discoverPage by persist<Result<Innertube.DiscoverPage>>("home/discoveryMoods")
+    var discoverPage by persist<Result<Environment.DiscoverPage>>("home/discoveryMoods")
     LaunchedEffect(Unit) {
-        discoverPage = Innertube.discoverPage()
+        discoverPage = Environment.discoverPage()
     }
     val thumbnailSizeDp = Dimensions.thumbnails.album + 24.dp
 

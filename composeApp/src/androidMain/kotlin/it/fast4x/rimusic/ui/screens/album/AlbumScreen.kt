@@ -52,9 +52,9 @@ import androidx.navigation.NavController
 import com.valentinilk.shimmer.shimmer
 import it.fast4x.compose.persist.PersistMapCleanup
 import it.fast4x.compose.persist.persist
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.YtMusic
-import it.fast4x.innertube.requests.AlbumPage
+import it.fast4x.environment.Environment
+import it.fast4x.environment.EnvironmentExt
+import it.fast4x.environment.requests.AlbumPage
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.MODIFIED_PREFIX
 import it.fast4x.rimusic.R
@@ -76,15 +76,14 @@ import it.fast4x.rimusic.ui.items.AlbumItemPlaceholder
 import it.fast4x.rimusic.ui.screens.searchresult.ItemsPage
 import it.fast4x.rimusic.ui.styling.px
 import it.fast4x.rimusic.utils.asMediaItem
-import it.fast4x.rimusic.utils.asSong
 import it.fast4x.rimusic.utils.disableScrollingTextKey
 import it.fast4x.rimusic.utils.playerPositionKey
 import it.fast4x.rimusic.utils.rememberPreference
 import it.fast4x.rimusic.utils.thumbnailRoundnessKey
 import it.fast4x.rimusic.utils.transitionEffectKey
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
@@ -130,9 +129,9 @@ fun AlbumScreen(
             .album(browseId).collect { currentAlbum ->
                 println("AlbumScreen collect ${currentAlbum?.title}")
                 album = currentAlbum
-                runBlocking(Dispatchers.IO) {
+                CoroutineScope(Dispatchers.IO).launch {
                     if (albumPage == null)
-                        YtMusic.getAlbum(browseId)
+                        EnvironmentExt.getAlbum(browseId)
                             .onSuccess { currentAlbumPage ->
                                 albumPage = currentAlbumPage
 
@@ -158,7 +157,7 @@ fun AlbumScreen(
                                     ),
                                     currentAlbumPage
                                         .songs.distinct()
-                                        .map(Innertube.SongItem::asMediaItem)
+                                        .map(Environment.SongItem::asMediaItem)
                                         .onEach(Database::insert)
                                         .mapIndexed { position, mediaItem ->
                                             SongAlbumMap(
@@ -452,7 +451,7 @@ fun AlbumScreen(
                                     itemsPageProvider = albumPage?.let {
                                         ({
                                             Result.success(
-                                                Innertube.ItemsPage(
+                                                Environment.ItemsPage(
                                                     items = albumPage?.otherVersions,
                                                     continuation = null
                                                 )

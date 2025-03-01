@@ -935,4 +935,6 @@
     <string name="dislikes">No m\'agrada</string>
     <string name="loudness_boost_level">Nivell d\'augment de la sonoritat</string>
     <string name="loudness_boost_level_info">El nivell de sonoritat addicional, que s\'utilitza sense exagerar, pot danyar el dispositiu</string>
+    <string name="export_crash_log">Export crash log</string>
+    <string name="export_log">Export log</string>
 </resources>

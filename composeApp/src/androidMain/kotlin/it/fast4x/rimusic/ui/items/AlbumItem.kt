@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import it.fast4x.innertube.Innertube
+import it.fast4x.environment.Environment
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.cleanPrefix
 import it.fast4x.rimusic.models.Album
@@ -66,7 +66,7 @@ fun AlbumItem(
 
 @Composable
 fun AlbumItem(
-    album: Innertube.AlbumItem,
+    album: Environment.AlbumItem,
     thumbnailSizePx: Int,
     thumbnailSizeDp: Dp,
     modifier: Modifier = Modifier,

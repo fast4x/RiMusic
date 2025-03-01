@@ -2,7 +2,8 @@
 /release
 /lint-baseline.xml
 /accrescent
-/foss
+/full
 /.gradle
 /_conveyor.conf
 /conveyor.conf
+/src/androidMain/res/raw/configuration.json

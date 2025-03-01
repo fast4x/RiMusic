@@ -74,9 +74,9 @@ import coil.compose.AsyncImage
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import it.fast4x.compose.persist.persist
 import it.fast4x.compose.persist.persistList
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.NextBody
-import it.fast4x.innertube.requests.relatedSongs
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.NextBody
+import it.fast4x.environment.requests.relatedSongs
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
@@ -358,7 +358,7 @@ fun BuiltInPlaylistSongs(
     //**** SMART RECOMMENDATION
     val recommendationsNumber by rememberPreference(recommendationsNumberKey,   RecommendationsNumber.`5`)
     var isRecommendationEnabled by rememberPreference(isRecommendationEnabledKey, false)
-    var relatedSongsRecommendationResult by persist<Result<Innertube.RelatedSongs?>?>(tag = "home/relatedSongsResult")
+    var relatedSongsRecommendationResult by persist<Result<Environment.RelatedSongs?>?>(tag = "home/relatedSongsResult")
     var songBaseRecommendation by persist<Song?>("home/songBaseRecommendation")
     var positionsRecommendationList = arrayListOf<Int>()
     if (isRecommendationEnabled) {
@@ -366,7 +366,7 @@ fun BuiltInPlaylistSongs(
                 val song = songs.shuffled().firstOrNull()
                 if (relatedSongsRecommendationResult == null || songBaseRecommendation?.id != song?.id) {
                     relatedSongsRecommendationResult =
-                        Innertube.relatedSongs(NextBody(videoId = (song?.id ?: "HZnNt9nnEhw")))
+                        Environment.relatedSongs(NextBody(videoId = (song?.id ?: "HZnNt9nnEhw")))
                 }
         }
 
@@ -1192,6 +1192,7 @@ fun BuiltInPlaylistSongs(
                                         navController = navController,
                                         mediaItem = song.asMediaItem,
                                         onDismiss = menuState::hide,
+                                        onInfo = {},
                                         disableScrollingText = disableScrollingText
                                     )
 
@@ -1199,6 +1200,7 @@ fun BuiltInPlaylistSongs(
                                         navController = navController,
                                         song = song,
                                         onDismiss = menuState::hide,
+                                        onInfo = {},
                                         disableScrollingText = disableScrollingText
                                     )
 

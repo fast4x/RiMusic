@@ -223,7 +223,9 @@ import it.fast4x.rimusic.utils.useVolumeKeysToChangeSongKey
 import it.fast4x.rimusic.utils.visualizerEnabledKey
 import it.fast4x.rimusic.utils.volumeNormalizationKey
 import it.fast4x.rimusic.colorPalette
+import it.fast4x.rimusic.enums.DnsOverHttpsType
 import it.fast4x.rimusic.enums.PresetsReverb
+import it.fast4x.rimusic.enums.ValidationType
 import it.fast4x.rimusic.ui.components.themed.Search
 import it.fast4x.rimusic.typography
 import it.fast4x.rimusic.utils.audioReverbPresetKey
@@ -232,8 +234,17 @@ import it.fast4x.rimusic.utils.autoDownloadSongWhenAlbumBookmarkedKey
 import it.fast4x.rimusic.utils.autoDownloadSongWhenLikedKey
 import it.fast4x.rimusic.utils.bassboostEnabledKey
 import it.fast4x.rimusic.utils.bassboostLevelKey
+import it.fast4x.rimusic.utils.dnsOverHttpsTypeKey
+import it.fast4x.rimusic.utils.getSystemlanguage
 import it.fast4x.rimusic.utils.handleAudioFocusEnabledKey
 import it.fast4x.rimusic.utils.isConnectionMeteredEnabledKey
+import it.fast4x.rimusic.utils.isProxyEnabledKey
+import it.fast4x.rimusic.utils.proxyHostnameKey
+import it.fast4x.rimusic.utils.proxyModeKey
+import it.fast4x.rimusic.utils.proxyPortKey
+import it.fast4x.rimusic.utils.restartActivityKey
+import it.fast4x.rimusic.utils.volumeBoostLevelKey
+import java.net.Proxy
 
 
 @ExperimentalAnimationApi
@@ -244,8 +255,8 @@ fun GeneralSettings(
 ) {
     val binder = LocalPlayerServiceBinder.current
 
-    var languageApp  by rememberPreference(languageAppKey, Languages.English)
     val systemLocale = LocaleListCompat.getDefault().get(0).toString()
+    var languageApp  by rememberPreference(languageAppKey, getSystemlanguage())
 
     var exoPlayerMinTimeForEvent by rememberPreference(
         exoPlayerMinTimeForEventKey,
@@ -265,6 +276,8 @@ fun GeneralSettings(
     var volumeNormalization by rememberPreference(volumeNormalizationKey, false)
     var audioQualityFormat by rememberPreference(audioQualityFormatKey, AudioQualityFormat.Auto)
     var isConnectionMeteredEnabled by rememberPreference(isConnectionMeteredEnabledKey, true)
+
+    var useDnsOverHttpsType by rememberPreference(dnsOverHttpsTypeKey, DnsOverHttpsType.Google)
 
 
     var keepPlayerMinimized by rememberPreference(keepPlayerMinimizedKey,   false)
@@ -326,6 +339,7 @@ fun GeneralSettings(
 
     var bassboostEnabled by rememberPreference(bassboostEnabledKey,false)
     var bassboostLevel by rememberPreference(bassboostLevelKey, 0.5f)
+    var volumeBoostLevel by rememberPreference(volumeBoostLevelKey, 0f)
     var audioReverb by rememberPreference(audioReverbPresetKey,   PresetsReverb.NONE)
     var audioFocusEnabled by rememberPreference(handleAudioFocusEnabledKey, true)
 
@@ -338,7 +352,10 @@ fun GeneralSettings(
     var autoDownloadSongWhenLiked by rememberPreference(autoDownloadSongWhenLikedKey, false)
     var autoDownloadSongWhenAlbumBookmarked by rememberPreference(autoDownloadSongWhenAlbumBookmarkedKey, false)
 
-
+    var isProxyEnabled by rememberPreference(isProxyEnabledKey, false)
+    var proxyHost by rememberPreference(proxyHostnameKey, "")
+    var proxyPort by rememberPreference(proxyPortKey, 1080)
+    var proxyMode by rememberPreference(proxyModeKey, Proxy.Type.HTTP)
 
     Column(
         modifier = Modifier
@@ -430,7 +447,65 @@ fun GeneralSettings(
                 }
             )
 
+        SettingsEntryGroupText(title = "Network")
+        if (search.input.isBlank() || stringResource(R.string.enable_connection_metered).contains(search.input,true))
+            SwitchSettingEntry(
+                title = stringResource(R.string.enable_connection_metered),
+                text = stringResource(R.string.info_enable_connection_metered),
+                isChecked = isConnectionMeteredEnabled,
+                onCheckedChange = {
+                    isConnectionMeteredEnabled = it
+                    if (it)
+                        audioQualityFormat = AudioQualityFormat.Auto
+                }
+            )
 
+        if (search.input.isBlank() || "Use alternative dns".contains(search.input,true)) {
+            EnumValueSelectorSettingsEntry(
+                title = "Use dns over https",
+                selectedValue = useDnsOverHttpsType,
+                onValueSelected = {
+                    useDnsOverHttpsType = it
+                    restartActivity = true
+                },
+                valueText = { it.textName }
+            )
+            SettingsDescription(text = "If you have loading problems, you can use an alternative dns server")
+            RestartActivity(restartActivity, onRestart = { restartActivity = false })
+        }
+
+        //SettingsEntryGroupText(title = stringResource(R.string.proxy))
+        //SettingsGroupSpacer()
+
+        SwitchSettingEntry(
+            title = stringResource(R.string.enable_proxy),
+            text = "",
+            isChecked = isProxyEnabled,
+            onCheckedChange = { isProxyEnabled = it }
+        )
+        SettingsDescription(text = stringResource(R.string.restarting_rimusic_is_required))
+
+        AnimatedVisibility(visible = isProxyEnabled) {
+            Column {
+                EnumValueSelectorSettingsEntry(title = stringResource(R.string.proxy_mode),
+                    selectedValue = proxyMode,
+                    onValueSelected = { proxyMode = it },
+                    valueText = { it.name }
+                )
+                TextDialogSettingEntry(
+                    title = stringResource(R.string.proxy_host),
+                    text = proxyHost,
+                    currentText = proxyHost,
+                    onTextSave = { proxyHost = it },
+                    validationType = ValidationType.Ip
+                )
+                TextDialogSettingEntry(
+                    title = stringResource(R.string.proxy_port),
+                    text = proxyPort.toString(),
+                    currentText = proxyPort.toString(),
+                    onTextSave = { proxyPort = it.toIntOrNull() ?: 1080 })
+            }
+        }
 
         SettingsGroupSpacer()
         SettingsEntryGroupText(stringResource(R.string.player))
@@ -471,18 +546,6 @@ fun GeneralSettings(
             RestartPlayerService(restartService, onRestart = { restartService = false } )
 
         }
-
-        if (search.input.isBlank() || stringResource(R.string.enable_connection_metered).contains(search.input,true))
-            SwitchSettingEntry(
-                title = stringResource(R.string.enable_connection_metered),
-                text = stringResource(R.string.info_enable_connection_metered),
-                isChecked = isConnectionMeteredEnabled,
-                onCheckedChange = {
-                    isConnectionMeteredEnabled = it
-                    if (it)
-                        audioQualityFormat = AudioQualityFormat.Auto
-                }
-            )
 
         if (search.input.isBlank() || stringResource(R.string.jump_previous).contains(search.input,true)) {
             BasicText(
@@ -864,6 +927,9 @@ fun GeneralSettings(
                 val initialValue by remember { derivedStateOf { loudnessBaseGain } }
                 var newValue by remember(initialValue) { mutableFloatStateOf(initialValue) }
 
+                val initialValueVolume by remember { derivedStateOf { volumeBoostLevel } }
+                var newValueVolume by remember(initialValue) { mutableFloatStateOf(initialValueVolume) }
+
 
                 Column(
                     modifier = Modifier.padding(start = 25.dp)
@@ -878,6 +944,18 @@ fun GeneralSettings(
                         },
                         toDisplay = { "%.1f dB".format(loudnessBaseGain).replace(",", ".") },
                         range = -20f..20f
+                    )
+
+                    SliderSettingsEntry(
+                        title = stringResource(R.string.loudness_boost_level),
+                        text = stringResource(R.string.loudness_boost_level_info),
+                        state = newValueVolume,
+                        onSlide = { newValueVolume = it },
+                        onSlideComplete = {
+                            volumeBoostLevel = newValueVolume
+                        },
+                        toDisplay = { "%.2f dB".format(volumeBoostLevel).replace(",", ".") },
+                        range = -30f..30f
                     )
                 }
             }

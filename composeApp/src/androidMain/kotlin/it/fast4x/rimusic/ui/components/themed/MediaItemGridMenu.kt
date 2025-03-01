@@ -51,8 +51,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import it.fast4x.compose.persist.persistList
-import it.fast4x.innertube.YtMusic
-import it.fast4x.innertube.models.NavigationEndpoint
+import it.fast4x.environment.models.NavigationEndpoint
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.MODIFIED_PREFIX
@@ -61,7 +60,6 @@ import it.fast4x.rimusic.PINNED_PREFIX
 import it.fast4x.rimusic.PIPED_PREFIX
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.appContext
-import it.fast4x.rimusic.cleanPrefix
 import it.fast4x.rimusic.enums.NavRoutes
 import it.fast4x.rimusic.enums.PlaylistSortBy
 import it.fast4x.rimusic.enums.SortOrder
@@ -94,9 +92,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import it.fast4x.rimusic.colorPalette
-import it.fast4x.rimusic.context
 import it.fast4x.rimusic.enums.PopupType
-import it.fast4x.rimusic.service.MyDownloadHelper
 import it.fast4x.rimusic.typography
 import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
 import it.fast4x.rimusic.utils.addSongToYtPlaylist
@@ -165,6 +161,7 @@ fun BaseMediaItemGridMenu(
     onGoToPlaylist: ((Long) -> Unit)? = null,
     onAddToPreferites: (() -> Unit)? = null,
     onMatchingSong: (() -> Unit)? = null,
+    onInfo: (() -> Unit)? = null,
     disableScrollingText: Boolean
 ) {
     //val context = LocalContext.current
@@ -233,6 +230,7 @@ fun BaseMediaItemGridMenu(
         onGoToPlaylist = {
             navController.navigate(route = "${NavRoutes.localPlaylist.name}/$it")
         },
+        onInfo = onInfo,
         modifier = modifier,
         disableScrollingText = disableScrollingText
     )
@@ -310,6 +308,7 @@ fun MediaItemGridMenu (
     onGoToArtist: ((String) -> Unit)? = null,
     onRemoveFromQuickPicks: (() -> Unit)? = null,
     onGoToPlaylist: ((Long) -> Unit)?,
+    onInfo: (() -> Unit)? = null,
     disableScrollingText: Boolean
 ) {
     val binder = LocalPlayerServiceBinder.current
@@ -873,6 +872,18 @@ fun MediaItemGridMenu (
                     topContent()
                 }
             ) {
+                if (!isLocal) onInfo?.let { onInfo ->
+                    GridMenuItem(
+                        icon = R.drawable.information,
+                        title = R.string.information,
+                        colorIcon = colorPalette.text,
+                        colorText = colorPalette.text,
+                        onClick = {
+                            onDismiss()
+                            onInfo()
+                        }
+                    )
+                }
 
                 if (!isLocal && songSaved > 0) {
                     GridMenuItem(

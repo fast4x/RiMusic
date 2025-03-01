@@ -11,9 +11,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.NextBody
-import it.fast4x.innertube.requests.relatedPage
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.NextBody
+import it.fast4x.environment.requests.relatedPage
 
 @Composable
 fun ArtistsScreen(
@@ -30,9 +30,9 @@ fun ArtistsScreen(
         ) {
             Text("Artists")
 
-            val relatedPage = remember { mutableStateOf<Innertube.RelatedPage?>(null) }
+            val relatedPage = remember { mutableStateOf<Environment.RelatedPage?>(null) }
             LaunchedEffect(Unit) {
-                Innertube.relatedPage(
+                Environment.relatedPage(
                     NextBody(
                         videoId = ("HZnNt9nnEhw")
                     )

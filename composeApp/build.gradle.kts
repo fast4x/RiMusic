@@ -84,7 +84,7 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
 
-            implementation(projects.innertube)
+            implementation(projects.environment)
             implementation(projects.piped)
             implementation(projects.invidious)
 
@@ -126,8 +126,8 @@ android {
         applicationId = "it.fast4x.rimusic"
         minSdk = 21
         targetSdk = 35
-        versionCode = 83
-        versionName = "0.6.71"
+        versionCode = 86
+        versionName = "0.6.73"
     }
 
     splits {
@@ -161,14 +161,14 @@ android {
             .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
             .forEach { output ->
                 //val outputFileName = "app-${variant.baseName}-${variant.versionName}-${variant.versionCode}.apk"
-                val outputFileName = "app-${variant.baseName}.apk"
+                val outputFileName = "rimusic-${variant.baseName}.apk"
                 output.outputFileName = outputFileName
             }
     }
 
     flavorDimensions += "version"
     productFlavors {
-        create("foss") {
+        create("full") {
             dimension = "version"
         }
     }
@@ -321,7 +321,7 @@ dependencies {
     implementation(libs.hilt)
     ksp(libs.hilt.compiler)
 
-    implementation(projects.innertube)
+    implementation(projects.environment)
     implementation(projects.kugou)
     implementation(projects.lrclib)
     implementation(projects.piped)

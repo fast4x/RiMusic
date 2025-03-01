@@ -3,8 +3,6 @@ package it.fast4x.rimusic.ui.screens.artist
 import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,7 +21,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
@@ -34,53 +31,23 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import com.valentinilk.shimmer.shimmer
-import it.fast4x.compose.persist.PersistMapCleanup
 import it.fast4x.compose.persist.persist
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.YtMusic
-import it.fast4x.innertube.models.bodies.BrowseBody
-import it.fast4x.innertube.models.bodies.ContinuationBody
-import it.fast4x.innertube.requests.ArtistPage
-import it.fast4x.innertube.requests.ArtistSection
-import it.fast4x.innertube.requests.artistPage
-import it.fast4x.innertube.requests.itemsPage
-import it.fast4x.innertube.utils.from
+import it.fast4x.environment.EnvironmentExt
+import it.fast4x.environment.requests.ArtistPage
+import it.fast4x.environment.requests.ArtistSection
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.cleanPrefix
 import it.fast4x.rimusic.enums.NavRoutes
 import it.fast4x.rimusic.enums.ThumbnailRoundness
-import it.fast4x.rimusic.enums.UiType
 import it.fast4x.rimusic.models.Artist
-import it.fast4x.rimusic.ui.components.LocalMenuState
-import it.fast4x.rimusic.ui.components.Scaffold
-import it.fast4x.rimusic.ui.components.SwipeablePlaylistItem
 import it.fast4x.rimusic.ui.components.themed.Header
 import it.fast4x.rimusic.ui.components.themed.HeaderIconButton
 import it.fast4x.rimusic.ui.components.themed.HeaderPlaceholder
-import it.fast4x.rimusic.ui.components.themed.NonQueuedMediaItemMenu
-import it.fast4x.rimusic.ui.components.themed.NowPlayingSongIndicator
 import it.fast4x.rimusic.ui.components.themed.SecondaryTextButton
-import it.fast4x.rimusic.ui.components.themed.SmartMessage
 import it.fast4x.rimusic.ui.components.themed.adaptiveThumbnailContent
-import it.fast4x.rimusic.ui.items.AlbumItem
-import it.fast4x.rimusic.ui.items.AlbumItemPlaceholder
-import it.fast4x.rimusic.ui.items.SongItem
-import it.fast4x.rimusic.ui.items.SongItemPlaceholder
-import it.fast4x.rimusic.ui.screens.searchresult.ItemsPage
-import it.fast4x.rimusic.ui.styling.Dimensions
-import it.fast4x.rimusic.ui.styling.px
-import it.fast4x.rimusic.utils.addNext
-import it.fast4x.rimusic.utils.asMediaItem
-import it.fast4x.rimusic.utils.completed
 import it.fast4x.rimusic.utils.disableScrollingTextKey
-import it.fast4x.rimusic.utils.enqueue
-import it.fast4x.rimusic.utils.forcePlay
-import it.fast4x.rimusic.utils.getDownloadState
-import it.fast4x.rimusic.utils.isDownloadedSong
-import it.fast4x.rimusic.utils.isNowPlaying
-import it.fast4x.rimusic.utils.manageDownload
 import it.fast4x.rimusic.utils.parentalControlEnabledKey
 import it.fast4x.rimusic.utils.rememberPreference
 import it.fast4x.rimusic.utils.thumbnailRoundnessKey
@@ -90,13 +57,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.ui.components.Skeleton
-import it.fast4x.rimusic.ui.screens.settings.isYouTubeLoggedIn
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.runBlocking
 
 @ExperimentalMaterialApi
 @ExperimentalTextApi
@@ -163,8 +126,8 @@ fun ArtistScreenModern(
                 artist = currentArtist
 
                 if (artistPage == null && (currentArtist?.timestamp == null || mustFetch)) {
-                    runBlocking(Dispatchers.IO) {
-                        YtMusic.getArtistPage(browseId = browseId)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        EnvironmentExt.getArtistPage(browseId = browseId)
                             .onSuccess { currentArtistPage ->
                                 artistPage = currentArtistPage
 

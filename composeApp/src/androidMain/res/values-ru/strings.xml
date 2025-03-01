@@ -937,4 +937,6 @@
     <string name="dislikes">Не нравится</string>
     <string name="loudness_boost_level">Уровень усиления громкости</string>
     <string name="loudness_boost_level_info">Дополнительный уровень громкости (не злоупотребляйте, так как это может повредить устройство)</string>
+    <string name="export_crash_log">Export crash log</string>
+    <string name="export_log">Export log</string>
 </resources>

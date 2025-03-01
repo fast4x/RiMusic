@@ -4,9 +4,11 @@ import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DataSpec
+import androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException
 import androidx.media3.datasource.ResolvingDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR
+import io.ktor.client.plugins.ClientRequestException
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.utils.asSong
 import it.fast4x.rimusic.utils.isConnectionMetered
@@ -15,6 +17,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import it.fast4x.rimusic.appContext
+import it.fast4x.rimusic.utils.InvalidHttpCodeException
+import it.fast4x.rimusic.utils.findCause
+import it.fast4x.rimusic.utils.handleRangeErrors
+import it.fast4x.rimusic.utils.retryIf
+import timber.log.Timber
 import java.io.IOException
 
 @OptIn(UnstableApi::class)
@@ -86,8 +93,19 @@ internal fun MyDownloadHelper.createDataSourceFactory(): DataSource.Factory {
             }
         }
         catch (e: Throwable) {
+            Timber.e("MyDownloadHelper DataSourcefactory Error: ${e.stackTraceToString()}")
             println("MyDownloadHelper DataSourcefactory Error: ${e.stackTraceToString()}")
             throw IOException(e)
         }
-    }
+    }.retryIf<UnplayableException>(
+        maxRetries = 3,
+        printStackTrace = true
+    ).retryIf(
+        maxRetries = 1,
+        printStackTrace = true
+    ) { ex ->
+        ex.findCause<InvalidResponseCodeException>()?.responseCode == 403 ||
+                ex.findCause<ClientRequestException>()?.response?.status?.value == 403 ||
+                ex.findCause<InvalidHttpCodeException>() != null
+    }.handleRangeErrors()
 }

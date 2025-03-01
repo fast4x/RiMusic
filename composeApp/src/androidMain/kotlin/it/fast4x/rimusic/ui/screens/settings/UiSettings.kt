@@ -1287,13 +1287,19 @@ fun UiSettings(
                 )
         }
 
-        if (search.input.isBlank() || stringResource(R.string.show_floating_icon).contains(search.input,true))
-            SwitchSettingEntry(
-                title = stringResource(R.string.show_floating_icon),
-                text = "",
-                isChecked = showFloatingIcon,
-                onCheckedChange = { showFloatingIcon = it }
+        if (uiType == UiType.ViMusic) {
+            if (search.input.isBlank() || stringResource(R.string.show_floating_icon).contains(
+                    search.input,
+                    true
+                )
             )
+                SwitchSettingEntry(
+                    title = stringResource(R.string.show_floating_icon),
+                    text = "",
+                    isChecked = showFloatingIcon,
+                    onCheckedChange = { showFloatingIcon = it }
+                )
+        } else showFloatingIcon = false
 
 
 

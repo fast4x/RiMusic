@@ -1,30 +1,67 @@
 package it.fast4x.rimusic.extensions.webpotoken
 
-import com.dd3boh.outertune.utils.potoken.PoTokenGenerator
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
 import io.ktor.client.call.body
-import it.fast4x.innertube.Innertube.player
-import it.fast4x.innertube.Innertube.playerWithWebPoToken
-import it.fast4x.innertube.models.PlayerResponse
-import it.fast4x.innertube.models.bodies.PlayerBody
+import it.fast4x.environment.Environment.playerWithWebPoToken
+import it.fast4x.environment.models.PlayerResponse
+import it.fast4x.environment.models.bodies.PlayerBody
+import it.fast4x.rimusic.service.UnplayableException
 import it.fast4x.rimusic.utils.getSignatureTimestampOrNull
 
-suspend fun advancedPoTokenPlayer(body: PlayerBody): Result<Triple<String?, PlayerResponse, String?>> = runCatching{
-    val poTokenGenerator = PoTokenGenerator()
-    val signatureTimestamp = getSignatureTimestampOrNull(body.videoId)
-    val (webPlayerPot, webStreamingPot) = poTokenGenerator.getWebClientPoToken(body.videoId)?.let {
-        Pair(it.playerRequestPoToken, it.streamingDataPoToken)
-    } ?: Pair(null, null)
+@OptIn(UnstableApi::class)
+suspend fun advancedWebPoTokenPlayer(body: PlayerBody): Result<Triple<String?, PlayerResponse?, String?>> =
+    runCatching {
 
-    val response = playerWithWebPoToken(
-        body.videoId,
-        body.playlistId,
-        signatureTimestamp,
-        webPlayerPot
-    ).body<PlayerResponse>()
+        val maxRetries = 2
+        var retryCount = 0
+        var loop = true
+        var response: PlayerResponse? = null
 
-    println("advancedPoTokenPlayer webStreamingPot: $webStreamingPot webPlayerPot: $webPlayerPot signatureTimestamp: $signatureTimestamp")
-    println("advancedPoTokenPlayer response urls: ${response.streamingData?.adaptiveFormats?.map { it.url }}")
+        println("advancedPoTokenPlayer with login videoId ${body.videoId}")
 
-    return@runCatching Triple(null, response, webStreamingPot)
 
-}
+        val poTokenGenerator = PoTokenGenerator()
+        val signatureTimestamp = getSignatureTimestampOrNull(body.videoId)
+        val (webPlayerPot, webStreamingPot) = poTokenGenerator.getWebClientPoToken(body.videoId)
+            ?.let {
+                Pair(it.playerRequestPoToken, it.streamingDataPoToken)
+            } ?: Pair(null, null)
+
+//    while (loop == true) {
+//
+//        response = playerWithWebPoToken(
+//            body.videoId,
+//            body.playlistId,
+//            signatureTimestamp,
+//            webPlayerPot
+//        ).body<PlayerResponse>()
+//
+//        println("advancedPoTokenPlayer with login webStreamingPot: $webStreamingPot webPlayerPot: $webPlayerPot signatureTimestamp: $signatureTimestamp")
+//
+//
+//        if (response.playabilityStatus?.status == "OK" || retryCount >= maxRetries)
+//            loop = false
+//
+//        println("advancedPoTokenPlayer retryCount: $retryCount")
+//        retryCount++
+//    }
+
+        val call = if (signatureTimestamp != null && webPlayerPot != null)
+            playerWithWebPoToken(
+                body.videoId,
+                body.playlistId,
+                signatureTimestamp,
+                webPlayerPot
+            ) else throw UnplayableException()
+
+        if (call.status.value == 200)
+            response = call.body<PlayerResponse>()
+        else throw UnplayableException()
+
+        println("advancedPoTokenPlayer with login webStreamingPot: $webStreamingPot webPlayerPot: $webPlayerPot signatureTimestamp: $signatureTimestamp")
+
+
+        return@runCatching Triple(null, response, webStreamingPot)
+
+    }

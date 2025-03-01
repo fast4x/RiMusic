@@ -30,8 +30,8 @@ import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import it.fast4x.compose.persist.persist
 import it.fast4x.compose.persist.persistList
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.requests.discoverPageNewAlbums
+import it.fast4x.environment.Environment
+import it.fast4x.environment.requests.discoverPageNewAlbums
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.enums.NavRoutes
@@ -59,9 +59,9 @@ import it.fast4x.rimusic.typography
 fun NewAlbumsFromArtists(
     navController: NavController
 ) {
-    var discoverPage by persist<Result<Innertube.DiscoverPageAlbums>>("home/discoveryAlbums")
+    var discoverPage by persist<Result<Environment.DiscoverPageAlbums>>("home/discoveryAlbums")
     LaunchedEffect(Unit) {
-        discoverPage = Innertube.discoverPageNewAlbums()
+        discoverPage = Environment.discoverPageNewAlbums()
     }
 
     var preferitesArtists by persistList<Artist>("home/artists")
@@ -100,7 +100,7 @@ fun NewAlbumsFromArtists(
 
         /***************/
         discoverPage?.getOrNull()?.let { page ->
-            var newReleaseAlbumsFiltered by persistList<Innertube.AlbumItem>("discovery/newalbumsartist")
+            var newReleaseAlbumsFiltered by persistList<Environment.AlbumItem>("discovery/newalbumsartist")
             page.newReleaseAlbums.forEach { album ->
                 preferitesArtists.forEach { artist ->
                     if (artist.name == album.authors?.first()?.name) {

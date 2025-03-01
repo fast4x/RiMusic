@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import it.fast4x.innertube.Innertube
+import it.fast4x.environment.Environment
 import it.fast4x.rimusic.ui.components.themed.TextPlaceholder
 import it.fast4x.rimusic.ui.styling.onOverlay
 import it.fast4x.rimusic.ui.styling.overlay
@@ -33,7 +33,7 @@ import it.fast4x.rimusic.typography
 
 @Composable
 fun VideoItem(
-    video: Innertube.VideoItem,
+    video: Environment.VideoItem,
     thumbnailHeightDp: Dp,
     thumbnailWidthDp: Dp,
     modifier: Modifier = Modifier,

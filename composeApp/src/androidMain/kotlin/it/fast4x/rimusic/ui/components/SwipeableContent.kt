@@ -31,7 +31,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadService
-import it.fast4x.innertube.Innertube
+import it.fast4x.environment.Environment
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.appContext
@@ -54,9 +54,7 @@ import it.fast4x.rimusic.utils.queueSwipeLeftActionKey
 import it.fast4x.rimusic.utils.queueSwipeRightActionKey
 import kotlinx.coroutines.flow.distinctUntilChanged
 import it.fast4x.rimusic.colorPalette
-import it.fast4x.rimusic.context
 import it.fast4x.rimusic.enums.PopupType
-import it.fast4x.rimusic.service.MyDownloadHelper
 import it.fast4x.rimusic.service.MyDownloadService
 import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
 import it.fast4x.rimusic.utils.addToYtLikedSong
@@ -335,7 +333,7 @@ fun SwipeablePlaylistItem(
 @OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
 fun SwipeableAlbumItem(
-    albumItem: Innertube.AlbumItem,
+    albumItem: Environment.AlbumItem,
     onPlayNext: () -> Unit,
     onEnqueue: () -> Unit,
     onBookmark: () -> Unit,

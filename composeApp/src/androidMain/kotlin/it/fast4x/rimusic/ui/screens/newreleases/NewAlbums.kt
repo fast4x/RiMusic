@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import it.fast4x.compose.persist.persist
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.requests.discoverPage
+import it.fast4x.environment.Environment
+import it.fast4x.environment.requests.discoverPage
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.enums.NavRoutes
 import it.fast4x.rimusic.enums.NavigationBarPosition
@@ -50,9 +50,9 @@ import it.fast4x.rimusic.colorPalette
 fun NewAlbums(
     navController: NavController
 ) {
-    var discoverPage by persist<Result<Innertube.DiscoverPage>>("home/discoveryAlbums")
+    var discoverPage by persist<Result<Environment.DiscoverPage>>("home/discoveryAlbums")
     LaunchedEffect(Unit) {
-        discoverPage = Innertube.discoverPage()
+        discoverPage = Environment.discoverPage()
     }
 
     val thumbnailSizeDp = Dimensions.thumbnails.album + 24.dp

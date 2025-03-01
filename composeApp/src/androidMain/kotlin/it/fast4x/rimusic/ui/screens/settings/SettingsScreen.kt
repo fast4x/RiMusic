@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -60,6 +61,7 @@ import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.ui.components.themed.IDialog
 import it.fast4x.rimusic.typography
 
+@ExperimentalMaterial3Api
 @ExperimentalMaterialApi
 @ExperimentalTextApi
 @ExperimentalFoundationApi

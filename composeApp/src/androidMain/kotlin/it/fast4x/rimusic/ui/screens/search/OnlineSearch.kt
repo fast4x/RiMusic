@@ -55,9 +55,9 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import it.fast4x.compose.persist.persistList
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.SearchSuggestionsBody
-import it.fast4x.innertube.requests.searchSuggestionsWithItems
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.SearchSuggestionsBody
+import it.fast4x.environment.requests.searchSuggestionsWithItems
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerAwareWindowInsets
 import it.fast4x.rimusic.LocalPlayerServiceBinder
@@ -124,7 +124,7 @@ fun OnlineSearch(
 
     //var suggestionsResult by persist<Result<List<String>?>?>("search/online/suggestionsResult")
     var suggestionsResult by remember {
-        mutableStateOf<Result<Innertube.SearchSuggestions>?>(null)
+        mutableStateOf<Result<Environment.SearchSuggestions>?>(null)
     }
 
     LaunchedEffect(textFieldValue.text) {
@@ -133,7 +133,7 @@ fun OnlineSearch(
             //suggestionsResult =
             //    Innertube.searchSuggestions(SearchSuggestionsBody(input = textFieldValue.text))
             suggestionsResult =
-                Innertube.searchSuggestionsWithItems(SearchSuggestionsBody(input = textFieldValue.text))
+                Environment.searchSuggestionsWithItems(SearchSuggestionsBody(input = textFieldValue.text))
         }
     }
 

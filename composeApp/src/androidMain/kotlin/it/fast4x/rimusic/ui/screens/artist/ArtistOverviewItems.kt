@@ -1,31 +1,25 @@
 package it.fast4x.rimusic.ui.screens.artist
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -33,8 +27,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,27 +42,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
 import it.fast4x.compose.persist.persist
 import it.fast4x.compose.persist.persistList
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.YtMusic
-import it.fast4x.innertube.models.BrowseEndpoint
-import it.fast4x.innertube.models.bodies.BrowseBody
-import it.fast4x.innertube.requests.ArtistItemsPage
-import it.fast4x.innertube.requests.ArtistPage
-import it.fast4x.innertube.requests.ArtistSection
-import it.fast4x.innertube.requests.itemsPage
-import it.fast4x.innertube.utils.completed
-import it.fast4x.innertube.utils.from
+import it.fast4x.environment.Environment
+import it.fast4x.environment.EnvironmentExt
+import it.fast4x.environment.models.BrowseEndpoint
+import it.fast4x.environment.requests.ArtistItemsPage
+import it.fast4x.environment.utils.completed
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerAwareWindowInsets
 import it.fast4x.rimusic.LocalPlayerServiceBinder
@@ -78,56 +61,33 @@ import it.fast4x.rimusic.R
 import it.fast4x.rimusic.appContext
 import it.fast4x.rimusic.enums.NavRoutes
 import it.fast4x.rimusic.enums.NavigationBarPosition
-import it.fast4x.rimusic.enums.UiType
-import it.fast4x.rimusic.models.Artist
 import it.fast4x.rimusic.ui.components.LocalMenuState
-import it.fast4x.rimusic.ui.components.ShimmerHost
-import it.fast4x.rimusic.ui.components.themed.AutoResizeText
-import it.fast4x.rimusic.ui.components.themed.FontSizeRange
 import it.fast4x.rimusic.ui.components.themed.HeaderIconButton
-import it.fast4x.rimusic.ui.components.themed.LayoutWithAdaptiveThumbnail
-import it.fast4x.rimusic.ui.components.themed.MultiFloatingActionsContainer
-import it.fast4x.rimusic.ui.components.themed.SecondaryTextButton
 import it.fast4x.rimusic.ui.components.themed.SmartMessage
-import it.fast4x.rimusic.ui.components.themed.TextPlaceholder
 import it.fast4x.rimusic.ui.components.themed.Title
 import it.fast4x.rimusic.ui.items.AlbumItem
-import it.fast4x.rimusic.ui.items.AlbumItemPlaceholder
 import it.fast4x.rimusic.ui.items.PlaylistItem
 import it.fast4x.rimusic.ui.items.SongItem
-import it.fast4x.rimusic.ui.items.SongItemPlaceholder
 import it.fast4x.rimusic.ui.styling.Dimensions
 import it.fast4x.rimusic.ui.styling.px
-import it.fast4x.rimusic.utils.align
 import it.fast4x.rimusic.utils.asMediaItem
-import it.fast4x.rimusic.utils.color
-import it.fast4x.rimusic.utils.conditional
-import it.fast4x.rimusic.utils.fadingEdge
 import it.fast4x.rimusic.utils.forcePlay
 import it.fast4x.rimusic.utils.getHttpClient
-import it.fast4x.rimusic.utils.isLandscape
 import it.fast4x.rimusic.utils.languageDestination
-import it.fast4x.rimusic.utils.medium
 import it.fast4x.rimusic.utils.parentalControlEnabledKey
 import it.fast4x.rimusic.utils.rememberPreference
-import it.fast4x.rimusic.utils.resize
-import it.fast4x.rimusic.utils.semiBold
-import it.fast4x.rimusic.utils.showFloatingIconKey
 import me.bush.translator.Translator
 import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.enums.MaxSongs
 import it.fast4x.rimusic.enums.PopupType
 import it.fast4x.rimusic.isVideoEnabled
 import it.fast4x.rimusic.models.Song
-import it.fast4x.rimusic.models.SongEntity
 import it.fast4x.rimusic.models.Album
-import it.fast4x.rimusic.typography
 import it.fast4x.rimusic.ui.components.SwipeablePlaylistItem
 import it.fast4x.rimusic.ui.components.themed.AddToPlaylistArtistSongs
 import it.fast4x.rimusic.ui.components.themed.ConfirmationDialog
 import it.fast4x.rimusic.ui.components.themed.NonQueuedMediaItemMenu
 import it.fast4x.rimusic.ui.components.themed.NowPlayingSongIndicator
-import it.fast4x.rimusic.ui.components.themed.TitleMiniSection
 import it.fast4x.rimusic.ui.components.themed.TitleSection
 import it.fast4x.rimusic.ui.items.ArtistItem
 import it.fast4x.rimusic.ui.items.VideoItem
@@ -234,7 +194,7 @@ fun ArtistOverviewItems(
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        artistItemsPage = YtMusic.getArtistItemsPage(
+        artistItemsPage = EnvironmentExt.getArtistItemsPage(
             BrowseEndpoint(
                 browseId = browseId,
                 params = params
@@ -259,9 +219,9 @@ fun ArtistOverviewItems(
             )
     ) {
 
-        if (artistItemsPage?.items?.firstOrNull() is Innertube.SongItem) {
+        if (artistItemsPage?.items?.firstOrNull() is Environment.SongItem) {
             val artistSongs = artistItemsPage!!.items
-                .map{it as Innertube.SongItem}
+                .map{it as Environment.SongItem}
                 .map { it.asMediaItem }
 
             if (showConfirmDownloadAllDialog) {
@@ -605,6 +565,9 @@ fun ArtistOverviewItems(
                                                     menuState.hide()
                                                     forceRecompose = true
                                                 },
+                                                onInfo = {
+                                                    navController.navigate("${NavRoutes.videoOrSongInfo.name}/${item.mediaId}")
+                                                },
                                                 mediaItem = item,
                                                 disableScrollingText = disableScrollingText
                                             )
@@ -813,7 +776,7 @@ fun ArtistOverviewItems(
 ////                                )
 ////                            }
 //                        }
-                        is Innertube.AlbumItem -> {
+                        is Environment.AlbumItem -> {
                             var albumById by remember { mutableStateOf<Album?>(null) }
                             LaunchedEffect(item) {
                                 CoroutineScope(Dispatchers.IO).launch {
@@ -834,7 +797,7 @@ fun ArtistOverviewItems(
                                 disableScrollingText = disableScrollingText
                             )
                         }
-                        is Innertube.PlaylistItem -> {
+                        is Environment.PlaylistItem -> {
                             PlaylistItem(
                                 playlist = item,
                                 alternative = true,
@@ -846,7 +809,7 @@ fun ArtistOverviewItems(
                                 })
                             )
                         }
-                        is Innertube.VideoItem -> {
+                        is Environment.VideoItem -> {
                             VideoItem(
                                 video = item,
                                 thumbnailHeightDp = playlistThumbnailSizeDp,
@@ -861,7 +824,7 @@ fun ArtistOverviewItems(
                                 })
                             )
                         }
-                        is Innertube.ArtistItem -> {
+                        is Environment.ArtistItem -> {
                             ArtistItem(
                                 artist = item,
                                 alternative = true,

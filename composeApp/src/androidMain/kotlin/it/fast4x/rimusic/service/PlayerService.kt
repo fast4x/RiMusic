@@ -73,11 +73,11 @@ import androidx.media3.extractor.ExtractorsFactory
 import androidx.media3.extractor.mkv.MatroskaExtractor
 import androidx.media3.extractor.mp4.FragmentedMp4Extractor
 import androidx.media3.extractor.text.DefaultSubtitleParserFactory
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.NavigationEndpoint
-import it.fast4x.innertube.models.bodies.SearchBody
-import it.fast4x.innertube.requests.searchPage
-import it.fast4x.innertube.utils.from
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.NavigationEndpoint
+import it.fast4x.environment.models.bodies.SearchBody
+import it.fast4x.environment.requests.searchPage
+import it.fast4x.environment.utils.from
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.MainActivity
 import it.fast4x.rimusic.R
@@ -1992,12 +1992,12 @@ class PlayerService : InvincibleService(),
 
         fun playFromSearch(query: String) {
             coroutineScope.launch {
-                Innertube.searchPage(
+                Environment.searchPage(
                     body = SearchBody(
                         query = query,
-                        params = Innertube.SearchFilter.Song.value
+                        params = Environment.SearchFilter.Song.value
                     ),
-                    fromMusicShelfRendererContent = Innertube.SongItem.Companion::from
+                    fromMusicShelfRendererContent = Environment.SongItem.Companion::from
                 )?.getOrNull()?.items?.firstOrNull()?.info?.endpoint?.let { playRadio(it) }
             }
         }

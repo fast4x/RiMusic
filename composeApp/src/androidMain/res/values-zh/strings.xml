@@ -925,4 +925,16 @@
     <string name="adding_yt_to_pl_failed">Error occurred for the next 50 songs. Adding songs to the playlist one by one</string>
     <string name="songs_add_yt_success">Added the song in the YouTube Playlist</string>
     <string name="songs_add_yt_failed">Failed to add the song in the YouTube Playlist</string>
+    <string name="viewType">Change view type</string>
+    <string name="copy_translated_lyrics">Copy translated lyrics</string>
+    <string name="description">Description</string>
+    <string name="numbers">Numbers</string>
+    <string name="subscribers">Subscribers</string>
+    <string name="views">Views</string>
+    <string name="likes">Likes</string>
+    <string name="dislikes">Dislikes</string>
+    <string name="loudness_boost_level">Loudness boost level</string>
+    <string name="loudness_boost_level_info">Additional loudness level, to be used without overdoing it, may damage the device</string>
+    <string name="export_crash_log">Export crash log</string>
+    <string name="export_log">Export log</string>
 </resources>

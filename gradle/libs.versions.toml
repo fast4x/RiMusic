@@ -46,6 +46,7 @@ kotlinxCoroutinesSwing = "1.9.0"
 hilt = "2.53.1"
 hypnoticcanvas = "0.3.0"
 ksoup = "0.3.1"
+okhttpDnsOverHttps = "4.12.0"
 
 [libraries]
 kotlin-coroutines = {group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlin-coroutine"}
@@ -117,11 +118,12 @@ hypnoticcanvas-shaders = {group = "com.mikepenz.hypnoticcanvas", name = "hypnoti
 
 ksoup-html = { group = "com.mohamedrejeb.ksoup", name = "ksoup-html", version.ref = "ksoup" }
 ksoup-entities = { group = "com.mohamedrejeb.ksoup", name = "ksoup-entities", version.ref = "ksoup" }
-# Use fork of NewPipeExtractor until https://github.com/TeamNewPipe/NewPipeExtractor/pull/1253 is merged
-#newpipe-extractor = { group = "com.github.gechoto", name = "NewPipeExtractor", version = "00cf7dad9e49933c7faaa382c9c7b1e7afb28a7d" }
 newpipe-extractor = { group = "com.github.TeamNewPipe", name = "NewPipeExtractor", version = "v0.24.5" } #before was used v0.24.3
 nanojson = { group = "com.github.TeamNewPipe", name = "nanojson", version = "1d9e1aea9049fc9f85e68b43ba39fe7be1c1f751" }
 androidx-webkit = { group = "androidx.webkit", name = "webkit", version = "1.9.0" }
+
+okhttp-dnsoverhttps = { group = "com.squareup.okhttp3", name = "okhttp-dnsoverhttps", version.ref = "okhttpDnsOverHttps" }
+
 
 
 [plugins]

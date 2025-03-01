@@ -50,12 +50,10 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -100,12 +98,11 @@ import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import it.fast4x.compose.persist.persist
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.YtMusic
-import it.fast4x.innertube.models.bodies.SearchBody
-import it.fast4x.innertube.requests.ArtistPage
-import it.fast4x.innertube.requests.searchPage
-import it.fast4x.innertube.utils.from
+import it.fast4x.environment.Environment
+import it.fast4x.environment.EnvironmentExt
+import it.fast4x.environment.models.bodies.SearchBody
+import it.fast4x.environment.requests.searchPage
+import it.fast4x.environment.utils.from
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.Database.Companion.update
 import it.fast4x.rimusic.LocalPlayerServiceBinder
@@ -158,18 +155,15 @@ import it.fast4x.rimusic.models.SongPlaylistMap
 import it.fast4x.rimusic.typography
 import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
 import it.fast4x.rimusic.ui.styling.Dimensions
-import it.fast4x.rimusic.ui.styling.onOverlay
 import it.fast4x.rimusic.ui.styling.px
 import it.fast4x.rimusic.utils.asMediaItem
 import it.fast4x.rimusic.utils.asSong
 import it.fast4x.rimusic.utils.bassboostLevelKey
 import it.fast4x.rimusic.utils.getLikeState
 import it.fast4x.rimusic.utils.isExplicit
-import it.fast4x.rimusic.utils.left
 import it.fast4x.rimusic.utils.lyricsSizeKey
 import it.fast4x.rimusic.utils.lyricsSizeLKey
 import it.fast4x.rimusic.utils.removeYTSongFromPlaylist
-import it.fast4x.rimusic.utils.right
 import it.fast4x.rimusic.utils.thumbnail
 import it.fast4x.rimusic.utils.thumbnailFadeExKey
 import it.fast4x.rimusic.utils.thumbnailSpacingLKey
@@ -575,7 +569,7 @@ inline fun SelectorArtistsDialog(
                         LaunchedEffect(Unit) {
                             if (artist?.thumbnailUrl == null) {
                                 withContext(Dispatchers.IO) {
-                                    YtMusic.getArtistPage(browseId = browseId)
+                                    EnvironmentExt.getArtistPage(browseId = browseId)
                                         .onSuccess { currentArtistPage ->
                                             artist?.copy(
                                                 thumbnailUrl = currentArtistPage.artist.thumbnail?.url
@@ -1102,47 +1096,6 @@ inline fun StringListDialog(
 
 }
 
-
-
-@Composable
-inline fun GenericDialog(
-    modifier: Modifier = Modifier,
-    noinline onDismiss: () -> Unit,
-    title: String,
-    textButton: String = stringResource(R.string.cancel),
-    crossinline content: @Composable () -> Unit,
-) {
-    Dialog(onDismissRequest = onDismiss) {
-        Column(
-            modifier = modifier
-                .padding(all = 48.dp)
-                .background(color = colorPalette().background1, shape = RoundedCornerShape(8.dp))
-                .padding(vertical = 16.dp)
-        ) {
-            BasicText(
-                text = title,
-                style = typography().s.bold,
-                modifier = Modifier
-                    .padding(vertical = 8.dp, horizontal = 24.dp)
-            )
-
-            content()
-
-            Box(
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(end = 24.dp)
-            ) {
-                DialogTextButton(
-                    text = textButton,
-                    onClick = onDismiss,
-                    modifier = Modifier
-                )
-            }
-        }
-    }
-}
-
 @Composable
 fun NewVersionDialog (
     updatedProductName: String,
@@ -1218,25 +1171,25 @@ fun NewVersionDialog (
                         .size(30.dp)
                         .clickable {
                             onDismiss()
-                            uriHandler.openUri("https://github.com/fast4x/RiMusic/releases/download/$updatedVersionName/app-foss-release.apk")
+                            uriHandler.openUri("https://github.com/fast4x/RiMusic/releases/download/$updatedVersionName/rimusic-full-release.apk")
                         }
                 )
             }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(bottom = 20.dp)
-                    .fillMaxWidth()
-            ) {
-                BasicText(
-                    text = stringResource(R.string.f_droid_users_can_wait_for_the_update_info),
-                    style = typography().xxs.semiBold.copy(color = colorPalette().textSecondary),
-                    maxLines = 4,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+//            Row(
+//                horizontalArrangement = Arrangement.SpaceBetween,
+//                verticalAlignment = Alignment.CenterVertically,
+//                modifier = Modifier
+//                    .padding(bottom = 20.dp)
+//                    .fillMaxWidth()
+//            ) {
+//                BasicText(
+//                    text = stringResource(R.string.f_droid_users_can_wait_for_the_update_info),
+//                    style = typography().xxs.semiBold.copy(color = colorPalette().textSecondary),
+//                    maxLines = 4,
+//                    overflow = TextOverflow.Ellipsis,
+//                    modifier = Modifier.fillMaxWidth()
+//                )
+//            }
         }
 
     )
@@ -1881,18 +1834,18 @@ fun SongMatchingDialog(
                     .replace(Regex("\\s+"), " ")
                 return filteredText
             }
-            var songsList by remember { mutableStateOf<List<Innertube.SongItem?>>(emptyList()) }
+            var songsList by remember { mutableStateOf<List<Environment.SongItem?>>(emptyList()) }
             var searchText by remember {mutableStateOf(filteredText("${cleanPrefix(songToRematch.title)} ${songToRematch.artistsText}"))}
             var startSearch by remember { mutableStateOf(false) }
 
             LaunchedEffect(Unit,startSearch) {
                 runBlocking(Dispatchers.IO) {
-                    val searchQuery = Innertube.searchPage(
+                    val searchQuery = Environment.searchPage(
                         body = SearchBody(
                             query = searchText,
-                            params = Innertube.SearchFilter.Song.value
+                            params = Environment.SearchFilter.Song.value
                         ),
-                        fromMusicShelfRendererContent = Innertube.SongItem.Companion::from
+                        fromMusicShelfRendererContent = Environment.SongItem.Companion::from
                     )
 
                     songsList = searchQuery?.getOrNull()?.items ?: emptyList()
@@ -2062,7 +2015,7 @@ fun SongMatchingDialog(
                                                 album?.copy(thumbnailUrl = song.thumbnail?.url)?.let { update(it) }
 
                                                 if (isYouTubeSyncEnabled() && playlist?.isYoutubePlaylist == true && playlist.isEditable){
-                                                    YtMusic.addToPlaylist(playlist.browseId ?: "", song.asMediaItem.mediaId)
+                                                    EnvironmentExt.addToPlaylist(playlist.browseId ?: "", song.asMediaItem.mediaId)
                                                 }
                                             }
                                             if ((artistsNames != null) && (artistsIds != null)) {
@@ -2891,8 +2844,7 @@ fun PlaybackParamsDialog(
         ) {
             IconButton(
                 onClick = {
-                    playbackDeviceVolume = getDeviceVolume(context)
-                    setDeviceVolume(context, playbackDeviceVolume)
+                    bassBoost = defaultBassboost
                 },
                 icon = R.drawable.musical_notes,
                 color = colorPalette().favoritesIcon,

@@ -142,7 +142,7 @@ import dev.chrisbanes.haze.HazeDefaults
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.haze
 import dev.chrisbanes.haze.hazeChild
-import it.fast4x.innertube.models.NavigationEndpoint
+import it.fast4x.environment.models.NavigationEndpoint
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
@@ -179,7 +179,6 @@ import it.fast4x.rimusic.ui.components.themed.ConfirmationDialog
 import it.fast4x.rimusic.ui.components.themed.DefaultDialog
 import it.fast4x.rimusic.ui.components.themed.DownloadStateIconButton
 import it.fast4x.rimusic.ui.components.themed.IconButton
-import it.fast4x.rimusic.ui.components.themed.MiniPlayerMenu
 import it.fast4x.rimusic.ui.components.themed.NowPlayingSongIndicator
 import it.fast4x.rimusic.ui.components.themed.PlayerMenu
 import it.fast4x.rimusic.ui.components.themed.RotateThumbnailCoverAnimationModern
@@ -234,7 +233,6 @@ import it.fast4x.rimusic.utils.horizontalFadingEdge
 import it.fast4x.rimusic.utils.isDownloadedSong
 import it.fast4x.rimusic.utils.isExplicit
 import it.fast4x.rimusic.utils.isLandscape
-import it.fast4x.rimusic.utils.jumpPreviousKey
 import it.fast4x.rimusic.utils.manageDownload
 import it.fast4x.rimusic.utils.mediaItems
 import it.fast4x.rimusic.utils.miniQueueExpandedKey
@@ -252,7 +250,6 @@ import it.fast4x.rimusic.utils.queueDurationExpandedKey
 import it.fast4x.rimusic.utils.queueLoopTypeKey
 import it.fast4x.rimusic.utils.queueTypeKey
 import it.fast4x.rimusic.utils.rememberPreference
-import it.fast4x.rimusic.utils.resize
 import it.fast4x.rimusic.utils.seamlessPlay
 import it.fast4x.rimusic.utils.semiBold
 import it.fast4x.rimusic.utils.setQueueLoopState
@@ -314,7 +311,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.unit.LayoutDirection
 import it.fast4x.rimusic.ui.components.themed.AddToPlaylistPlayerMenu
-import it.fast4x.rimusic.utils.conditional
 import kotlin.math.sqrt
 
 
@@ -851,9 +847,9 @@ fun Player(
 
         //val context = LocalContext.current
         //println("Player before getting dynamic color ${dynamicColorPalette}")
-        println("Player url mediaitem ${mediaItem.mediaMetadata.artworkUri}")
-        println("Player url binder ${binder.player.currentWindow?.mediaItem?.mediaMetadata?.artworkUri}")
-        val isSystemDarkMode = isSystemInDarkTheme()
+        //println("Player url mediaitem ${mediaItem.mediaMetadata.artworkUri}")
+        //println("Player url binder ${binder.player.currentWindow?.mediaItem?.mediaMetadata?.artworkUri}")
+        //val isSystemDarkMode = isSystemInDarkTheme()
         LaunchedEffect(mediaItem.mediaId, updateBrush) {
             if (playerBackgroundColors == PlayerBackgroundColors.CoverColorGradient ||
                 playerBackgroundColors == PlayerBackgroundColors.CoverColor ||
@@ -1948,6 +1944,9 @@ fun Player(
                                             onClosePlayer = {
                                                 onDismiss()
                                             },
+                                            onInfo = {
+                                                navController.navigate("${NavRoutes.videoOrSongInfo.name}/${mediaItem.mediaId}")
+                                            },
                                             disableScrollingText = disableScrollingText
                                         )
                                     }
@@ -2936,6 +2935,9 @@ fun Player(
                                                     binder = binder,
                                                     onClosePlayer = {
                                                         onDismiss()
+                                                    },
+                                                    onInfo = {
+                                                        navController.navigate("${NavRoutes.videoOrSongInfo.name}/${mediaItem.mediaId}")
                                                     },
                                                     disableScrollingText = disableScrollingText
                                                 )

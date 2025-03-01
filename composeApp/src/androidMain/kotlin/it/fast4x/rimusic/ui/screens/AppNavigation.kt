@@ -72,6 +72,7 @@ import it.fast4x.rimusic.ui.screens.search.SearchScreen
 import it.fast4x.rimusic.ui.screens.searchresult.SearchResultScreen
 import it.fast4x.rimusic.ui.screens.settings.SettingsScreen
 import it.fast4x.rimusic.ui.screens.statistics.StatisticsScreen
+import it.fast4x.rimusic.utils.ShowVideoOrSongInfo
 import it.fast4x.rimusic.utils.clearPreference
 import it.fast4x.rimusic.utils.homeScreenTabIndexKey
 import it.fast4x.rimusic.utils.pauseSearchHistoryKey
@@ -215,6 +216,21 @@ fun AppNavigation(
                 SnakeGame()
             }
 
+        }
+
+        composable(
+            route = "${NavRoutes.videoOrSongInfo.name}/{id}",
+            arguments = listOf(
+                navArgument(
+                    name = "id",
+                    builder = { type = NavType.StringType }
+                )
+            )
+        ) { navBackStackEntry ->
+            val id = navBackStackEntry.arguments?.getString("id") ?: ""
+            modalBottomSheetPage {
+                ShowVideoOrSongInfo(id)
+            }
         }
 
         composable(route = NavRoutes.queue.name) {

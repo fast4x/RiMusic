@@ -229,7 +229,10 @@ object MyDownloadHelper {
             .Builder(
                 /* id      = */ mediaItem.mediaId,
                 /* uri     = */ mediaItem.requestMetadata.mediaUri
-                    ?: Uri.parse("https://music.youtube.com/watch?v=${mediaItem.mediaId}")
+                    //try to download from youtube.com
+                    ?: Uri.parse("https://youtube.com/watch?v=${mediaItem.mediaId}")
+                    //try to download ffrom music.youtube.com
+                    //?: Uri.parse("https://music.youtube.com/watch?v=${mediaItem.mediaId}")
             )
             .setCustomCacheKey(mediaItem.mediaId)
             .setData("${mediaItem.mediaMetadata.artist.toString()} - ${mediaItem.mediaMetadata.title.toString()}".encodeToByteArray()) // Title in notification

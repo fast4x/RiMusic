@@ -63,8 +63,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import it.fast4x.compose.persist.persistList
-import it.fast4x.innertube.YtMusic
-import it.fast4x.innertube.models.NavigationEndpoint
+import it.fast4x.environment.models.NavigationEndpoint
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.MODIFIED_PREFIX
@@ -143,6 +142,7 @@ fun InHistoryMediaItemMenu(
     song: Song,
     onHideFromDatabase: (() -> Unit)? = {},
     onDeleteFromDatabase: (() -> Unit)? = {},
+    onInfo: (() -> Unit)? = {},
     modifier: Modifier = Modifier,
     disableScrollingText: Boolean
 ) {
@@ -171,6 +171,7 @@ fun InHistoryMediaItemMenu(
                 }
             }
         },
+        onInfo = onInfo,
         modifier = modifier,
         disableScrollingText = disableScrollingText
     )
@@ -188,6 +189,7 @@ fun InPlaylistMediaItemMenu(
     positionInPlaylist: Int,
     song: Song,
     onMatchingSong: (() -> Unit)? = null,
+    onInfo: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     disableScrollingText: Boolean
 ) {
@@ -259,6 +261,7 @@ fun InPlaylistMediaItemMenu(
         },
         onMatchingSong = { if (onMatchingSong != null) {onMatchingSong()}
             onDismiss() },
+        onInfo = onInfo,
         modifier = modifier,
         disableScrollingText = disableScrollingText
     )
@@ -277,6 +280,7 @@ fun NonQueuedMediaItemMenuLibrary(
     onRemoveFromQuickPicks: (() -> Unit)? = null,
     onDownload: (() -> Unit)? = null,
     onMatchingSong: (() -> Unit)? = null,
+    onInfo: (() -> Unit)?,
     disableScrollingText: Boolean
 ) {
     val binder = LocalPlayerServiceBinder.current
@@ -392,6 +396,7 @@ fun NonQueuedMediaItemMenuLibrary(
                 }
             },
             onMatchingSong = onMatchingSong,
+            onInfo = onInfo,
             modifier = modifier,
             disableScrollingText = disableScrollingText
         )
@@ -414,6 +419,7 @@ fun NonQueuedMediaItemMenu(
     onDownload: (() -> Unit)? = null,
     onAddToPreferites: (() -> Unit)? = null,
     onMatchingSong: (() -> Unit)? = null,
+    onInfo: (() -> Unit)? = null,
     disableScrollingText: Boolean
 ) {
     val binder = LocalPlayerServiceBinder.current
@@ -450,6 +456,7 @@ fun NonQueuedMediaItemMenu(
             onRemoveFromQuickPicks = onRemoveFromQuickPicks,
             onAddToPreferites = onAddToPreferites,
             onMatchingSong =  onMatchingSong,
+            onInfo = onInfo,
             modifier = modifier,
             disableScrollingText = disableScrollingText
         )
@@ -478,6 +485,7 @@ fun NonQueuedMediaItemMenu(
             onRemoveFromQuickPicks = onRemoveFromQuickPicks,
             onAddToPreferites = onAddToPreferites,
             onMatchingSong =  onMatchingSong,
+            onInfo = onInfo,
             modifier = modifier,
             disableScrollingText = disableScrollingText
         )
@@ -493,6 +501,7 @@ fun QueuedMediaItemMenu(
     onDismiss: () -> Unit,
     onDownload: (() -> Unit)?,
     onMatchingSong: (() -> Unit)? = null,
+    onInfo: (() -> Unit)?,
     mediaItem: MediaItem,
     indexInQueue: Int?,
     modifier: Modifier = Modifier,
@@ -593,6 +602,7 @@ fun QueuedMediaItemMenu(
                 }
             },
             onMatchingSong = onMatchingSong,
+            onInfo = onInfo,
             disableScrollingText = disableScrollingText
         )
     }
@@ -622,6 +632,7 @@ fun BaseMediaItemMenu(
     onGoToPlaylist: ((Long) -> Unit)? = null,
     onAddToPreferites: (() -> Unit)?,
     onMatchingSong: (() -> Unit)?,
+    onInfo: (() -> Unit)?,
     disableScrollingText: Boolean
 ) {
     val context = LocalContext.current
@@ -707,6 +718,7 @@ fun BaseMediaItemMenu(
         onGoToPlaylist = {
             navController.navigate(route = "${NavRoutes.localPlaylist.name}/$it")
         },
+        onInfo = onInfo,
         modifier = modifier,
         disableScrollingText = disableScrollingText
     )
@@ -722,6 +734,7 @@ fun MiniMediaItemMenu(
     mediaItem: MediaItem,
     onGoToPlaylist: ((Long) -> Unit)? = null,
     onAddToPreferites: (() -> Unit)?,
+    onInfo: (() -> Unit)?,
     modifier: Modifier = Modifier,
     disableScrollingText: Boolean
 ) {
@@ -769,6 +782,7 @@ fun MiniMediaItemMenu(
             context.startActivity(Intent.createChooser(sendIntent, null))
         },
         onAddToPreferites = onAddToPreferites,
+        onInfo = onInfo,
         modifier = modifier,
         disableScrollingText = disableScrollingText
     )
@@ -860,6 +874,7 @@ fun MediaItemMenu(
     onShare: () -> Unit,
     onGoToPlaylist: ((Long) -> Unit)? = null,
     onMatchingSong: (() -> Unit)? = null,
+    onInfo: (() -> Unit)?,
     disableScrollingText: Boolean
 ) {
     val density = LocalDensity.current
@@ -1371,6 +1386,17 @@ fun MediaItemMenu(
                     modifier = Modifier
                         .height(8.dp)
                 )
+
+                if (!isLocal) onInfo?.let { onInfo ->
+                    MenuEntry(
+                        icon = R.drawable.information,
+                        text = stringResource(R.string.information),
+                        onClick = {
+                            onDismiss()
+                            onInfo()
+                        }
+                    )
+                }
 
                 if (!isLocal && songSaved > 0) {
                     MenuEntry(

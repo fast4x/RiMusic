@@ -27,10 +27,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.BrowseBodyWithLocale
-import it.fast4x.innertube.requests.BrowseResult
-import it.fast4x.innertube.requests.browse
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.BrowseBodyWithLocale
+import it.fast4x.environment.requests.BrowseResult
+import it.fast4x.environment.requests.browse
 import it.fast4x.rimusic.items.AlbumItem
 import it.fast4x.rimusic.items.ArtistItem
 import it.fast4x.rimusic.items.PlaylistItem
@@ -45,7 +45,7 @@ internal const val defaultBrowseId = "FEmusic_moods_and_genres_category"
 
 @Composable
 fun MoodScreen(
-    mood: Innertube.Mood.Item,
+    mood: Environment.Mood.Item,
     onAlbumClick: (String) -> Unit,
     onArtistClick: (String) -> Unit,
     onPlaylistClick: (String) -> Unit
@@ -58,7 +58,7 @@ fun MoodScreen(
     var moodPage by remember { mutableStateOf<BrowseResult?>(null) }
     var moodPageResult by remember { mutableStateOf<Result<BrowseResult>?>(null) }
     LaunchedEffect(browseId) {
-        moodPageResult = Innertube.browse(BrowseBodyWithLocale(browseId = browseId, params = mood.endpoint.params))
+        moodPageResult = Environment.browse(BrowseBodyWithLocale(browseId = browseId, params = mood.endpoint.params))
     }
 
     moodPageResult?.getOrThrow().also { moodPage = it }
@@ -121,7 +121,7 @@ fun MoodScreen(
                             items(items = item.items, key = { it.key }) { childItem ->
                                 if (childItem.key == defaultBrowseId) return@items
                                 when (childItem) {
-                                    is Innertube.AlbumItem -> AlbumItem(
+                                    is Environment.AlbumItem -> AlbumItem(
                                         album = childItem,
                                         thumbnailSizeDp = albumThumbnailSize,
                                         alternative = true,
@@ -132,7 +132,7 @@ fun MoodScreen(
                                         }
                                     )
 
-                                    is Innertube.ArtistItem -> ArtistItem(
+                                    is Environment.ArtistItem -> ArtistItem(
                                         artist = childItem,
                                         thumbnailSizeDp = artistThumbnailSize,
                                         alternative = true,
@@ -143,7 +143,7 @@ fun MoodScreen(
                                         }
                                     )
 
-                                    is Innertube.PlaylistItem -> PlaylistItem(
+                                    is Environment.PlaylistItem -> PlaylistItem(
                                         playlist = childItem,
                                         thumbnailSizeDp = playlistThumbnailSize,
                                         alternative = true,

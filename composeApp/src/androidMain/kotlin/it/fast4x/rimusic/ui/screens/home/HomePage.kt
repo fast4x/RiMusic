@@ -38,9 +38,9 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import it.fast4x.compose.persist.persist
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.YtMusic
-import it.fast4x.innertube.requests.HomePage
+import it.fast4x.environment.Environment
+import it.fast4x.environment.EnvironmentExt
+import it.fast4x.environment.requests.HomePage
 import it.fast4x.rimusic.LocalPlayerAwareWindowInsets
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
@@ -74,15 +74,9 @@ import kotlinx.coroutines.launch
 import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.typography
 import it.fast4x.rimusic.ui.items.VideoItem
-import it.fast4x.rimusic.ui.screens.settings.isYouTubeLoggedIn
 import it.fast4x.rimusic.utils.asMediaItem
 import it.fast4x.rimusic.utils.forcePlay
-import it.fast4x.rimusic.utils.saveFileToInternalStorage
 import timber.log.Timber
-import java.io.File
-import java.io.IOException
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.days
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,7 +95,7 @@ fun HomePage(
     onAlbumClick: (String) -> Unit,
     onArtistClick: (String) -> Unit,
     onPlaylistClick: (String) -> Unit,
-    onMoodClick: (mood: Innertube.Mood.Item) -> Unit,
+    onMoodClick: (mood: Environment.Mood.Item) -> Unit,
 ) {
     val binder = LocalPlayerServiceBinder.current
     val menuState = LocalMenuState.current
@@ -126,7 +120,7 @@ fun HomePage(
 
     suspend fun loadData() {
 
-        homePageResult = YtMusic.getHomePage()
+        homePageResult = EnvironmentExt.getHomePage()
 
         if (loadedData) return
 
@@ -247,7 +241,7 @@ fun HomePage(
                     LazyRow(contentPadding = endPaddingValues) {
                         items(it.items) { item ->
                             when (item) {
-                                is Innertube.SongItem -> {
+                                is Environment.SongItem -> {
                                     println("Innertube homePage SongItem: ${item.info?.name}")
                                     SongItem(
                                         song = item,
@@ -263,7 +257,7 @@ fun HomePage(
                                     )
                                 }
 
-                                is Innertube.AlbumItem -> {
+                                is Environment.AlbumItem -> {
                                     println("Innertube homePage AlbumItem: ${item.info?.name}")
                                     AlbumItem(
                                         album = item,
@@ -277,7 +271,7 @@ fun HomePage(
 
                                     )
                                 }
-                                is Innertube.ArtistItem -> {
+                                is Environment.ArtistItem -> {
                                     println("Innertube homePage ArtistItem: ${item.info?.name}")
                                     ArtistItem(
                                         artist = item,
@@ -289,7 +283,7 @@ fun HomePage(
                                         })
                                     )
                                 }
-                                is Innertube.PlaylistItem -> {
+                                is Environment.PlaylistItem -> {
                                     println("Innertube homePage PlaylistItem: ${item.info?.name}")
                                     PlaylistItem(
                                         playlist = item,
@@ -302,7 +296,7 @@ fun HomePage(
                                         })
                                     )
                                 }
-                                is Innertube.VideoItem -> {
+                                is Environment.VideoItem -> {
                                     println("Innertube homePage VideoItem: ${item.info?.name}")
                                     VideoItem(
                                         video = item,

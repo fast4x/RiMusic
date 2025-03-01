@@ -1,6 +1,7 @@
 package it.fast4x.rimusic.utils
 
 import android.content.Context
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.util.UnstableApi
@@ -12,11 +13,13 @@ import androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException
 import androidx.media3.datasource.TransferListener
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.okhttp.OkHttpDataSource
-import it.fast4x.innertube.utils.ProxyPreferences
-import it.fast4x.innertube.utils.getProxy
+import it.fast4x.environment.utils.ProxyPreferences
+import it.fast4x.environment.utils.getProxy
 import okhttp3.OkHttpClient
+import timber.log.Timber
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.pow
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -103,7 +106,72 @@ private fun okHttpClient(): OkHttpClient {
         .build()
 }
 
+// Thanks to ViTune for the idea and implementation
+@UnstableApi
+class RetryingDataSourceFactory(
+    private val parent: DataSource.Factory,
+    private val maxRetries: Int,
+    private val printStackTrace: Boolean,
+    private val exponential: Boolean,
+    private val predicate: (Throwable) -> Boolean
+) : DataSource.Factory {
+    inner class Source(private val parent: DataSource) : DataSource by parent {
+        @OptIn(UnstableApi::class)
+        override fun open(dataSpec: DataSpec): Long {
+            var lastException: Throwable? = null
+            var retries = 0
+            while (retries < maxRetries) {
+                if (retries > 0) Timber.d("RetryingDataSourceFactory Retry $retries of $maxRetries fetching datasource")
 
+                @Suppress("TooGenericExceptionCaught")
+                return try {
+                    parent.open(dataSpec)
+                } catch (ex: Throwable) {
+                    lastException = ex
+                    if (printStackTrace) Timber.e(
+                        /* msg = */ " RetryingDataSourceFactory Exception caught by retry mechanism",
+                        /* tr = */ ex
+                    )
+                    if (predicate(ex)) {
+                        val time = if (exponential) 1000L * 2.0.pow(retries).toLong() else 2500L
+                        Timber.d("RetryingDataSourceFactory Retry policy accepted retry, sleeping for $time milliseconds")
+                        Thread.sleep(time)
+                        retries++
+                        continue
+                    }
+                    Timber.e(
+                        "RetryingDataSourceFactory Retry policy declined retry, throwing the last exception..."
+                    )
+                    throw ex
+                }
+            }
+            Timber.e(
+                "RetryingDataSourceFactory Max retries $maxRetries exceeded, throwing the last exception..."
+            )
+            throw lastException!!
+        }
+    }
+
+    override fun createDataSource() = Source(parent.createDataSource())
+}
+
+// Thanks to ViTune for the idea and implementation
+inline fun <reified T : Throwable> DataSource.Factory.retryIf(
+    maxRetries: Int = 5,
+    printStackTrace: Boolean = false,
+    exponential: Boolean = true
+) = retryIf(maxRetries, printStackTrace, exponential) { ex -> ex.findCause<T>() != null }
+
+// Thanks to ViTune for the idea and implementation
+@OptIn(UnstableApi::class)
+fun DataSource.Factory.retryIf(
+    maxRetries: Int = 5,
+    printStackTrace: Boolean = false,
+    exponential: Boolean = true,
+    predicate: (Throwable) -> Boolean
+): DataSource.Factory = RetryingDataSourceFactory(this, maxRetries, printStackTrace, exponential, predicate)
+
+// Thanks to ViTune for the idea and implementation
 @OptIn(UnstableApi::class)
 class ConditionalCacheDataSourceFactory(
     private val cacheDataSourceFactory: CacheDataSource.Factory,

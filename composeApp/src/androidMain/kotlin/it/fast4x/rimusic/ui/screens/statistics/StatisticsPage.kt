@@ -375,6 +375,9 @@ fun StatisticsPage(
                                                     menuState.hide()
                                                     forceRecompose = true
                                                 },
+                                                onInfo = {
+                                                    navController.navigate("${NavRoutes.videoOrSongInfo.name}/${songs.get(it).id}")
+                                                },
                                                 disableScrollingText = disableScrollingText
                                             )
                                         }

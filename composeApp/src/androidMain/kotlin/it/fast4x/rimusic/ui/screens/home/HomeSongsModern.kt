@@ -103,6 +103,7 @@ import it.fast4x.rimusic.enums.SortOrder
 import it.fast4x.rimusic.enums.ThumbnailRoundness
 import it.fast4x.rimusic.enums.TopPlaylistPeriod
 import it.fast4x.rimusic.enums.UiType
+import it.fast4x.rimusic.enums.NavRoutes
 import it.fast4x.rimusic.models.Folder
 import it.fast4x.rimusic.models.OnDeviceSong
 import it.fast4x.rimusic.models.Song
@@ -280,6 +281,7 @@ fun HomeSongsModern(
     var nowPlayingItem by remember {
         mutableStateOf(-1)
     }
+
 
     /************ OnDeviceDev */
     val permission = if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_AUDIO
@@ -1844,6 +1846,9 @@ fun HomeSongsModern(
                                                         menuState.hide()
                                                         forceRecompose = true
                                                     },
+                                                    onInfo = {
+                                                        navController.navigate("${NavRoutes.videoOrSongInfo.name}/${song.song.id}")
+                                                    },
                                                     disableScrollingText = disableScrollingText
                                                 )
                                             }
@@ -2056,9 +2061,12 @@ fun HomeSongsModern(
                                                     menuState.hide()
                                                     forceRecompose = true
                                                 },
+                                                onInfo = {
+                                                    navController.navigate("${NavRoutes.videoOrSongInfo.name}/${song.song.id}")
+                                                },
                                                 onHideFromDatabase = { isHiding = true },
                                                 onDeleteFromDatabase = { isDeleting = true },
-                                                disableScrollingText = disableScrollingText
+                                                disableScrollingText = disableScrollingText,
                                             )
                                         }
                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -2163,15 +2171,6 @@ fun HomeSongsModern(
                 onClickSettings = onSettingsClick,
                 onClickSearch = onSearchClick
             )
-
-        /*
-    FloatingActionsContainerWithScrollToTop(
-            lazyListState = lazyListState,
-            iconId = R.drawable.search,
-            onClick = onSearchClick
-        )
-
-         */
 
 
 

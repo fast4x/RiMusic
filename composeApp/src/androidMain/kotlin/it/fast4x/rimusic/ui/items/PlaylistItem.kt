@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import it.fast4x.innertube.Innertube
+import it.fast4x.environment.Environment
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.models.PlaylistPreview
@@ -202,7 +202,7 @@ fun PlaylistItem(
 
 @Composable
 fun PlaylistItem(
-    playlist: Innertube.PlaylistItem,
+    playlist: Environment.PlaylistItem,
     thumbnailSizePx: Int,
     thumbnailSizeDp: Dp,
     modifier: Modifier = Modifier,

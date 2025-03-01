@@ -1,4 +1,4 @@
-package com.dd3boh.outertune.utils.potoken
+package it.fast4x.rimusic.extensions.webpotoken
 
 class PoTokenResult(
     val playerRequestPoToken: String,

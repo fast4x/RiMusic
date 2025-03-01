@@ -28,13 +28,13 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import it.fast4x.compose.persist.persist
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.BrowseBody
-import it.fast4x.innertube.models.bodies.ContinuationBody
-import it.fast4x.innertube.models.bodies.SearchBody
-import it.fast4x.innertube.requests.albumPage
-import it.fast4x.innertube.requests.searchPage
-import it.fast4x.innertube.utils.from
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.BrowseBody
+import it.fast4x.environment.models.bodies.ContinuationBody
+import it.fast4x.environment.models.bodies.SearchBody
+import it.fast4x.environment.requests.albumPage
+import it.fast4x.environment.requests.searchPage
+import it.fast4x.environment.utils.from
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
@@ -185,17 +185,17 @@ fun SearchResultScreen(
                                 tag = "searchResults/$query/songs",
                                 itemsPageProvider = { continuation ->
                                     if (continuation == null) {
-                                        Innertube.searchPage(
+                                        Environment.searchPage(
                                             body = SearchBody(
                                                 query = query,
-                                                params = Innertube.SearchFilter.Song.value
+                                                params = Environment.SearchFilter.Song.value
                                             ),
-                                            fromMusicShelfRendererContent = Innertube.SongItem.Companion::from
+                                            fromMusicShelfRendererContent = Environment.SongItem.Companion::from
                                         )
                                     } else {
-                                        Innertube.searchPage(
+                                        Environment.searchPage(
                                             body = ContinuationBody(continuation = continuation),
-                                            fromMusicShelfRendererContent = Innertube.SongItem.Companion::from
+                                            fromMusicShelfRendererContent = Environment.SongItem.Companion::from
                                         )
                                     }
                                 },
@@ -262,6 +262,9 @@ fun SearchResultScreen(
                                                                     menuState.hide()
                                                                     forceRecompose = true
                                                                 },
+                                                                onInfo = {
+                                                                    navController.navigate("${NavRoutes.videoOrSongInfo.name}/${song.key}")
+                                                                },
                                                                 mediaItem = song.asMediaItem,
                                                                 disableScrollingText = disableScrollingText
                                                             )
@@ -297,24 +300,24 @@ fun SearchResultScreen(
                                 tag = "searchResults/$query/albums",
                                 itemsPageProvider = { continuation ->
                                     if (continuation == null) {
-                                        Innertube.searchPage(
+                                        Environment.searchPage(
                                             body = SearchBody(
                                                 query = query,
-                                                params = Innertube.SearchFilter.Album.value
+                                                params = Environment.SearchFilter.Album.value
                                             ),
-                                            fromMusicShelfRendererContent = Innertube.AlbumItem::from
+                                            fromMusicShelfRendererContent = Environment.AlbumItem::from
                                         )
                                     } else {
-                                        Innertube.searchPage(
+                                        Environment.searchPage(
                                             body = ContinuationBody(continuation = continuation),
-                                            fromMusicShelfRendererContent = Innertube.AlbumItem::from
+                                            fromMusicShelfRendererContent = Environment.AlbumItem::from
                                         )
                                     }
                                 },
                                 emptyItemsText = emptyItemsText,
                                 headerContent = headerContent,
                                 itemContent = { album ->
-                                    var albumPage by persist<Innertube.PlaylistOrAlbumPage?>("album/${album.key}/albumPage")
+                                    var albumPage by persist<Environment.PlaylistOrAlbumPage?>("album/${album.key}/albumPage")
                                     SwipeableAlbumItem(
                                         albumItem = album,
                                         onPlayNext = {
@@ -325,7 +328,7 @@ fun SearchResultScreen(
                                                     .collect {
                                                         if (albumPage == null)
                                                             withContext(Dispatchers.IO) {
-                                                                Innertube.albumPage(
+                                                                Environment.albumPage(
                                                                     BrowseBody(
                                                                         browseId = album.key
                                                                     )
@@ -340,7 +343,7 @@ fun SearchResultScreen(
                                                                             ?.songsPage
                                                                             ?.items
                                                                             ?.map(
-                                                                                Innertube.SongItem::asMediaItem
+                                                                                Environment.SongItem::asMediaItem
                                                                             )
                                                                             ?.let { it1 ->
                                                                                 withContext(Dispatchers.Main) {
@@ -375,7 +378,7 @@ fun SearchResultScreen(
                                                     .collect {
                                                         if (albumPage == null)
                                                             withContext(Dispatchers.IO) {
-                                                                Innertube.albumPage(
+                                                                Environment.albumPage(
                                                                     BrowseBody(
                                                                         browseId = album.key
                                                                     )
@@ -390,7 +393,7 @@ fun SearchResultScreen(
                                                                             ?.songsPage
                                                                             ?.items
                                                                             ?.map(
-                                                                                Innertube.SongItem::asMediaItem
+                                                                                Environment.SongItem::asMediaItem
                                                                             )
                                                                             ?.let { it1 ->
                                                                                 withContext(Dispatchers.Main) {
@@ -425,7 +428,7 @@ fun SearchResultScreen(
                                                     .collect {
                                                         if (albumPage == null)
                                                             withContext(Dispatchers.IO) {
-                                                                Innertube.albumPage(
+                                                                Environment.albumPage(
                                                                     BrowseBody(
                                                                         browseId = album.key
                                                                     )
@@ -457,7 +460,7 @@ fun SearchResultScreen(
                                                                                 .songsPage
                                                                                 ?.items
                                                                                 ?.map(
-                                                                                    Innertube.SongItem::asMediaItem
+                                                                                    Environment.SongItem::asMediaItem
                                                                                 )
                                                                                 ?.onEach(
                                                                                     Database::insert
@@ -520,17 +523,17 @@ fun SearchResultScreen(
                                 tag = "searchResults/$query/artists",
                                 itemsPageProvider = { continuation ->
                                     if (continuation == null) {
-                                        Innertube.searchPage(
+                                        Environment.searchPage(
                                             body = SearchBody(
                                                 query = query,
-                                                params = Innertube.SearchFilter.Artist.value
+                                                params = Environment.SearchFilter.Artist.value
                                             ),
-                                            fromMusicShelfRendererContent = Innertube.ArtistItem::from
+                                            fromMusicShelfRendererContent = Environment.ArtistItem::from
                                         )
                                     } else {
-                                        Innertube.searchPage(
+                                        Environment.searchPage(
                                             body = ContinuationBody(continuation = continuation),
-                                            fromMusicShelfRendererContent = Innertube.ArtistItem::from
+                                            fromMusicShelfRendererContent = Environment.ArtistItem::from
                                         )
                                     }
                                 },
@@ -572,17 +575,17 @@ fun SearchResultScreen(
                                 tag = "searchResults/$query/videos",
                                 itemsPageProvider = { continuation ->
                                     if (continuation == null) {
-                                        Innertube.searchPage(
+                                        Environment.searchPage(
                                             body = SearchBody(
                                                 query = query,
-                                                params = Innertube.SearchFilter.Video.value
+                                                params = Environment.SearchFilter.Video.value
                                             ),
-                                            fromMusicShelfRendererContent = Innertube.VideoItem::from
+                                            fromMusicShelfRendererContent = Environment.VideoItem::from
                                         )
                                     } else {
-                                        Innertube.searchPage(
+                                        Environment.searchPage(
                                             body = ContinuationBody(continuation = continuation),
-                                            fromMusicShelfRendererContent = Innertube.VideoItem::from
+                                            fromMusicShelfRendererContent = Environment.VideoItem::from
                                         )
                                     }
                                 },
@@ -619,6 +622,9 @@ fun SearchResultScreen(
                                                                 navController = navController,
                                                                 mediaItem = video.asMediaItem,
                                                                 onDismiss = menuState::hide,
+                                                                onInfo = {
+                                                                    navController.navigate("${NavRoutes.videoOrSongInfo.name}/${video.key}")
+                                                                },
                                                                 disableScrollingText = disableScrollingText
                                                             )
                                                         };
@@ -664,18 +670,18 @@ fun SearchResultScreen(
                                 itemsPageProvider = { continuation ->
                                     if (continuation == null) {
                                         val filter = when (currentTabIndex) {
-                                            4 -> Innertube.SearchFilter.CommunityPlaylist
-                                            else -> Innertube.SearchFilter.FeaturedPlaylist
+                                            4 -> Environment.SearchFilter.CommunityPlaylist
+                                            else -> Environment.SearchFilter.FeaturedPlaylist
                                         }
 
-                                        Innertube.searchPage(
+                                        Environment.searchPage(
                                             body = SearchBody(query = query, params = filter.value),
-                                            fromMusicShelfRendererContent = Innertube.PlaylistItem::from
+                                            fromMusicShelfRendererContent = Environment.PlaylistItem::from
                                         )
                                     } else {
-                                        Innertube.searchPage(
+                                        Environment.searchPage(
                                             body = ContinuationBody(continuation = continuation),
-                                            fromMusicShelfRendererContent = Innertube.PlaylistItem::from
+                                            fromMusicShelfRendererContent = Environment.PlaylistItem::from
                                         )
                                     }
                                 },
@@ -718,16 +724,16 @@ fun SearchResultScreen(
                                 tag = "searchResults/$query/podcasts",
                                 itemsPageProvider = { continuation ->
                                     if (continuation == null) {
-                                        val filter = Innertube.SearchFilter.Podcast
+                                        val filter = Environment.SearchFilter.Podcast
 
-                                        Innertube.searchPage(
+                                        Environment.searchPage(
                                             body = SearchBody(query = query, params = filter.value),
-                                            fromMusicShelfRendererContent = Innertube.PlaylistItem::from
+                                            fromMusicShelfRendererContent = Environment.PlaylistItem::from
                                         )
                                     } else {
-                                        Innertube.searchPage(
+                                        Environment.searchPage(
                                             body = ContinuationBody(continuation = continuation),
-                                            fromMusicShelfRendererContent = Innertube.PlaylistItem::from
+                                            fromMusicShelfRendererContent = Environment.PlaylistItem::from
                                         )
                                     }
                                 },

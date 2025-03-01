@@ -23,7 +23,8 @@ enum class NavRoutes {
     statistics,
     newAlbums,
     moodsPage,
-    podcast;
+    podcast,
+    videoOrSongInfo;
 
     companion object {
 
