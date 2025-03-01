@@ -2,7 +2,7 @@ package it.fast4x.rimusic.utils
 
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Timeline
-import it.fast4x.innertube.Innertube
+import it.fast4x.environment.Environment
 import it.fast4x.rimusic.models.Album
 import it.fast4x.rimusic.models.Song
 import it.fast4x.rimusic.models.SongEntity
@@ -91,7 +91,7 @@ fun filterSongs(items: List<Song>, filter: String): List<Song> {
 }
 
 // Filter function for InnerTube.SongItem (used in playlists)
-fun filterInnerTubeSongs(items: List<Innertube.SongItem>?, filter: String): List<Innertube.SongItem> {
+fun filterInnerTubeSongs(items: List<Environment.SongItem>?, filter: String): List<Environment.SongItem> {
     return items?.filter { songItem ->
         filterMediaMetadata(songItem.asMediaItem.mediaMetadata, filter)
     }!!
