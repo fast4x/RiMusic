@@ -1,9 +1,12 @@
 package it.fast4x.rimusic.utils
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Timeline
 import it.fast4x.environment.Environment
-import it.fast4x.rimusic.Database
+import it.fast4x.rimusic.R
+import it.fast4x.rimusic.context
 import it.fast4x.rimusic.models.Album
 import it.fast4x.rimusic.models.Song
 import it.fast4x.rimusic.models.SongEntity
@@ -13,12 +16,12 @@ data class Token(val field: String, val value: String, val type: TokenType)
 
 /*
     TODO explicit operator (?)
-    TODO consolidate filter song functions possibly
-    TODO localization support using R. Specifically, OR, song, artist, album
+    TODO OR localization
+    TODO year range possibly
 */
 fun parseSearchQuery(query: String): List<List<Token>> {
     // The search tokens can be labeled (with quotes), labeled (without quotes), and unlabeled.
-    val regex = Regex("""(-?)(song|artist|album):"([^"]+)"|(-?)(song|artist|album):(\S+)|(-?)(\S+)""")
+    val regex = Regex("""(-?)(\S+):"([^"]+)"|(-?)(\S+):(\S+)|(-?)(\S+)""")
     val tokens = mutableListOf<List<Token>>()
     var currentGroup = mutableListOf<Token>()
 
@@ -52,6 +55,7 @@ fun filterMediaMetadata(metadata: MediaMetadata, filter: String): Boolean {
     val filterTrim = filter.trim()
     if (filterTrim.isBlank()) return true // Default should let everything be shown.
 
+    // If in the cache, do not re parse the search query.
     val tokenGroups: List<List<Token>> = when (tokensCache) {
         null -> parseSearchQuery(filterTrim)
         else -> when (tokensCache!!.first) {
@@ -63,10 +67,12 @@ fun filterMediaMetadata(metadata: MediaMetadata, filter: String): Boolean {
     val exclusionTokens = tokenGroups.flatten().filter { it.type == TokenType.EXCLUDED }
     val orGroups = tokenGroups.map { group: List<Token> -> group.filter { it.type != TokenType.EXCLUDED } }
 
+    // Map labels to what the correspond to.
     val metadataFields = mapOf(
-        "song" to (metadata.title ?: ""),
-        "artist" to (metadata.artist ?: ""),
-        "album" to (metadata.albumTitle ?: ""),
+        context().getString(R.string.sort_title) to (metadata.title ?: ""),
+        context().getString(R.string.sort_artist) to (metadata.artist ?: ""),
+        context().getString(R.string.sort_album) to (metadata.albumTitle ?: ""),
+        context().getString(R.string.sort_year) to (metadata.releaseYear.toString()),
     )
 
     // Step 1: Apply OR groups (at least one group must match)
@@ -92,8 +98,7 @@ fun filterMediaMetadata(metadata: MediaMetadata, filter: String): Boolean {
 
 // Filter function for Song
 fun filterSongs(items: List<Song>, filter: String): List<Song> {
-    return items.filter { it -> filterMediaMetadata(it.asMediaItem.mediaMetadata, filter)
-    }
+    return items.filter { it -> filterMediaMetadata(it.asMediaItem.mediaMetadata, filter) }
 }
 
 // Filter function for InnerTube.SongItem (used in playlists)
@@ -117,6 +122,7 @@ fun filterAlbums(items: List<Album>, filter: String): List<Album> {
         val metadata = MediaMetadata.Builder()
             .setAlbumTitle(album.title)
             .setArtist(album.authorsText)
+            .setReleaseYear(album.year?.toInt())
             .build()
         filterMediaMetadata(metadata, filter)
     }

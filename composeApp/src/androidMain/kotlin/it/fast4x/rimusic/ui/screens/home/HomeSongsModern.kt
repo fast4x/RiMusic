@@ -648,7 +648,7 @@ fun HomeSongsModern(
         if (builtInPlaylist == BuiltInPlaylist.OnDevice) {
             filteredSongs = filterSongEntities(songs, filterCharSequence)
             filteredFolders = folders
-                .filter { // TODO folder filter, unsure what this is
+                .filter {
                     it.name.contains(filterCharSequence,true)
                 }
         } else
