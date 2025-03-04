@@ -166,6 +166,7 @@ import it.fast4x.rimusic.ui.components.tab.toolbar.SongsShuffle
 import it.fast4x.rimusic.thumbnailShape
 import it.fast4x.rimusic.typography
 import it.fast4x.rimusic.utils.filterMediaMetadata
+import it.fast4x.rimusic.utils.isExplicit
 import okhttp3.internal.filterList
 import timber.log.Timber
 import java.util.Optional
@@ -493,8 +494,8 @@ fun HomeSongs(
                 .filter( naturalFilter )
                  .filter {
                      val included = filterMediaMetadata(it.song.asMediaItem.mediaMetadata, search.input)
-                     val isExplicit = parentalControlEnabled && it.song.title.startsWith(EXPLICIT_PREFIX)
-                     included || isExplicit // TODO consolidate Explicit with new filter stuff
+                     val isExplicit = parentalControlEnabled && it.song.asMediaItem.isExplicit
+                     included || isExplicit
                  }
         }
     }
