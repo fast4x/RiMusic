@@ -1,11 +1,7 @@
 package it.fast4x.rimusic.utils
 
-import androidx.annotation.OptIn
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Timeline
-import androidx.media3.common.util.UnstableApi
 import it.fast4x.environment.Environment
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.context
@@ -18,8 +14,20 @@ data class Token(val field: String, val value: String,
                  val shouldInclude: Boolean, val valueType: String? = null)
 
 /*
-    TODO OR localization
-    TODO do songs don't have year.
+    Filtering can be done for songs or albums.
+    Default behavior works same as before.
+    But now, you can specify a label:value or label:"value"
+    The label can be title, artist, album, duration, year, explicit.
+    Range format is duration:"0:00-10:00", year:2000-2015.
+    Mentioning the word explicit will also include explicit.
+    You can use OR / | to separate groups.
+    Finally, negative (-) can inverse a filter.
+ */
+
+/*
+    In the future, it would be nice to be able to easily sort albums by length and easily sort
+    songs by year. But this information is not directly attached to their respective objects,
+    and I'm not sure how to get them.
 */
 fun parseSearchQuery(query: String): List<List<Token>> {
     // The search tokens can be labeled (with quotes), labeled (without quotes), and unlabeled.
@@ -34,7 +42,8 @@ fun parseSearchQuery(query: String): List<List<Token>> {
         val field = field1.ifEmpty { field2.ifEmpty { "" } }
         val value = quoted1.ifEmpty { value2.ifEmpty { value3 } }
         // By default, everything is AND (original behavior). Separate groups based on OR placement.
-        if (value.equals("OR", ignoreCase = true) || value == "|") {
+        val or = context().getString(R.string.or_operator)
+        if (value.equals(or, ignoreCase = true) || value == "|") {
             tokens.add(currentGroup)
             currentGroup = mutableListOf()
         } else {
