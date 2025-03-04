@@ -5,12 +5,12 @@ import coil3.toUri
 import database.entities.Song
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.UserAgent
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.ContinuationBody
-import it.fast4x.innertube.requests.playlistPage
-import it.fast4x.innertube.utils.ProxyPreferences
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.ContinuationBody
+import it.fast4x.environment.requests.playlistPage
+import it.fast4x.environment.utils.ProxyPreferences
 import database.entities.SongEntity
-import it.fast4x.innertube.utils.getProxy
+import it.fast4x.environment.utils.getProxy
 
 fun String.resize(
     width: Int? = null,
@@ -56,7 +56,7 @@ fun getHttpClient() = HttpClient() {
     }
 }
 
-suspend fun Result<Innertube.PlaylistOrAlbumPage>.completed(
+suspend fun Result<Environment.PlaylistOrAlbumPage>.completed(
     maxDepth: Int =  Int.MAX_VALUE
 ) = runCatching {
     val page = getOrThrow()
@@ -68,7 +68,7 @@ suspend fun Result<Innertube.PlaylistOrAlbumPage>.completed(
     //continuationsList += continuation.orEmpty()
 
     while (continuation != null && depth++ < maxDepth) {
-        val newSongs = Innertube
+        val newSongs = Environment
             .playlistPage(
                 body = ContinuationBody(continuation = continuation)
             )
@@ -85,10 +85,10 @@ suspend fun Result<Innertube.PlaylistOrAlbumPage>.completed(
         //println("mediaItem loop continuationList size ${continuationsList.size}")
     }
 
-    page.copy(songsPage = Innertube.ItemsPage(items = songs, continuation = null))
+    page.copy(songsPage = Environment.ItemsPage(items = songs, continuation = null))
 }.also { it.exceptionOrNull()?.printStackTrace() }
 
-val Innertube.SongItem.asSong: Song
+val Environment.SongItem.asSong: Song
     get() = Song (
         id = key,
         title = info?.name ?: "",
@@ -97,7 +97,7 @@ val Innertube.SongItem.asSong: Song
         thumbnailUrl = thumbnail?.url
     )
 
-val Innertube.SongItem.asSongEntity: SongEntity
+val Environment.SongItem.asSongEntity: SongEntity
     get() = SongEntity (
         song = Song (
             id = key,

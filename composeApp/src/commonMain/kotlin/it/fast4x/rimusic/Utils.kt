@@ -9,21 +9,25 @@ const val MONTHLY_PREFIX = "monthly:"
 const val PIPED_PREFIX = "piped:"
 const val EXPLICIT_PREFIX = "e:"
 const val LOCAL_KEY_PREFIX = "local:"
-const val YTP_PREFIX = "PL"
+const val YTP_PREFIX = "account:"
 
+
+/**
+ * Assumption: all prefixes end with ":" and have at least 1 (other) character.
+ * Removes a "prefix of prefixes" including multiple times the same prefix (at different locations).
+ */
 fun cleanPrefix(text: String): String {
-    val cleanText = text.replace(PINNED_PREFIX, "", true)
-        .replace(MONTHLY_PREFIX, "", true)
-        .replace(PIPED_PREFIX, "", true)
-        .replace(EXPLICIT_PREFIX, "", true)
-        .replace(MODIFIED_PREFIX, "", true)
-        .replace(YTP_PREFIX, "", true)
-//    var cleanText = text.substringAfter(PINNED_PREFIX)
-//    cleanText = cleanText.substringAfter(MONTHLY_PREFIX)
-//    cleanText = cleanText.substringAfter(PIPED_PREFIX)
-//    cleanText = cleanText.substringAfter(EXPLICIT_PREFIX)
-//    cleanText = cleanText.substringAfter(MODIFIED_PREFIX)
-    return cleanText
+    val splitText = text.split(":")
+    var i = 0
+    while (i < splitText.size-1) {
+        if ("${splitText[i]}:" !in listOf(PINNED_PREFIX, MODIFIED_PREFIX, MONTHLY_PREFIX, PIPED_PREFIX,
+                EXPLICIT_PREFIX, LOCAL_KEY_PREFIX, YTP_PREFIX)) {
+            break
+        }
+        i++
+    }
+    if(i >= splitText.size) return ""
+    return splitText.subList(i, splitText.size).joinToString(":")
 }
 
 fun cleanString(text: String): String {

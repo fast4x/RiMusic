@@ -9,14 +9,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.edit
-import com.google.gson.Gson
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.requests.HomePage
+import it.fast4x.environment.Environment
+import it.fast4x.environment.requests.HomePage
 import it.fast4x.rimusic.models.Song
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
 import timber.log.Timber
 
 const val lastPlayerThumbnailSizeKey = "lastPlayerThumbnailSize"
@@ -300,7 +297,6 @@ const val enableYouTubeLoginKey = "enableYoutubeLogin"
 const val enableYouTubeSyncKey = "enableYoutubeSync"
 const val useYtLoginOnlyForBrowseKey = "useYtLoginOnlyForBrowse"
 
-
 const val autoLoadSongsInQueueKey = "autoLoadSongsInQueue"
 const val showSecondLineKey = "showSecondLine"
 const val VinylSizeKey = "VinylSize"
@@ -356,6 +352,24 @@ const val ytVisitorDataKey = "ytVisitorData"
 const val ytCookieKey = "ytCookie"
 const val ytAccountChannelHandleKey = "ytAccountChannelHandle"
 const val ytAccountThumbnailKey = "ytAccountThumbnail"
+const val ytDataSyncIdKey = "ytDataSyncId"
+const val filterByKey = "filterBy"
+
+const val bassboostEnabledKey = "bassboostEnabled"
+const val bassboostLevelKey = "bassboostLevel"
+const val audioReverbPresetKey = "audioReverbPreset"
+const val handleAudioFocusEnabledKey = "handleAudioFocusEnabled"
+
+const val pipedUsernameKey = "pipedUsername"
+const val pipedPasswordKey = "pipedPassword"
+const val pipedInstanceNameKey = "pipedInstanceName"
+const val pipedApiBaseUrlKey = "pipedApiBaseUrl"
+const val pipedApiTokenKey = "pipedApiToken"
+const val discordPersonalAccessTokenKey = "DiscordPersonalAccessToken"
+const val viewTypeKey = "viewType"
+const val enableYouTubeHistorySyncKey = "enableYouTubeHistorySync"
+const val volumeBoostLevelKey = "volumeBoostLevel"
+const val dnsOverHttpsTypeKey = "dnsOverHttpsType"
 
 /*
 @PublishedApi
@@ -453,14 +467,14 @@ fun rememberPreference(key: String, defaultValue: Song?): MutableState<Song?> {
 }
 
 @Composable
-fun rememberPreference(key: String, defaultValue: Innertube.DiscoverPage?): MutableState<Innertube.DiscoverPage?> {
+fun rememberPreference(key: String, defaultValue: Environment.DiscoverPage?): MutableState<Environment.DiscoverPage?> {
     val context = LocalContext.current
     val json = Json.encodeToString(defaultValue)
     return remember {
         mutableStatePreferenceOf(
             try {
                 context.preferences.getString(key, json)
-                    ?.let { Json.decodeFromString<Innertube.DiscoverPage>(it) }
+                    ?.let { Json.decodeFromString<Environment.DiscoverPage>(it) }
             } catch (e: Exception) {
                 Timber.e("RememberPreference DiscoverPage Error: ${ e.stackTraceToString() }")
                 null
@@ -475,14 +489,14 @@ fun rememberPreference(key: String, defaultValue: Innertube.DiscoverPage?): Muta
 }
 
 @Composable
-fun rememberPreference(key: String, defaultValue: Innertube.ChartsPage?): MutableState<Innertube.ChartsPage?> {
+fun rememberPreference(key: String, defaultValue: Environment.ChartsPage?): MutableState<Environment.ChartsPage?> {
     val context = LocalContext.current
     val json = Json.encodeToString(defaultValue)
     return remember {
         mutableStatePreferenceOf(
             try {
                 context.preferences.getString(key, json)
-                    ?.let { Json.decodeFromString<Innertube.ChartsPage>(it) }
+                    ?.let { Json.decodeFromString<Environment.ChartsPage>(it) }
             } catch (e: Exception) {
                 Timber.e("RememberPreference ChartsPage Error: ${ e.stackTraceToString() }")
                 null
@@ -497,14 +511,14 @@ fun rememberPreference(key: String, defaultValue: Innertube.ChartsPage?): Mutabl
 }
 
 @Composable
-fun rememberPreference(key: String, defaultValue: Innertube.RelatedPage?): MutableState<Innertube.RelatedPage?> {
+fun rememberPreference(key: String, defaultValue: Environment.RelatedPage?): MutableState<Environment.RelatedPage?> {
     val context = LocalContext.current
     val json = Json.encodeToString(defaultValue)
     return remember {
         mutableStatePreferenceOf(
             try {
                 context.preferences.getString(key, json)
-                    ?.let { Json.decodeFromString<Innertube.RelatedPage>(it) }
+                    ?.let { Json.decodeFromString<Environment.RelatedPage>(it) }
             } catch (e: Exception) {
                 Timber.e("RememberPreference RelatedPage Error: ${ e.stackTraceToString() }")
                 null

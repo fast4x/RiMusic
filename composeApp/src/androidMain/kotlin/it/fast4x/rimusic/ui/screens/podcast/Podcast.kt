@@ -65,11 +65,10 @@ import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import it.fast4x.compose.persist.persist
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.YtMusic
-import it.fast4x.innertube.models.NavigationEndpoint
-import it.fast4x.innertube.models.bodies.BrowseBody
-import it.fast4x.innertube.requests.podcastPage
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.NavigationEndpoint
+import it.fast4x.environment.models.bodies.BrowseBody
+import it.fast4x.environment.requests.podcastPage
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
@@ -129,6 +128,7 @@ import kotlinx.coroutines.withContext
 import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.typography
 import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
+import it.fast4x.rimusic.utils.addToYtPlaylist
 import timber.log.Timber
 
 
@@ -149,7 +149,7 @@ fun Podcast(
     val context = LocalContext.current
     val menuState = LocalMenuState.current
 
-    var podcastPage by persist<Innertube.Podcast?>("podcast/$browseId/listEpisodes")
+    var podcastPage by persist<Environment.Podcast?>("podcast/$browseId/listEpisodes")
 
     var filter: String? by rememberSaveable { mutableStateOf(null) }
     val hapticFeedback = LocalHapticFeedback.current
@@ -158,7 +158,7 @@ fun Podcast(
         if (podcastPage != null) return@LaunchedEffect
 
         podcastPage = withContext(Dispatchers.IO) {
-            Innertube.podcastPage(BrowseBody(browseId = browseId)).getOrNull()
+            Environment.podcastPage(BrowseBody(browseId = browseId)).getOrNull()
         }
 
         /*
@@ -219,14 +219,14 @@ fun Podcast(
                     val playlistId = insert(Playlist(name = text, browseId = browseId))
 
                     podcastPage?.listEpisode
-                        ?.map(Innertube.Podcast.EpisodeItem::asMediaItem)
+                        ?.map(Environment.Podcast.EpisodeItem::asMediaItem)
                         ?.onEach( ::insert )
                         ?.mapIndexed { index, mediaItem ->
                             SongPlaylistMap(
                                 songId = mediaItem.mediaId,
                                 playlistId = playlistId,
                                 position = index
-                            )
+                            ).default()
                         }?.let( ::insertSongPlaylistMaps )
                 }
                 SmartMessage(context.resources.getString(R.string.done), PopupType.Success, context = context)
@@ -459,7 +459,7 @@ fun Podcast(
                                     .padding(horizontal = 5.dp)
                                     .combinedClickable(
                                         onClick = {
-                                            podcastPage?.listEpisode?.map(Innertube.Podcast.EpisodeItem::asMediaItem)?.let { mediaItems ->
+                                            podcastPage?.listEpisode?.map(Environment.Podcast.EpisodeItem::asMediaItem)?.let { mediaItems ->
                                                 binder?.player?.enqueue(mediaItems, context)
                                             }
                                         },
@@ -480,7 +480,7 @@ fun Podcast(
                                         onClick = {
                                             if (podcastPage?.listEpisode?.isNotEmpty() == true) {
                                                 binder?.stopRadio()
-                                                podcastPage?.listEpisode?.shuffled()?.map(Innertube.Podcast.EpisodeItem::asMediaItem)
+                                                podcastPage?.listEpisode?.shuffled()?.map(Environment.Podcast.EpisodeItem::asMediaItem)
                                                     ?.let {
                                                         binder?.player?.forcePlayFromBeginning(
                                                             it
@@ -545,24 +545,32 @@ fun Podcast(
                                                             playlistPreview.songCount.minus(1) ?: 0
                                                         if (position > 0) position++ else position = 0
 
-                                                        podcastPage?.listEpisode?.forEachIndexed { index, song ->
-                                                            runCatching {
-                                                                Database.insert(song.asMediaItem)
-                                                                Database.insert(
-                                                                    SongPlaylistMap(
-                                                                        songId = song.asMediaItem.mediaId,
-                                                                        playlistId = playlistPreview.playlist.id,
-                                                                        position = position + index
+                                                        if (!isYouTubeSyncEnabled() || !playlistPreview.playlist.isYoutubePlaylist) {
+                                                            podcastPage?.listEpisode?.forEachIndexed { index, song ->
+                                                                runCatching {
+                                                                    Database.insert(song.asMediaItem)
+                                                                    Database.insert(
+                                                                        SongPlaylistMap(
+                                                                            songId = song.asMediaItem.mediaId,
+                                                                            playlistId = playlistPreview.playlist.id,
+                                                                            position = position + index
+                                                                        ).default()
                                                                     )
-                                                                )
-                                                            }.onFailure {
-                                                                Timber.e("Failed onAddToPlaylist in PlaylistSongListModern  ${it.stackTraceToString()}")
-                                                            }
-                                                            if(isYouTubeSyncEnabled())
-                                                                CoroutineScope(Dispatchers.IO).launch {
-                                                                    playlistPreview.playlist.browseId?.let { YtMusic.addToPlaylist(it, song.asMediaItem.mediaId) }
+                                                                }.onFailure {
+                                                                    Timber.e("Failed onAddToPlaylist in PlaylistSongListModern  ${it.stackTraceToString()}")
                                                                 }
+                                                            }
+                                                        } else {
+                                                            CoroutineScope(Dispatchers.IO).launch {
+                                                                playlistPreview.playlist.browseId?.let { id ->
+                                                                    addToYtPlaylist(playlistPreview.playlist.id,
+                                                                        position,
+                                                                        id,
+                                                                        podcastPage?.listEpisode?.map { it.asMediaItem } ?: emptyList())
+                                                                }
+                                                            }
                                                         }
+
                                                         CoroutineScope(Dispatchers.Main).launch {
                                                             SmartMessage(context.resources.getString(R.string.done), type = PopupType.Success, context = context)
                                                         }
@@ -764,6 +772,9 @@ fun Podcast(
                                                     menuState.hide()
                                                     forceRecompose = true
                                                 },
+                                                onInfo = {
+                                                    navController.navigate("${NavRoutes.videoOrSongInfo.name}/${song.videoId}")
+                                                },
                                                 mediaItem = song.asMediaItem,
                                                 disableScrollingText = disableScrollingText
                                             )
@@ -773,7 +784,7 @@ fun Podcast(
                                     onClick = {
                                         searching = false
                                         filter = null
-                                        podcastPage?.listEpisode?.map(Innertube.Podcast.EpisodeItem::asMediaItem)
+                                        podcastPage?.listEpisode?.map(Environment.Podcast.EpisodeItem::asMediaItem)
                                             ?.let { mediaItems ->
                                                 binder?.stopRadio()
                                                 binder?.player?.forcePlayAtIndex(mediaItems, index)
@@ -818,7 +829,7 @@ fun Podcast(
                         if (songs.isNotEmpty()) {
                             binder?.stopRadio()
                             binder?.player?.forcePlayFromBeginning(
-                                songs.shuffled().map(Innertube.Podcast.EpisodeItem::asMediaItem)
+                                songs.shuffled().map(Environment.Podcast.EpisodeItem::asMediaItem)
                             )
                         }
                     }

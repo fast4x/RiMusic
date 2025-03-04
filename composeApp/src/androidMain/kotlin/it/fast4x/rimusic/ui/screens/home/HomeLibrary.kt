@@ -13,11 +13,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -35,7 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import it.fast4x.compose.persist.persistList
-import it.fast4x.innertube.YtMusic
+import it.fast4x.environment.EnvironmentExt
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.MONTHLY_PREFIX
 import it.fast4x.rimusic.PINNED_PREFIX
@@ -74,8 +77,11 @@ import it.fast4x.rimusic.utils.showPinnedPlaylistsKey
 import it.fast4x.rimusic.utils.showPipedPlaylistsKey
 import kotlinx.coroutines.flow.map
 import it.fast4x.rimusic.colorPalette
+import it.fast4x.rimusic.enums.ViewType
+import it.fast4x.rimusic.getViewType
 import it.fast4x.rimusic.models.SongAlbumMap
 import it.fast4x.rimusic.models.SongArtistMap
+import it.fast4x.rimusic.ui.components.PullToRefreshBox
 import it.fast4x.rimusic.ui.components.themed.IDialog
 import it.fast4x.rimusic.ui.components.themed.Search
 import it.fast4x.rimusic.ui.components.navigation.header.TabToolBar
@@ -90,8 +96,11 @@ import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
 import it.fast4x.rimusic.utils.importYTMPrivatePlaylists
 import it.fast4x.rimusic.utils.Preference.HOME_LIBRARY_ITEM_SIZE
 import it.fast4x.rimusic.utils.autoSyncToolbutton
+import it.fast4x.rimusic.utils.autosyncKey
+import it.fast4x.rimusic.utils.viewTypeToolbutton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -172,11 +181,11 @@ fun HomeLibrary(
         override fun onSet(newValue: String) {
             if (isYouTubeSyncEnabled()) {
                 CoroutineScope(Dispatchers.IO).launch {
-                    YtMusic.createPlaylist(newValue).getOrNull()
+                    EnvironmentExt.createPlaylist(newValue).getOrNull()
                         .also {
                             println("Innertube YtMusic createPlaylist: $it")
                             Database.asyncTransaction {
-                                insert(Playlist(name = newValue, browseId = it))
+                                insert(Playlist(name = newValue, browseId = it, isYoutubePlaylist = true, isEditable = true))
                             }
                         }
 
@@ -230,7 +239,7 @@ fun HomeLibrary(
                     songId = song.id,
                     playlistId = plistId,
                     position = index
-                )
+                ).default()
             )
 
             if(album.id !=""){
@@ -258,11 +267,27 @@ fun HomeLibrary(
     )
     val sync = autoSyncToolbutton(R.string.autosync)
 
-    var justSynced by rememberSaveable { mutableStateOf(false) }
+    val doAutoSync by rememberPreference(autosyncKey, false)
+    var justSynced by rememberSaveable { mutableStateOf(!doAutoSync) }
+
+    val viewType = viewTypeToolbutton(R.string.viewType)
+
+    var refreshing by remember { mutableStateOf(false) }
+    val refreshScope = rememberCoroutineScope()
+
+    fun refresh() {
+        if (refreshing) return
+        refreshScope.launch(Dispatchers.IO) {
+            refreshing = true
+            justSynced = false
+            delay(500)
+            refreshing = false
+        }
+    }
 
     // START: Import YTM private playlists
-    LaunchedEffect(Unit) {
-        if (!justSynced && importYTMPrivatePlaylists())
+    LaunchedEffect(justSynced, doAutoSync) {
+        if ((!justSynced) && importYTMPrivatePlaylists())
             justSynced = true
     }
 
@@ -271,7 +296,7 @@ fun HomeLibrary(
         ImportPipedPlaylists()
 
     LaunchedEffect( sort.sortBy, sort.sortOrder ) {
-        Database.playlistPreviews( sort.sortBy, sort.sortOrder ).collect { items = it }
+        Database.playlistPreviews(sort.sortBy, sort.sortOrder).collect { items = it }
     }
     LaunchedEffect( items, search.input ) {
         val scrollIndex = lazyGridState.firstVisibleItemIndex
@@ -310,102 +335,172 @@ fun HomeLibrary(
         CheckMonthlyPlaylist()
     // END - Monthly playlist
 
-    Box(
-        modifier = Modifier
-            .background(colorPalette().background0)
-            //.fillMaxSize()
-            .fillMaxHeight()
-            .fillMaxWidth(
-                if (NavigationBarPosition.Right.isCurrent())
-                    Dimensions.contentWidthRightBar
-                else
-                    1f
-            )
+    PullToRefreshBox(
+        refreshing = refreshing,
+        onRefresh = { refresh() }
     ) {
-        Column( Modifier.fillMaxSize() ) {
-            // Sticky tab's title
-            TabHeader( R.string.playlists ) {
-                HeaderInfo( items.size.toString(), R.drawable.playlist )
-            }
-
-            // Sticky tab's tool bar
-            TabToolBar.Buttons( sort, sync, search, shuffle, newPlaylistDialog, importPlaylistDialog, itemSize )
-
-            // Sticky search bar
-            search.SearchBar( this )
-
-            LazyVerticalGrid(
-                state = lazyGridState,
-                columns = GridCells.Adaptive( itemSize.size.dp ),
-                modifier = Modifier
-                    .background(colorPalette().background0)
-            ) {
-                item(
-                    key = "separator",
-                    contentType = 0,
-                    span = { GridItemSpan(maxLineSpan) }) {
-                    ButtonsRow(
-                        chips = buttonsList,
-                        currentValue = playlistType,
-                        onValueUpdate = { playlistType = it },
-                        modifier = Modifier.padding(start = 12.dp, end = 12.dp)
-                    )
-                }
-
-                val listPrefix =
-                    when( playlistType ) {
-                        PlaylistsType.Playlist -> ""    // Matches everything
-                        PlaylistsType.PinnedPlaylist -> PINNED_PREFIX
-                        PlaylistsType.MonthlyPlaylist -> MONTHLY_PREFIX
-                        PlaylistsType.PipedPlaylist -> PIPED_PREFIX
-                        PlaylistsType.YTPlaylist -> YTP_PREFIX
-                    }
-                val condition: (PlaylistPreview) -> Boolean = {
-                    if (playlistType == PlaylistsType.YTPlaylist)
-                        it.playlist.browseId?.startsWith(listPrefix) ?: false
+        Box(
+            modifier = Modifier
+                .background(colorPalette().background0)
+                //.fillMaxSize()
+                .fillMaxHeight()
+                .fillMaxWidth(
+                    if (NavigationBarPosition.Right.isCurrent())
+                        Dimensions.contentWidthRightBar
                     else
-                    it.playlist.name.startsWith( listPrefix, true )
-                }
-                items(
-                    items = itemsOnDisplay.filter( condition ),
-                    key = { it.playlist.id }
-                ) { preview ->
-                    PlaylistItem(
-                        playlist = preview,
-                        thumbnailSizeDp = itemSize.size.dp,
-                        thumbnailSizePx = itemSize.size.px,
-                        alternative = true,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .animateItem(fadeInSpec = null, fadeOutSpec = null)
-                            .clickable(onClick = {
-                                search.onItemSelected()
-                                onPlaylistClick(preview.playlist)
-                            }),
-                        disableScrollingText = disableScrollingText
-                    )
+                        1f
+                )
+        ) {
+            Column( Modifier.fillMaxSize() ) {
+                // Sticky tab's title
+                TabHeader( R.string.playlists ) {
+                    HeaderInfo( items.size.toString(), R.drawable.playlist )
                 }
 
-                item(
-                    key = "footer",
-                    contentType = 0,
-                    span = { GridItemSpan(maxLineSpan) }
-                ) {
-                    Spacer(modifier = Modifier.height(Dimensions.bottomSpacer))
+                // Sticky tab's tool bar
+                TabToolBar.Buttons( sort, sync, search, shuffle, newPlaylistDialog, importPlaylistDialog, itemSize, viewType )
+
+                // Sticky search bar
+                search.SearchBar( this )
+
+                if (getViewType() == ViewType.List) {
+                    LazyColumn(
+                        state = rememberLazyListState(),
+                        modifier = Modifier
+
+                    ) {
+                        item(
+                            key = "separator",
+                            contentType = 0
+                        ) {
+                            ButtonsRow(
+                                chips = buttonsList,
+                                currentValue = playlistType,
+                                onValueUpdate = { playlistType = it },
+                                modifier = Modifier.padding(start = 12.dp, end = 12.dp)
+                            )
+                        }
+
+                        val listPrefix =
+                            when (playlistType) {
+                                PlaylistsType.Playlist -> ""    // Matches everything
+                                PlaylistsType.PinnedPlaylist -> PINNED_PREFIX
+                                PlaylistsType.MonthlyPlaylist -> MONTHLY_PREFIX
+                                PlaylistsType.PipedPlaylist -> PIPED_PREFIX
+                                PlaylistsType.YTPlaylist -> YTP_PREFIX
+                            }
+                        val condition: (PlaylistPreview) -> Boolean = {
+                            if (playlistType == PlaylistsType.YTPlaylist) {
+                                it.playlist.isYoutubePlaylist
+                            } else it.playlist.name.startsWith(listPrefix, true)
+                        }
+                        items(
+                            items = itemsOnDisplay.filter(condition),
+                            key = { it.playlist.id }
+                        ) { preview ->
+                            PlaylistItem(
+                                playlist = preview,
+                                thumbnailSizeDp = itemSize.size.dp,
+                                thumbnailSizePx = itemSize.size.px,
+                                alternative = false,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .animateItem(fadeInSpec = null, fadeOutSpec = null)
+                                    .clickable(onClick = {
+                                        search.onItemSelected()
+                                        onPlaylistClick(preview.playlist)
+                                    }),
+                                disableScrollingText = disableScrollingText,
+                                isYoutubePlaylist = preview.playlist.isYoutubePlaylist,
+                                isEditable = preview.playlist.isEditable
+                            )
+                        }
+
+                        item(
+                            key = "footer",
+                            contentType = 0
+                        ) {
+                            Spacer(modifier = Modifier.height(Dimensions.bottomSpacer))
+                        }
+
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        state = lazyGridState,
+                        columns = GridCells.Adaptive(itemSize.size.dp),
+                        modifier = Modifier
+                            .background(colorPalette().background0)
+                    ) {
+                        item(
+                            key = "separator",
+                            contentType = 0,
+                            span = { GridItemSpan(maxLineSpan) }) {
+                            ButtonsRow(
+                                chips = buttonsList,
+                                currentValue = playlistType,
+                                onValueUpdate = { playlistType = it },
+                                modifier = Modifier.padding(start = 12.dp, end = 12.dp)
+                            )
+                        }
+
+                        val listPrefix =
+                            when (playlistType) {
+                                PlaylistsType.Playlist -> ""    // Matches everything
+                                PlaylistsType.PinnedPlaylist -> PINNED_PREFIX
+                                PlaylistsType.MonthlyPlaylist -> MONTHLY_PREFIX
+                                PlaylistsType.PipedPlaylist -> PIPED_PREFIX
+                                PlaylistsType.YTPlaylist -> YTP_PREFIX
+                            }
+                        val condition: (PlaylistPreview) -> Boolean = {
+                            if (playlistType == PlaylistsType.YTPlaylist) {
+                                it.playlist.isYoutubePlaylist
+                            } else it.playlist.name.startsWith(listPrefix, true)
+                        }
+                        items(
+                            items = itemsOnDisplay.filter(condition),
+                            key = { it.playlist.id }
+                        ) { preview ->
+                            PlaylistItem(
+                                playlist = preview,
+                                thumbnailSizeDp = itemSize.size.dp,
+                                thumbnailSizePx = itemSize.size.px,
+                                alternative = true,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .animateItem(fadeInSpec = null, fadeOutSpec = null)
+                                    .clickable(onClick = {
+                                        search.onItemSelected()
+                                        onPlaylistClick(preview.playlist)
+                                    }),
+                                disableScrollingText = disableScrollingText,
+                                isYoutubePlaylist = preview.playlist.isYoutubePlaylist,
+                                isEditable = preview.playlist.isEditable
+                            )
+                        }
+
+                        item(
+                            key = "footer",
+                            contentType = 0,
+                            span = { GridItemSpan(maxLineSpan) }
+                        ) {
+                            Spacer(modifier = Modifier.height(Dimensions.bottomSpacer))
+                        }
+
+                    }
                 }
 
             }
+
+            FloatingActionsContainerWithScrollToTop(lazyGridState = lazyGridState)
+
+            val showFloatingIcon by rememberPreference(showFloatingIconKey, false)
+            if (UiType.ViMusic.isCurrent() && showFloatingIcon)
+                MultiFloatingActionsContainer(
+                    iconId = R.drawable.search,
+                    onClick = onSearchClick,
+                    onClickSettings = onSettingsClick,
+                    onClickSearch = onSearchClick
+                )
         }
-
-        FloatingActionsContainerWithScrollToTop(lazyGridState = lazyGridState)
-
-        val showFloatingIcon by rememberPreference(showFloatingIconKey, false)
-        if (UiType.ViMusic.isCurrent() && showFloatingIcon)
-            MultiFloatingActionsContainer(
-                iconId = R.drawable.search,
-                onClick = onSearchClick,
-                onClickSettings = onSettingsClick,
-                onClickSearch = onSearchClick
-            )
     }
 }

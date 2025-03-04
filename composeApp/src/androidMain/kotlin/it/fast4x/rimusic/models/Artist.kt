@@ -12,4 +12,5 @@ data class Artist(
     val thumbnailUrl: String? = null,
     val timestamp: Long? = null,
     val bookmarkedAt: Long? = null,
+    val isYoutubeArtist: Boolean = false,
 )

@@ -72,7 +72,7 @@ fun HomeScreen(
     //val showStatsInNavbar by rememberPreference(showStatsInNavbarKey, false)
     val enableQuickPicksPage by rememberPreference(enableQuickPicksPageKey, true)
 
-    PersistMapCleanup("home/")
+//    PersistMapCleanup("home/")
 
             val openTabFromShortcut1 by remember{ mutableIntStateOf(openTabFromShortcut) }
 
@@ -159,6 +159,7 @@ fun HomeScreen(
                         )
 
                         3 -> HomeAlbums(
+                            navController = navController,
                             onAlbumClick = {
                                 //albumRoute(it.id)
                                 navController.navigate(route = "${NavRoutes.album.name}/${it.id}")

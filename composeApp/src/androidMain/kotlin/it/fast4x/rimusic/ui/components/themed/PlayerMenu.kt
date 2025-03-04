@@ -5,6 +5,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -15,26 +16,30 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
-import it.fast4x.innertube.YtMusic
-import it.fast4x.innertube.models.NavigationEndpoint
+import it.fast4x.environment.models.NavigationEndpoint
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.PIPED_PREFIX
 import it.fast4x.rimusic.R
+import it.fast4x.rimusic.cleanPrefix
 import it.fast4x.rimusic.context
 import it.fast4x.rimusic.enums.MenuStyle
+import it.fast4x.rimusic.enums.PopupType
 import it.fast4x.rimusic.models.SongPlaylistMap
 import it.fast4x.rimusic.service.MyDownloadHelper
 import it.fast4x.rimusic.service.modern.PlayerServiceModern
 import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
+import it.fast4x.rimusic.utils.addSongToYtPlaylist
 import it.fast4x.rimusic.utils.addToPipedPlaylist
-import it.fast4x.rimusic.utils.asMediaItem
-import it.fast4x.rimusic.utils.forcePlay
+import it.fast4x.rimusic.utils.addToYtLikedSong
+import it.fast4x.rimusic.utils.addToYtPlaylist
 import it.fast4x.rimusic.utils.getPipedSession
+import it.fast4x.rimusic.utils.isNetworkConnected
 import it.fast4x.rimusic.utils.isPipedEnabledKey
 import it.fast4x.rimusic.utils.menuStyleKey
 import it.fast4x.rimusic.utils.rememberEqualizerLauncher
 import it.fast4x.rimusic.utils.rememberPreference
 import it.fast4x.rimusic.utils.removeFromPipedPlaylist
+import it.fast4x.rimusic.utils.removeYTSongFromPlaylist
 import it.fast4x.rimusic.utils.seamlessPlay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -53,6 +58,7 @@ fun PlayerMenu(
     onDismiss: () -> Unit,
     onClosePlayer: () -> Unit,
     onMatchingSong: (() -> Unit)? = null,
+    onInfo: (() -> Unit)? = null,
     disableScrollingText: Boolean
     ) {
 
@@ -75,7 +81,9 @@ fun PlayerMenu(
     if (isHiding) {
         ConfirmationDialog(
             text = stringResource(R.string.update_song),
-            onDismiss = { isHiding = false },
+            onDismiss = {
+                isHiding = false
+            },
             onConfirm = {
                 onDismiss()
                 binder.cache.removeResource(mediaItem.mediaId)
@@ -83,6 +91,7 @@ fun PlayerMenu(
                 Database.asyncTransaction {
                     resetTotalPlayTimeMs(mediaItem.mediaId)
                 }
+                binder.player.seekTo(0L)
             }
         )
     }
@@ -116,6 +125,7 @@ fun PlayerMenu(
              */
             onHideFromDatabase = { isHiding = true },
             onClosePlayer = onClosePlayer,
+            onInfo = onInfo,
             disableScrollingText = disableScrollingText
         )
     } else {
@@ -132,15 +142,26 @@ fun PlayerMenu(
             onHideFromDatabase = { isHiding = true },
             onDismiss = onDismiss,
             onAddToPreferites = {
-                Database.asyncTransaction {
-                    like(
-                        mediaItem.mediaId,
-                        System.currentTimeMillis()
-                    )
+                if (!isNetworkConnected(context()) && isYouTubeSyncEnabled()){
+                    SmartMessage(context().resources.getString(R.string.no_connection), context = context(), type = PopupType.Error)
+                } else if (!isYouTubeSyncEnabled()){
+                    Database.asyncTransaction {
+                        like(
+                            mediaItem.mediaId,
+                            System.currentTimeMillis()
+                        )
+                        MyDownloadHelper.autoDownloadWhenLiked(context(),mediaItem)
+                    }
+                }
+                else {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        addToYtLikedSong(mediaItem)
+                    }
                 }
             },
             onClosePlayer = onClosePlayer,
             onMatchingSong = onMatchingSong,
+            onInfo = onInfo,
             disableScrollingText = disableScrollingText
         )
     }
@@ -158,6 +179,7 @@ fun MiniPlayerMenu(
     mediaItem: MediaItem,
     onDismiss: () -> Unit,
     onClosePlayer: () -> Unit,
+    onInfo: (() -> Unit)? = null,
     disableScrollingText: Boolean
 ) {
 
@@ -174,13 +196,22 @@ fun MiniPlayerMenu(
                 onClosePlayer()
             },
             onAddToPreferites = {
-                Database.asyncTransaction {
-                    like(
-                        mediaItem.mediaId,
-                        System.currentTimeMillis()
-                    )
+                if (!isNetworkConnected(context()) && isYouTubeSyncEnabled()){
+                    SmartMessage(context().resources.getString(R.string.no_connection), context = context(), type = PopupType.Error)
+                } else if (!isYouTubeSyncEnabled()){
+                    Database.asyncTransaction {
+                        like(
+                            mediaItem.mediaId,
+                            System.currentTimeMillis()
+                        )
+                        MyDownloadHelper.autoDownloadWhenLiked(context(),mediaItem)
+                    }
                 }
-                MyDownloadHelper.autoDownloadWhenLiked(context(),mediaItem)
+                else {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        addToYtLikedSong(mediaItem)
+                    }
+                }
             },
             onDismiss = onDismiss,
             disableScrollingText = disableScrollingText
@@ -193,14 +224,24 @@ fun MiniPlayerMenu(
                 onClosePlayer()
             },
             onAddToPreferites = {
-                Database.asyncTransaction {
-                    like(
-                        mediaItem.mediaId,
-                        System.currentTimeMillis()
-                    )
+                if (!isNetworkConnected(context()) && isYouTubeSyncEnabled()){
+                    SmartMessage(context().resources.getString(R.string.no_connection), context = context(), type = PopupType.Error)
+                } else if (!isYouTubeSyncEnabled()){
+                    Database.asyncTransaction {
+                        like(
+                            mediaItem.mediaId,
+                            System.currentTimeMillis()
+                        )
+                        MyDownloadHelper.autoDownloadWhenLiked(context(),mediaItem)
+                    }
                 }
-                MyDownloadHelper.autoDownloadWhenLiked(context(),mediaItem)
+                else {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        addToYtLikedSong(mediaItem)
+                    }
+                }
             },
+            onInfo = onInfo,
             onDismiss = onDismiss,
             disableScrollingText = disableScrollingText
         )
@@ -230,21 +271,22 @@ fun AddToPlaylistPlayerMenu(
             onClosePlayer()
         },
         onAddToPlaylist = { playlist, position ->
-            Database.asyncTransaction {
-                insert(mediaItem)
-                insert(
-                    SongPlaylistMap(
-                        songId = mediaItem.mediaId,
-                        playlistId = insert(playlist).takeIf { it != -1L } ?: playlist.id,
-                        position = position
+            if (!isYouTubeSyncEnabled() || !playlist.isYoutubePlaylist){
+                Database.asyncTransaction {
+                    insert(mediaItem)
+                    insert(
+                        SongPlaylistMap(
+                            songId = mediaItem.mediaId,
+                            playlistId = insert(playlist).takeIf { it != -1L } ?: playlist.id,
+                            position = position
+                        ).default()
                     )
-                )
-            }
-
-            if(isYouTubeSyncEnabled())
-                CoroutineScope(Dispatchers.IO).launch {
-                    playlist.browseId?.let { YtMusic.addToPlaylist(it, mediaItem.mediaId) }
                 }
+            } else {
+                CoroutineScope(Dispatchers.IO).launch {
+                    addSongToYtPlaylist(playlist.id, position, playlist.browseId ?: "", mediaItem)
+                }
+            }
             if (playlist.name.startsWith(PIPED_PREFIX) && isPipedEnabled && pipedSession.token.isNotEmpty()) {
                 Timber.d("BaseMediaItemMenu onAddToPlaylist mediaItem ${mediaItem.mediaId}")
                 addToPipedPlaylist(
@@ -258,23 +300,93 @@ fun AddToPlaylistPlayerMenu(
         },
         onRemoveFromPlaylist = { playlist ->
             Database.asyncTransaction {
-                deleteSongFromPlaylist(mediaItem.mediaId,playlist.id)
                 if (playlist.name.startsWith(PIPED_PREFIX) && isPipedEnabled && pipedSession.token.isNotEmpty()) {
                     Timber.d("MediaItemMenu InPlaylistMediaItemMenu onRemoveFromPlaylist browseId ${playlist.browseId}")
                     removeFromPipedPlaylist(
                         context = context,
                         coroutineScope = coroutineScope,
                         pipedSession = pipedSession.toApiSession(),
-                        id = UUID.fromString(playlist.browseId),positionInPlaylist(mediaItem.mediaId,playlist.id)
+                        id = UUID.fromString(cleanPrefix(playlist.browseId ?: "")),positionInPlaylist(mediaItem.mediaId,playlist.id)
                     )
                 }
             }
-            if(isYouTubeSyncEnabled() && playlist.browseId != null && !playlist.name.startsWith(PIPED_PREFIX))
-                CoroutineScope(Dispatchers.IO).launch {
-                    playlist.browseId.let { YtMusic.removeFromPlaylist(
-                        it, mediaItem.mediaId
-                    ) }
+            if(isYouTubeSyncEnabled() && playlist.isYoutubePlaylist && playlist.isEditable) {
+                Database.asyncTransaction {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        if (removeYTSongFromPlaylist(
+                                mediaItem.mediaId,
+                                playlist.browseId ?: "",
+                                playlist.id
+                            )
+                        )
+                            deleteSongFromPlaylist(mediaItem.mediaId, playlist.id)
+
+                    }
                 }
+            } else {
+                Database.asyncTransaction {
+                    deleteSongFromPlaylist(mediaItem.mediaId, playlist.id)
+                }
+            }
+        },
+        onDismiss = onDismiss,
+    )
+}
+
+@ExperimentalTextApi
+@ExperimentalAnimationApi
+@UnstableApi
+@Composable
+fun AddToPlaylistArtistSongs(
+    navController: NavController,
+    mediaItems: List<MediaItem>,
+    onDismiss: () -> Unit,
+    onClosePlayer: () -> Unit,
+) {
+    val isPipedEnabled by rememberPreference(isPipedEnabledKey, false)
+    val pipedSession = getPipedSession()
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    var position by remember {
+        mutableIntStateOf(0)
+    }
+    AddToPlaylistArtistSongsMenu(
+        navController = navController,
+        onGoToPlaylist = {
+            onClosePlayer()
+        },
+        onAddToPlaylist = { playlistPreview ->
+            position = playlistPreview.songCount.minus(1)
+            if (position > 0) position++ else position = 0
+            mediaItems.forEachIndexed { index, mediaItem ->
+                if (!isYouTubeSyncEnabled() || !playlistPreview.playlist.isYoutubePlaylist){
+                    Database.asyncTransaction {
+                        insert(mediaItem)
+                        insert(
+                            SongPlaylistMap(
+                                songId = mediaItem.mediaId,
+                                playlistId = playlistPreview.playlist.id,
+                                position = position + index
+                            ).default()
+                        )
+                    }
+                } else {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        addToYtPlaylist(playlistPreview.playlist.id, position, playlistPreview.playlist.browseId ?: "", mediaItems)
+                    }
+                }
+                if (playlistPreview.playlist.name.startsWith(PIPED_PREFIX) && isPipedEnabled && pipedSession.token.isNotEmpty()) {
+                    Timber.d("BaseMediaItemMenu onAddToPlaylist mediaItem ${mediaItem.mediaId}")
+                    addToPipedPlaylist(
+                        context = context,
+                        coroutineScope = coroutineScope,
+                        pipedSession = pipedSession.toApiSession(),
+                        id = UUID.fromString(playlistPreview.playlist.browseId),
+                        videos = listOf(mediaItem.mediaId)
+                    )
+                }
+            }
+            onDismiss()
         },
         onDismiss = onDismiss,
     )

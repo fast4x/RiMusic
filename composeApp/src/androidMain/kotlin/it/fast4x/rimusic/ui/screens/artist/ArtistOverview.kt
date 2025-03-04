@@ -55,10 +55,10 @@ import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import it.fast4x.compose.persist.persist
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.BrowseBody
-import it.fast4x.innertube.requests.itemsPage
-import it.fast4x.innertube.utils.from
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.BrowseBody
+import it.fast4x.environment.requests.itemsPage
+import it.fast4x.environment.utils.from
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerAwareWindowInsets
 import it.fast4x.rimusic.LocalPlayerServiceBinder
@@ -132,7 +132,7 @@ import kotlin.random.Random
 fun ArtistOverview(
     navController: NavController,
     browseId: String?,
-    youtubeArtistPage: Innertube.ArtistInfoPage?,
+    youtubeArtistPage: Environment.ArtistInfoPage?,
     onViewAllSongsClick: () -> Unit,
     onViewAllAlbumsClick: () -> Unit,
     onViewAllSinglesClick: () -> Unit,
@@ -488,7 +488,7 @@ fun ArtistOverview(
                                 .combinedClickable(
                                     onClick = {
                                         binder?.player?.enqueue(
-                                            songs.map(Innertube.SongItem::asMediaItem),
+                                            songs.map(Environment.SongItem::asMediaItem),
                                             context
                                         )
                                     },
@@ -593,12 +593,12 @@ fun ArtistOverview(
                                                         .songsEndpoint
                                                         ?.takeIf { it.browseId != null }
                                                         ?.let { endpoint ->
-                                                            Innertube.itemsPage(
+                                                            Environment.itemsPage(
                                                                 body = BrowseBody(
                                                                     browseId = endpoint.browseId!!,
                                                                     params = endpoint.params,
                                                                 ),
-                                                                fromMusicResponsiveListItemRenderer = Innertube.SongItem::from,
+                                                                fromMusicResponsiveListItemRenderer = Environment.SongItem::from,
                                                             )
                                                         }
                                                         ?.getOrNull()
@@ -648,7 +648,7 @@ fun ArtistOverview(
                         ) {
                             items(
                                 items = playlists,
-                                key = Innertube.PlaylistItem::key
+                                key = Environment.PlaylistItem::key
                             ) { playlist ->
                                 PlaylistItem(
                                     playlist = playlist,
@@ -714,7 +714,7 @@ fun ArtistOverview(
                         ) {
                             items(
                                 items = albums,
-                                key = Innertube.AlbumItem::key
+                                key = Environment.AlbumItem::key
                             ) { album ->
                                 AlbumItem(
                                     album = album,
@@ -770,7 +770,7 @@ fun ArtistOverview(
                         ) {
                             items(
                                 items = singles,
-                                key = Innertube.AlbumItem::key
+                                key = Environment.AlbumItem::key
                             ) { album ->
                                 AlbumItem(
                                     album = album,

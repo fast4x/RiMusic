@@ -17,11 +17,11 @@ import androidx.media.MediaBrowserServiceCompat
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.cache.Cache
 import androidx.media3.exoplayer.offline.Download
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.NavigationEndpoint
-import it.fast4x.innertube.models.bodies.SearchBody
-import it.fast4x.innertube.requests.searchPage
-import it.fast4x.innertube.utils.from
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.NavigationEndpoint
+import it.fast4x.environment.models.bodies.SearchBody
+import it.fast4x.environment.requests.searchPage
+import it.fast4x.environment.utils.from
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.MONTHLY_PREFIX
 import it.fast4x.rimusic.PINNED_PREFIX
@@ -118,12 +118,12 @@ class PlayerMediaBrowserService : MediaBrowserServiceCompat(), ServiceConnection
     ) {
         result.detach()
         runBlocking(Dispatchers.IO) {
-            searchedSongs = Innertube.searchPage(
+            searchedSongs = Environment.searchPage(
                 body = SearchBody(
                     query = query,
-                    params = Innertube.SearchFilter.Song.value
+                    params = Environment.SearchFilter.Song.value
                 ),
-                fromMusicShelfRendererContent = Innertube.SongItem.Companion::from
+                fromMusicShelfRendererContent = Environment.SongItem.Companion::from
             )?.map {
                 it?.items?.map { it.asSong }
             }?.getOrNull() ?: emptyList()

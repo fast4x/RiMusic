@@ -5,8 +5,8 @@ package it.fast4x.rimusic.utils
  */
 
 
-import it.fast4x.innertube.utils.ProxyPreferences
-import it.fast4x.innertube.utils.getProxy
+import it.fast4x.environment.utils.ProxyPreferences
+import it.fast4x.environment.utils.getProxy
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.FormBody

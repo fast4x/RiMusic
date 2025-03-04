@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
@@ -38,9 +37,8 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import it.fast4x.compose.persist.persist
-import it.fast4x.compose.persist.persistList
-import it.fast4x.innertube.YtMusic
-import it.fast4x.innertube.requests.HistoryPage
+import it.fast4x.environment.EnvironmentExt
+import it.fast4x.environment.requests.HistoryPage
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.EXPLICIT_PREFIX
 import it.fast4x.rimusic.LocalPlayerAwareWindowInsets
@@ -57,7 +55,6 @@ import it.fast4x.rimusic.ui.components.themed.NowPlayingSongIndicator
 import it.fast4x.rimusic.ui.components.themed.Title
 import it.fast4x.rimusic.ui.items.SongItem
 import it.fast4x.rimusic.ui.styling.Dimensions
-import it.fast4x.rimusic.ui.styling.favoritesOverlay
 import it.fast4x.rimusic.ui.styling.px
 import it.fast4x.rimusic.utils.asMediaItem
 import it.fast4x.rimusic.utils.disableScrollingTextKey
@@ -75,12 +72,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.enums.HistoryType
-import it.fast4x.rimusic.enums.PlaylistsType
-import it.fast4x.rimusic.models.PlaylistPreview
+import it.fast4x.rimusic.enums.NavRoutes
 import it.fast4x.rimusic.ui.components.ButtonsRow
 import it.fast4x.rimusic.ui.screens.settings.isYouTubeLoggedIn
 import it.fast4x.rimusic.utils.historyTypeKey
-import it.fast4x.rimusic.utils.playlistTypeKey
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
@@ -149,7 +144,7 @@ fun HistoryList(
     var historyPage by persist<Result<HistoryPage>>("home/historyPage")
     LaunchedEffect(Unit, historyType) {
         if (isYouTubeLoggedIn())
-            historyPage = YtMusic.getHistory()
+            historyPage = EnvironmentExt.getHistory()
     }
 
     var downloadState by remember {
@@ -300,6 +295,9 @@ fun HistoryList(
                                                             menuState.hide()
                                                             forceRecompose = true
                                                         },
+                                                        onInfo = {
+                                                            navController.navigate("${NavRoutes.videoOrSongInfo.name}/${event.song.id}")
+                                                        },
                                                         disableScrollingText = disableScrollingText
                                                     )
                                                 }
@@ -392,6 +390,9 @@ fun HistoryList(
                                                 onDismiss = {
                                                     menuState.hide()
                                                     forceRecompose = true
+                                                },
+                                                onInfo = {
+                                                    navController.navigate("${NavRoutes.videoOrSongInfo.name}/${song.mediaId}")
                                                 },
                                                 disableScrollingText = disableScrollingText
                                             )

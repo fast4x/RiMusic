@@ -31,10 +31,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.valentinilk.shimmer.shimmer
 import it.fast4x.compose.persist.persist
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.BrowseBodyWithLocale
-import it.fast4x.innertube.requests.BrowseResult
-import it.fast4x.innertube.requests.browse
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.BrowseBodyWithLocale
+import it.fast4x.environment.requests.BrowseResult
+import it.fast4x.environment.requests.browse
 import it.fast4x.rimusic.LocalPlayerAwareWindowInsets
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.enums.NavRoutes
@@ -73,7 +73,7 @@ fun MoodList(
     var moodPage by persist<Result<BrowseResult>>("playlist/$browseId${mood.params?.let { "/$it" } ?: ""}")
 
     LaunchedEffect(Unit) {
-        moodPage = Innertube.browse(BrowseBodyWithLocale(browseId = browseId, params = mood.params))
+        moodPage = Environment.browse(BrowseBodyWithLocale(browseId = browseId, params = mood.params))
     }
 
     val thumbnailSizeDp = Dimensions.thumbnails.album
@@ -140,7 +140,7 @@ fun MoodList(
                             items(items = item.items, key = { it.key }) { childItem ->
                                 if (childItem.key == defaultBrowseId) return@items
                                 when (childItem) {
-                                    is Innertube.AlbumItem -> AlbumItem(
+                                    is Environment.AlbumItem -> AlbumItem(
                                         album = childItem,
                                         thumbnailSizePx = thumbnailSizePx,
                                         thumbnailSizeDp = thumbnailSizeDp,
@@ -154,7 +154,7 @@ fun MoodList(
                                         disableScrollingText = disableScrollingText
                                     )
 
-                                    is Innertube.ArtistItem -> ArtistItem(
+                                    is Environment.ArtistItem -> ArtistItem(
                                         artist = childItem,
                                         thumbnailSizePx = thumbnailSizePx,
                                         thumbnailSizeDp = thumbnailSizeDp,
@@ -167,7 +167,7 @@ fun MoodList(
                                         disableScrollingText = disableScrollingText
                                     )
 
-                                    is Innertube.PlaylistItem -> PlaylistItem(
+                                    is Environment.PlaylistItem -> PlaylistItem(
                                         playlist = childItem,
                                         thumbnailSizePx = thumbnailSizePx,
                                         thumbnailSizeDp = thumbnailSizeDp,

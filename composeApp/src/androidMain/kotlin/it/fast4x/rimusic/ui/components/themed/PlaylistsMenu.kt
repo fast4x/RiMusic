@@ -100,7 +100,7 @@ class PlaylistsMenu private constructor(
                                 songId = mediaItem.mediaId,
                                 playlistId = preview.playlist.id,
                                 position = startPos + index
-                            )
+                            ).default()
                         )
                     }
                 } catch ( e: Throwable ) {

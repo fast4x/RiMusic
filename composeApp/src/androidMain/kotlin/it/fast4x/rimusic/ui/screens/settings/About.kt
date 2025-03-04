@@ -104,9 +104,13 @@ fun About() {
             title = stringResource(R.string.social_discord),
             text = stringResource(R.string.social_discord_info),
             onClick = {
-                uriHandler.openUri("https://discord.gg/y7NJwdwXEM")
+                uriHandler.openUri("https://discord.gg/h7eS2PcGeW")
             }
         )
+
+        SettingsGroupSpacer()
+
+        SettingsEntryGroupText(title = "Official Project Page")
 
         SettingsEntry(
             title = stringResource(R.string.social_github),
@@ -115,6 +119,8 @@ fun About() {
                 uriHandler.openUri("https://github.com/fast4x/RiMusic")
             }
         )
+
+
 
         SettingsGroupSpacer()
 

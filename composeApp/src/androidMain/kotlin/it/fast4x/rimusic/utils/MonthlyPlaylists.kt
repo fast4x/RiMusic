@@ -79,7 +79,7 @@ fun CheckMonthlyPlaylist() {
                                                 songId = song.id,
                                                 playlistId = it,
                                                 position = position
-                                            )
+                                            ).default()
                                         )
                                     }
                                 }
@@ -165,7 +165,7 @@ fun CreateMonthlyPlaylist() {
                                         songId = song.id,
                                         playlistId = it,
                                         position = position
-                                    )
+                                    ).default()
                                 )
                             }
                         }

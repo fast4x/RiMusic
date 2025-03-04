@@ -29,6 +29,7 @@ import it.fast4x.rimusic.ui.components.themed.SmartMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import it.fast4x.rimusic.appContext
+import it.fast4x.rimusic.cleanPrefix
 import it.fast4x.rimusic.ui.components.themed.DeleteDialog
 import it.fast4x.rimusic.ui.components.themed.IDialog
 import it.fast4x.rimusic.ui.components.tab.Sort
@@ -307,7 +308,7 @@ class RenameDialog private constructor(
                 context = appContext(),
                 coroutineScope = coroutineScope,
                 pipedSession = pipedSession.toApiSession(),
-                id = UUID.fromString( playlist.browseId ),
+                id = UUID.fromString( cleanPrefix(playlist.browseId ?: "") ),
                 name = "$PIPED_PREFIX$newValue"
             )
 

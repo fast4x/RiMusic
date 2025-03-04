@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 23,
-    "identityHash": "205c24811149a247279bcbfdc2d6c396",
+    "identityHash": "2affde115955d91f7d754e3e8d2f0e4b",
     "entities": [
       {
         "tableName": "Song",
@@ -23,26 +23,22 @@
           {
             "fieldPath": "artistsText",
             "columnName": "artistsText",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "durationText",
             "columnName": "durationText",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "thumbnailUrl",
             "columnName": "thumbnailUrl",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "likedAt",
             "columnName": "likedAt",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "totalPlayTimeMs",
@@ -56,13 +52,11 @@
           "columnNames": [
             "id"
           ]
-        },
-        "indices": [],
-        "foreignKeys": []
+        }
       },
       {
         "tableName": "SongPlaylistMap",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`songId` TEXT NOT NULL, `playlistId` INTEGER NOT NULL, `position` INTEGER NOT NULL, PRIMARY KEY(`songId`, `playlistId`), FOREIGN KEY(`songId`) REFERENCES `Song`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`playlistId`) REFERENCES `Playlist`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`songId` TEXT NOT NULL, `playlistId` INTEGER NOT NULL, `position` INTEGER NOT NULL, `setVideoId` TEXT, PRIMARY KEY(`songId`, `playlistId`), FOREIGN KEY(`songId`) REFERENCES `Song`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`playlistId`) REFERENCES `Playlist`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "songId",
@@ -81,6 +75,11 @@
             "columnName": "position",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "setVideoId",
+            "columnName": "setVideoId",
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -154,8 +153,7 @@
           {
             "fieldPath": "browseId",
             "columnName": "browseId",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -163,9 +161,7 @@
           "columnNames": [
             "id"
           ]
-        },
-        "indices": [],
-        "foreignKeys": []
+        }
       },
       {
         "tableName": "Artist",
@@ -180,26 +176,22 @@
           {
             "fieldPath": "name",
             "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "thumbnailUrl",
             "columnName": "thumbnailUrl",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "timestamp",
             "columnName": "timestamp",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "bookmarkedAt",
             "columnName": "bookmarkedAt",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -207,9 +199,7 @@
           "columnNames": [
             "id"
           ]
-        },
-        "indices": [],
-        "foreignKeys": []
+        }
       },
       {
         "tableName": "SongArtistMap",
@@ -293,44 +283,37 @@
           {
             "fieldPath": "title",
             "columnName": "title",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "thumbnailUrl",
             "columnName": "thumbnailUrl",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "year",
             "columnName": "year",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "authorsText",
             "columnName": "authorsText",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "shareUrl",
             "columnName": "shareUrl",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "timestamp",
             "columnName": "timestamp",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "bookmarkedAt",
             "columnName": "bookmarkedAt",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -338,9 +321,7 @@
           "columnNames": [
             "id"
           ]
-        },
-        "indices": [],
-        "foreignKeys": []
+        }
       },
       {
         "tableName": "SongAlbumMap",
@@ -361,8 +342,7 @@
           {
             "fieldPath": "position",
             "columnName": "position",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -450,8 +430,7 @@
             "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_SearchQuery_query` ON `${TABLE_NAME}` (`query`)"
           }
-        ],
-        "foreignKeys": []
+        ]
       },
       {
         "tableName": "QueuedMediaItem",
@@ -472,8 +451,7 @@
           {
             "fieldPath": "position",
             "columnName": "position",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -481,9 +459,7 @@
           "columnNames": [
             "id"
           ]
-        },
-        "indices": [],
-        "foreignKeys": []
+        }
       },
       {
         "tableName": "Format",
@@ -498,38 +474,32 @@
           {
             "fieldPath": "itag",
             "columnName": "itag",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "mimeType",
             "columnName": "mimeType",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "bitrate",
             "columnName": "bitrate",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "contentLength",
             "columnName": "contentLength",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "lastModified",
             "columnName": "lastModified",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "loudnessDb",
             "columnName": "loudnessDb",
-            "affinity": "REAL",
-            "notNull": false
+            "affinity": "REAL"
           }
         ],
         "primaryKey": {
@@ -538,7 +508,6 @@
             "songId"
           ]
         },
-        "indices": [],
         "foreignKeys": [
           {
             "table": "Song",
@@ -626,14 +595,12 @@
           {
             "fieldPath": "fixed",
             "columnName": "fixed",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "synced",
             "columnName": "synced",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -642,7 +609,6 @@
             "songId"
           ]
         },
-        "indices": [],
         "foreignKeys": [
           {
             "table": "Song",
@@ -666,7 +632,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '205c24811149a247279bcbfdc2d6c396')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2affde115955d91f7d754e3e8d2f0e4b')"
     ]
   }
 }

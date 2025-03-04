@@ -63,7 +63,7 @@ fun syncSongsInPipedPlaylist(context: Context,coroutineScope: CoroutineScope, pi
                         songId = song.id.toString(),
                         playlistId = playlistId,
                         position = index
-                    )
+                    ).default()
                 )
             }
 
@@ -130,7 +130,7 @@ fun ImportPipedPlaylists(){
                                                     songId = song.id.toString(),
                                                     playlistId = playlistId,
                                                     position = index
-                                                )
+                                                ).default()
                                             )
                                         }
                                     }

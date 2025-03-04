@@ -28,10 +28,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import database.entities.Song
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.NextBody
-import it.fast4x.innertube.requests.discoverPage
-import it.fast4x.innertube.requests.relatedPage
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.NextBody
+import it.fast4x.environment.requests.discoverPage
+import it.fast4x.environment.requests.relatedPage
 import it.fast4x.rimusic.items.AlbumItem
 import it.fast4x.rimusic.items.ArtistItem
 import it.fast4x.rimusic.items.MoodItemColored
@@ -62,7 +62,7 @@ fun QuickPicsScreen(
     onAlbumClick: (String) -> Unit,
     onArtistClick: (String) -> Unit,
     onPlaylistClick: (String) -> Unit,
-    onMoodClick: (Innertube.Mood.Item) -> Unit
+    onMoodClick: (Environment.Mood.Item) -> Unit
 ) {
 
     Title2Actions(
@@ -75,19 +75,19 @@ fun QuickPicsScreen(
     val quickPicksLazyGridState = rememberLazyGridState()
     val moodAngGenresLazyGridState = rememberLazyGridState()
     val endPaddingValues = windowInsets.only(WindowInsetsSides.End).asPaddingValues()
-    val related = remember { mutableStateOf<Innertube.RelatedPage?>(null) }
-    var relatedPageResult by remember { mutableStateOf<Result<Innertube.RelatedPage?>?>(null) }
-    var discoverPageResult by remember { mutableStateOf<Result<Innertube.DiscoverPage?>?>(null) }
-    var discover = remember { mutableStateOf<Innertube.DiscoverPage?>(null) }
+    val related = remember { mutableStateOf<Environment.RelatedPage?>(null) }
+    var relatedPageResult by remember { mutableStateOf<Result<Environment.RelatedPage?>?>(null) }
+    var discoverPageResult by remember { mutableStateOf<Result<Environment.DiscoverPage?>?>(null) }
+    var discover = remember { mutableStateOf<Environment.DiscoverPage?>(null) }
 
     LaunchedEffect(Unit) {
-        relatedPageResult = Innertube.relatedPage(
+        relatedPageResult = Environment.relatedPage(
             NextBody(
                 videoId = "HZnNt9nnEhw"
             )
         )
 
-        discoverPageResult = Innertube.discoverPage()
+        discoverPageResult = Environment.discoverPage()
     }
     relatedPageResult?.getOrNull().also { related.value = it }
     discoverPageResult?.getOrNull().also { discover.value = it }
@@ -106,7 +106,7 @@ fun QuickPicsScreen(
                 items = related.value!!.songs?.distinctBy { it.key }
                 //?.dropLast(if (trending == null) 0 else 1)
                     ?: emptyList(),
-                key = Innertube.SongItem::key
+                key = Environment.SongItem::key
             ) { song ->
 
                 SongItem(

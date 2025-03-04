@@ -39,10 +39,10 @@ import androidx.compose.ui.unit.dp
 import database.MusicDatabaseDesktop
 import database.entities.Album
 import database.entities.Song
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.PlayerResponse
-import it.fast4x.innertube.models.bodies.PlayerBody
-import it.fast4x.innertube.requests.player
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.PlayerResponse
+import it.fast4x.environment.models.bodies.PlayerBody
+import it.fast4x.environment.requests.player
 import it.fast4x.rimusic.enums.PageType
 import it.fast4x.rimusic.styling.Dimensions.layoutColumnBottomPadding
 import it.fast4x.rimusic.styling.Dimensions.layoutColumnBottomSpacer
@@ -56,7 +56,6 @@ import it.fast4x.rimusic.ui.screens.ArtistScreen
 import it.fast4x.rimusic.ui.screens.MoodScreen
 import it.fast4x.rimusic.ui.screens.PlaylistScreen
 import it.fast4x.rimusic.ui.screens.QuickPicsScreen
-import it.fast4x.rimusic.utils.getPipedSession
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -84,7 +83,7 @@ fun ThreeColumnsApp() {
     var artistId by remember { mutableStateOf("") }
     var albumId by remember { mutableStateOf("") }
     var playlistId by remember { mutableStateOf("") }
-    var mood by remember { mutableStateOf<Innertube.Mood.Item?>(null) }
+    var mood by remember { mutableStateOf<Environment.Mood.Item?>(null) }
 
     val formatAudio =
         remember { mutableStateOf<PlayerResponse.StreamingData.AdaptiveFormat?>(null) }
@@ -92,7 +91,7 @@ fun ThreeColumnsApp() {
     LaunchedEffect(videoId) {
         if (videoId.isEmpty()) return@LaunchedEffect
 
-        Innertube.player(
+        Environment.player(
             body = PlayerBody(videoId = videoId)
         ).onSuccess {
                 println("videoId  ${videoId} adaptiveFormats ${it.streamingData?.adaptiveFormats}")

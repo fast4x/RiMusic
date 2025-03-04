@@ -89,9 +89,9 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import com.valentinilk.shimmer.shimmer
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.NextBody
-import it.fast4x.innertube.requests.lyrics
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.NextBody
+import it.fast4x.environment.requests.lyrics
 import it.fast4x.kugou.KuGou
 import it.fast4x.lrclib.LrcLib
 import it.fast4x.lrclib.models.Track
@@ -238,6 +238,9 @@ fun Lyrics(
         }
 
         val text = if (isShowingSynchronizedLyrics) lyrics?.synced else lyrics?.fixed
+        var textTranslated by remember {
+            mutableStateOf("")
+        }
 
         var isError by remember(mediaId, isShowingSynchronizedLyrics) {
             mutableStateOf(false)
@@ -325,6 +328,16 @@ fun Lyrics(
 
         if (copyToClipboard) text?.let {
             textCopyToClipboard(it, context)
+            copyToClipboard = false
+        }
+
+        var copyTranslatedToClipboard by remember {
+            mutableStateOf(false)
+        }
+
+        if (copyTranslatedToClipboard) textTranslated.let {
+            textCopyToClipboard(it, context)
+            copyTranslatedToClipboard = false
         }
 
         var fontSize by rememberPreference(lyricsFontSizeKey, LyricsFontSize.Medium)
@@ -432,6 +445,7 @@ fun Lyrics(
                                 } else {mainTranslation.sourcePronunciation ?: mainTranslation.sourceText} + "\\n[${mainTranslation.translatedPronunciation ?: mainTranslation.translatedText}]"
                         }
                         outputText?.replace("\\r","\r")?.replace("\\n","\n")
+
                     } catch (e: Exception) {
                         if(isSync){
                             Timber.e("Lyrics sync translation ${e.stackTraceToString()}")
@@ -444,6 +458,8 @@ fun Lyrics(
                     if (result.toString() == "kotlin.Unit") "" else result.toString()
                 showPlaceholder = false
                 output.value = translatedText
+
+                textTranslated = translatedText
             }
         }
 
@@ -577,7 +593,7 @@ fun Lyrics(
                         isError = false
                         lyrics = null
                         kotlin.runCatching {
-                            Innertube.lyrics(NextBody(videoId = mediaId))
+                            Environment.lyrics(NextBody(videoId = mediaId))
                                 ?.onSuccess { fixedLyrics ->
                                     Database.upsert(
                                         Lyrics(
@@ -2374,6 +2390,15 @@ fun Lyrics(
                                             onClick = {
                                                 menuState.hide()
                                                 copyToClipboard = true
+                                            }
+                                        )
+
+                                        MenuEntry(
+                                            icon = R.drawable.copy,
+                                            text = stringResource(R.string.copy_translated_lyrics),
+                                            onClick = {
+                                                menuState.hide()
+                                                copyTranslatedToClipboard = true
                                             }
                                         )
 

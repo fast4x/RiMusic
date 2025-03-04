@@ -33,10 +33,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.BrowseBody
-import it.fast4x.innertube.requests.playlistPage
-import it.fast4x.innertube.requests.song
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.BrowseBody
+import it.fast4x.environment.requests.playlistPage
+import it.fast4x.environment.requests.song
 import it.fast4x.rimusic.LocalPlayerAwareWindowInsets
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
@@ -198,7 +198,7 @@ fun GoToLink(
                                     val browseId = "VL$playlistId"
 
                                     if (playlistId.startsWith("OLAK5uy_")) {
-                                        Innertube.playlistPage(BrowseBody(browseId = browseId))
+                                        Environment.playlistPage(BrowseBody(browseId = browseId))
                                             ?.getOrNull()?.let {
                                                 it.songsPage?.items?.firstOrNull()?.album?.endpoint?.browseId?.let { browseId ->
                                                     //albumRoute.ensureGlobal(browseId)
@@ -223,7 +223,7 @@ fun GoToLink(
                                     uri.host == "youtu.be" -> path
                                     else -> null
                                 }?.let { videoId ->
-                                    Innertube.song(videoId)?.getOrNull()?.let { song ->
+                                    Environment.song(videoId)?.getOrNull()?.let { song ->
                                         val binder = snapshotFlow { binder }.filterNotNull().first()
                                         withContext(Dispatchers.Main) {
                                             binder.player.forcePlay(song.asMediaItem)

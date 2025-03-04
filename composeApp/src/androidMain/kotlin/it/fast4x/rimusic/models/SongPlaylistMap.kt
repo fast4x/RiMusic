@@ -26,5 +26,13 @@ import androidx.room.ForeignKey
 data class SongPlaylistMap(
     @ColumnInfo(index = true) val songId: String,
     @ColumnInfo(index = true) val playlistId: Long,
-    val position: Int
-)
+    val position: Int,
+    val setVideoId: String? = null,
+    val dateAdded: Long? = null
+){
+    fun default(): SongPlaylistMap {
+        return copy(
+            dateAdded = System.currentTimeMillis()
+        )
+    }
+}

@@ -3,7 +3,7 @@ package it.fast4x.rimusic.models
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.compose.ui.graphics.Color
-import it.fast4x.innertube.Innertube
+import it.fast4x.environment.Environment
 
 data class Mood(
     val name: String,
@@ -33,7 +33,7 @@ data class Mood(
     }
 }
 
-fun Innertube.Mood.Item.toUiMood() = Mood(
+fun Environment.Mood.Item.toUiMood() = Mood(
     name = title,
     color = Color(stripeColor),
     browseId = endpoint.browseId,

@@ -19,11 +19,11 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.ContinuationBody
-import it.fast4x.innertube.models.bodies.SearchBody
-import it.fast4x.innertube.requests.searchPage
-import it.fast4x.innertube.utils.from
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.ContinuationBody
+import it.fast4x.environment.models.bodies.SearchBody
+import it.fast4x.environment.requests.searchPage
+import it.fast4x.environment.utils.from
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.ui.components.LocalMenuState
@@ -45,7 +45,7 @@ fun SearchYoutubeEntity (
     navController: NavController,
     onDismiss: () -> Unit,
     query: String,
-    filter: Innertube.SearchFilter = Innertube.SearchFilter.Video,
+    filter: Environment.SearchFilter = Environment.SearchFilter.Video,
     disableScrollingText: Boolean
 ) {
     val binder = LocalPlayerServiceBinder.current
@@ -78,17 +78,17 @@ fun SearchYoutubeEntity (
                 tag = "searchYTEntity/$query/videos",
                 itemsPageProvider = { continuation ->
                     if (continuation == null) {
-                        Innertube.searchPage(
+                        Environment.searchPage(
                             body = SearchBody(
                                 query = query,
-                                params = Innertube.SearchFilter.Video.value
+                                params = Environment.SearchFilter.Video.value
                             ),
-                            fromMusicShelfRendererContent = Innertube.VideoItem::from
+                            fromMusicShelfRendererContent = Environment.VideoItem::from
                         )
                     } else {
-                        Innertube.searchPage(
+                        Environment.searchPage(
                             body = ContinuationBody(continuation = continuation),
-                            fromMusicShelfRendererContent = Innertube.VideoItem::from
+                            fromMusicShelfRendererContent = Environment.VideoItem::from
                         )
                     }
                 },

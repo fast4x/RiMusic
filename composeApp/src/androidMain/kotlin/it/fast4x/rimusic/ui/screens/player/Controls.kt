@@ -106,7 +106,7 @@ fun Controls(
         }
     }
 
-    println("Controls currentSong: ${currentSong?.title}")
+    //println("Controls currentSong: ${currentSong?.title}")
 
     /*
     var scrubbingPosition by remember(mediaId) {

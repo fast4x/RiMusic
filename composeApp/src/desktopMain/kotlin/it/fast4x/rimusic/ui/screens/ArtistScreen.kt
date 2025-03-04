@@ -41,9 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import database.entities.Song
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.BrowseBody
-import it.fast4x.innertube.requests.artistPage
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.BrowseBody
+import it.fast4x.environment.requests.artistPage
 import it.fast4x.rimusic.items.AlbumItem
 import it.fast4x.rimusic.items.PlaylistItem
 import it.fast4x.rimusic.items.SongItem
@@ -93,9 +93,9 @@ fun ArtistScreen(
 ) {
     //val leftScrollState = rememberScrollState()
     //val rightScrollState = rememberScrollState()
-    val artistPage = remember { mutableStateOf<Innertube.ArtistPage?>(null) }
+    val artistPage = remember { mutableStateOf<Environment.ArtistPage?>(null) }
     LaunchedEffect(browseId) {
-        Innertube.artistPage(BrowseBody(browseId = browseId))
+        Environment.artistPage(BrowseBody(browseId = browseId))
             ?.onSuccess {
                 artistPage.value = it
             }
@@ -380,7 +380,7 @@ fun ArtistScreen(
                         ) {
                             items(
                                 items = playlists,
-                                key = Innertube.PlaylistItem::key
+                                key = Environment.PlaylistItem::key
                             ) { playlist ->
                                 PlaylistItem(
                                     playlist = playlist,
@@ -431,7 +431,7 @@ fun ArtistScreen(
                         ) {
                             items(
                                 items = albums,
-                                key = Innertube.AlbumItem::key
+                                key = Environment.AlbumItem::key
                             ) { album ->
                                 AlbumItem(
                                     album = album,
@@ -469,7 +469,7 @@ fun ArtistScreen(
                         ) {
                             items(
                                 items = singles,
-                                key = Innertube.AlbumItem::key
+                                key = Environment.AlbumItem::key
                             ) { album ->
                                 AlbumItem(
                                     album = album,

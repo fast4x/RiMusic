@@ -229,7 +229,10 @@ object MyDownloadHelper {
             .Builder(
                 /* id      = */ mediaItem.mediaId,
                 /* uri     = */ mediaItem.requestMetadata.mediaUri
-                    ?: Uri.parse("https://music.youtube.com/watch?v=${mediaItem.mediaId}")
+                    //try to download from youtube.com
+                    ?: Uri.parse("https://youtube.com/watch?v=${mediaItem.mediaId}")
+                    //try to download ffrom music.youtube.com
+                    //?: Uri.parse("https://music.youtube.com/watch?v=${mediaItem.mediaId}")
             )
             .setCustomCacheKey(mediaItem.mediaId)
             .setData("${mediaItem.mediaMetadata.artist.toString()} - ${mediaItem.mediaMetadata.title.toString()}".encodeToByteArray()) // Title in notification
@@ -300,7 +303,13 @@ object MyDownloadHelper {
 
     fun autoDownloadWhenLiked(context: Context, mediaItem: MediaItem) {
         if (context.preferences.getBoolean(autoDownloadSongWhenLikedKey, false)) {
-            autoDownload(context, mediaItem)
+            Database.asyncQuery {
+                if (getLikedAt(mediaItem.mediaId) !in listOf(-1L,null)) {
+                    autoDownload(context, mediaItem)
+                } else {
+                    removeDownload(context, mediaItem)
+                }
+            }
         }
     }
 

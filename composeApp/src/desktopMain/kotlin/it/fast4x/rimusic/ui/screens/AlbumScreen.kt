@@ -44,9 +44,9 @@ import database.DB
 import database.entities.Album
 import database.entities.Song
 import database.entities.SongAlbumMap
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.BrowseBody
-import it.fast4x.innertube.requests.albumPage
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.BrowseBody
+import it.fast4x.environment.requests.albumPage
 import it.fast4x.rimusic.MODIFIED_PREFIX
 import it.fast4x.rimusic.items.AlbumItem
 import it.fast4x.rimusic.items.SongItem
@@ -101,13 +101,13 @@ fun AlbumScreen(
 
 
 
-    val albumPage = remember { mutableStateOf<Innertube.PlaylistOrAlbumPage?>(null) }
+    val albumPage = remember { mutableStateOf<Environment.PlaylistOrAlbumPage?>(null) }
     LaunchedEffect(browseId) {
         DB.album(browseId).collect { currentAlbum ->
             album = currentAlbum
 
             if (albumPage.value == null)
-                Innertube.albumPage(BrowseBody(browseId = browseId))
+                Environment.albumPage(BrowseBody(browseId = browseId))
                     ?.onSuccess { currentAlbumPage ->
                         albumPage.value = currentAlbumPage
 
@@ -138,7 +138,7 @@ fun AlbumScreen(
                             currentAlbumPage
                                 .songsPage
                                 ?.items
-                                ?.map(Innertube.SongItem::asSong)
+                                ?.map(Environment.SongItem::asSong)
                                 ?.onEach {
                                     DB.upsert(it)
                                 }
@@ -452,7 +452,7 @@ fun AlbumScreen(
                         ) {
                             items(
                                 items = otherVersion,
-                                key = Innertube.AlbumItem::key
+                                key = Environment.AlbumItem::key
                             ) { album ->
                                 AlbumItem(
                                     album = album,

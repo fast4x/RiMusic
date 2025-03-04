@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import it.fast4x.rimusic.utils.center
@@ -42,6 +44,7 @@ fun SliderControl(
             .fillMaxSize()
     ) {
         Slider(
+            isEnabled = isEnabled,
             state = state,
             setState = onSlide,
             onSlideComplete = onSlideComplete,
@@ -58,7 +61,12 @@ fun SliderControl(
         if (showValue)
             BasicText(
                 text = toDisplay(state),
-                style = typography().xs.semiBold.center,
+                style = TextStyle(
+                    textAlign = TextAlign.Center,
+                    color = typography().xs.semiBold.color.copy(alpha = if (isEnabled) 1.0f else 0.5f),
+                    fontSize = typography().xs.semiBold.center.fontSize,
+                    fontWeight = typography().xs.semiBold.center.fontWeight
+                ),
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
                 modifier = Modifier

@@ -51,8 +51,8 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import it.fast4x.compose.persist.persist
 import it.fast4x.compose.persist.persistList
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.requests.discoverPage
+import it.fast4x.environment.Environment
+import it.fast4x.environment.requests.discoverPage
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerAwareWindowInsets
 import it.fast4x.rimusic.R
@@ -86,7 +86,7 @@ import it.fast4x.rimusic.typography
 @OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeDiscovery(
-    onMoodClick: (mood: Innertube.Mood.Item) -> Unit,
+    onMoodClick: (mood: Environment.Mood.Item) -> Unit,
     onNewReleaseAlbumClick: (String) -> Unit,
     onSearchClick: () -> Unit
 ) {
@@ -109,12 +109,12 @@ fun HomeDiscovery(
     val thumbnailSizeDp = 20.dp
     //val thumbnailSizePx = thumbnailSizeDp.px
 
-    var discoverPage by persist<Result<Innertube.DiscoverPage>>("home/discovery")
+    var discoverPage by persist<Result<Environment.DiscoverPage>>("home/discovery")
 
     var preferitesArtists by persistList<Artist>("home/artists")
 
     LaunchedEffect(key1 = Unit) {
-        discoverPage = Innertube.discoverPage()
+        discoverPage = Environment.discoverPage()
     }
     LaunchedEffect(Unit) {
         Database.preferitesArtistsByName().collect { preferitesArtists = it }
@@ -166,7 +166,7 @@ fun HomeDiscovery(
                 onClick = onSearchClick
             )
             discoverPage?.getOrNull()?.let { page ->
-                var newReleaseAlbumsFiltered by persistList<Innertube.AlbumItem>("discovery/newalbumsartist")
+                var newReleaseAlbumsFiltered by persistList<Environment.AlbumItem>("discovery/newalbumsartist")
                 page.newReleaseAlbums.forEach { album ->
                     preferitesArtists.forEach { artist ->
                         if (artist.name == album.authors?.first()?.name) {
@@ -317,7 +317,7 @@ fun HomeDiscovery(
 
 @Composable
 fun MoodItemColored(
-    mood: Innertube.Mood.Item,
+    mood: Environment.Mood.Item,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -371,7 +371,7 @@ fun MoodItemColored(
 
 @Composable
 fun MoodGridItemColored(
-    mood: Innertube.Mood.Item,
+    mood: Environment.Mood.Item,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     thumbnailSizeDp: Dp
@@ -433,7 +433,7 @@ fun MoodGridItemColored(
 
 @Composable
 fun MoodItem(
-    mood: Innertube.Mood.Item,
+    mood: Environment.Mood.Item,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -478,7 +478,7 @@ fun MoodItem(
 
 @Composable
 fun MoodGridItem(
-    mood: Innertube.Mood.Item,
+    mood: Environment.Mood.Item,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     thumbnailSizeDp: Dp

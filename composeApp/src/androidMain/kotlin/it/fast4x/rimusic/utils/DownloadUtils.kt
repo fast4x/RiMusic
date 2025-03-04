@@ -76,9 +76,8 @@ fun manageDownload(
 
     if (downloadState) {
         MyDownloadHelper.removeDownload(context = context, mediaItem = mediaItem)
-    }
-    else {
-        if (isNetworkAvailable(context)) {
+    } else {
+        if (isNetworkConnected(context)) {
             MyDownloadHelper.addDownload(context = context, mediaItem = mediaItem)
         }
     }
@@ -90,7 +89,8 @@ fun manageDownload(
 @Composable
 fun getDownloadState(mediaId: String): Int {
     val downloader = LocalDownloadHelper.current
-    if (!isNetworkAvailableComposable()) return 3
+    val context = LocalContext.current
+    if (!isNetworkConnected(context)) return 3
 
     return downloader.getDownload(mediaId).collectAsState(initial = null).value?.state
         ?: 3

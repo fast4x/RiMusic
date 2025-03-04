@@ -34,14 +34,13 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import com.valentinilk.shimmer.shimmer
-import it.fast4x.compose.persist.PersistMapCleanup
 import it.fast4x.compose.persist.persist
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.BrowseBody
-import it.fast4x.innertube.models.bodies.ContinuationBody
-import it.fast4x.innertube.requests.artistPage
-import it.fast4x.innertube.requests.itemsPage
-import it.fast4x.innertube.utils.from
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.BrowseBody
+import it.fast4x.environment.models.bodies.ContinuationBody
+import it.fast4x.environment.requests.artistPage
+import it.fast4x.environment.requests.itemsPage
+import it.fast4x.environment.utils.from
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
@@ -58,7 +57,6 @@ import it.fast4x.rimusic.ui.components.themed.HeaderPlaceholder
 import it.fast4x.rimusic.ui.components.themed.NonQueuedMediaItemMenu
 import it.fast4x.rimusic.ui.components.themed.NowPlayingSongIndicator
 import it.fast4x.rimusic.ui.components.themed.SecondaryTextButton
-import it.fast4x.rimusic.ui.components.themed.SmartMessage
 import it.fast4x.rimusic.ui.components.themed.adaptiveThumbnailContent
 import it.fast4x.rimusic.ui.items.AlbumItem
 import it.fast4x.rimusic.ui.items.AlbumItemPlaceholder
@@ -115,7 +113,7 @@ fun ArtistScreen(
 
     var artist by persist<Artist?>("artist/$browseId/artist")
 
-    var artistPage by persist<Innertube.ArtistInfoPage?>("artist/$browseId/artistPage")
+    var artistPage by persist<Environment.ArtistInfoPage?>("artist/$browseId/artistPage")
 
     var downloadState by remember {
         mutableStateOf(Download.STATE_STOPPED)
@@ -144,7 +142,7 @@ fun ArtistScreen(
 
                 if (artistPage == null && (currentArtist?.timestamp == null || mustFetch)) {
                     withContext(Dispatchers.IO) {
-                        Innertube.artistPage(BrowseBody(browseId = browseId))
+                        Environment.artistPage(BrowseBody(browseId = browseId))
                             ?.onSuccess { currentArtistPage ->
                                 artistPage = currentArtistPage
 
@@ -304,16 +302,16 @@ fun ArtistScreen(
                                             ?.songsEndpoint
                                             ?.takeIf { it.browseId != null }
                                             ?.let { endpoint ->
-                                                Innertube.itemsPage(
+                                                Environment.itemsPage(
                                                     body = BrowseBody(
                                                         browseId = endpoint.browseId!!,
                                                         params = endpoint.params
                                                     ),
-                                                    fromMusicResponsiveListItemRenderer = Innertube.SongItem::from,
+                                                    fromMusicResponsiveListItemRenderer = Environment.SongItem::from,
                                                 )?.completed()
                                             }
                                         ?: Result.success( // is this section ever reached now?
-                                            Innertube.ItemsPage(
+                                            Environment.ItemsPage(
                                                 items = artistPage?.songs,
                                                 continuation = null
                                             )
@@ -393,12 +391,12 @@ fun ArtistScreen(
                                                                 ?.songsEndpoint
                                                                 ?.takeIf { it.browseId != null }
                                                                 ?.let { endpoint ->
-                                                                    Innertube.itemsPage(
+                                                                    Environment.itemsPage(
                                                                         body = BrowseBody(
                                                                             browseId = endpoint.browseId!!,
                                                                             params = endpoint.params,
                                                                         ),
-                                                                        fromMusicResponsiveListItemRenderer = Innertube.SongItem::from,
+                                                                        fromMusicResponsiveListItemRenderer = Environment.SongItem::from,
                                                                     )
                                                                 }
                                                                 ?.getOrNull()
@@ -447,24 +445,24 @@ fun ArtistScreen(
                                 itemsPageProvider = artistPage?.let {
                                     ({ continuation ->
                                         continuation?.let {
-                                            Innertube.itemsPage(
+                                            Environment.itemsPage(
                                                 body = ContinuationBody(continuation = continuation),
-                                                fromMusicTwoRowItemRenderer = Innertube.AlbumItem::from,
+                                                fromMusicTwoRowItemRenderer = Environment.AlbumItem::from,
                                             )
                                         } ?: artistPage
                                             ?.albumsEndpoint
                                             ?.takeIf { it.browseId != null }
                                             ?.let { endpoint ->
-                                                Innertube.itemsPage(
+                                                Environment.itemsPage(
                                                     body = BrowseBody(
                                                         browseId = endpoint.browseId!!,
                                                         params = endpoint.params,
                                                     ),
-                                                    fromMusicTwoRowItemRenderer = Innertube.AlbumItem::from,
+                                                    fromMusicTwoRowItemRenderer = Environment.AlbumItem::from,
                                                 )
                                             }
                                         ?: Result.success(
-                                            Innertube.ItemsPage(
+                                            Environment.ItemsPage(
                                                 items = artistPage?.albums,
                                                 continuation = null
                                             )
@@ -502,24 +500,24 @@ fun ArtistScreen(
                                 itemsPageProvider = artistPage?.let {
                                     ({ continuation ->
                                         continuation?.let {
-                                            Innertube.itemsPage(
+                                            Environment.itemsPage(
                                                 body = ContinuationBody(continuation = continuation),
-                                                fromMusicTwoRowItemRenderer = Innertube.AlbumItem::from,
+                                                fromMusicTwoRowItemRenderer = Environment.AlbumItem::from,
                                             )
                                         } ?: artistPage
                                             ?.singlesEndpoint
                                             ?.takeIf { it.browseId != null }
                                             ?.let { endpoint ->
-                                                Innertube.itemsPage(
+                                                Environment.itemsPage(
                                                     body = BrowseBody(
                                                         browseId = endpoint.browseId!!,
                                                         params = endpoint.params,
                                                     ),
-                                                    fromMusicTwoRowItemRenderer = Innertube.AlbumItem::from,
+                                                    fromMusicTwoRowItemRenderer = Environment.AlbumItem::from,
                                                 )
                                             }
                                         ?: Result.success(
-                                            Innertube.ItemsPage(
+                                            Environment.ItemsPage(
                                                 items = artistPage?.singles,
                                                 continuation = null
                                             )

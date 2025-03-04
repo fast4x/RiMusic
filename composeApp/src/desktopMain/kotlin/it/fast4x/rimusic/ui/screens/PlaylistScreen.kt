@@ -41,9 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import database.entities.Song
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.BrowseBody
-import it.fast4x.innertube.requests.playlistPage
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.BrowseBody
+import it.fast4x.environment.requests.playlistPage
 import it.fast4x.rimusic.EXPLICIT_PREFIX
 import it.fast4x.rimusic.items.AlbumItem
 import it.fast4x.rimusic.items.SongItem
@@ -84,14 +84,14 @@ fun PlaylistScreen(
 ) {
     //val leftScrollState = rememberScrollState()
     //val rightScrollState = rememberScrollState()
-    var playlistPage by remember { mutableStateOf<Innertube.PlaylistOrAlbumPage?>(null) }
-    var playlistSongs by remember { mutableStateOf<List<Innertube.SongItem?>>(emptyList()) }
+    var playlistPage by remember { mutableStateOf<Environment.PlaylistOrAlbumPage?>(null) }
+    var playlistSongs by remember { mutableStateOf<List<Environment.SongItem?>>(emptyList()) }
     val parentalControlEnabled by remember{ mutableStateOf(false)}
     LaunchedEffect(Unit) {
         if (playlistPage != null && playlistPage!!.songsPage?.continuation == null) return@LaunchedEffect
 
         playlistPage = withContext(Dispatchers.IO) {
-            Innertube.playlistPage(BrowseBody(browseId = browseId))?.completed()?.getOrNull()
+            Environment.playlistPage(BrowseBody(browseId = browseId))?.completed()?.getOrNull()
         }
 
         println("mediaItem playlistPage ${playlistPage?.songsPage}")
@@ -376,7 +376,7 @@ fun PlaylistScreen(
                         ) {
                             items(
                                 items = otherVersion,
-                                key = Innertube.AlbumItem::key
+                                key = Environment.AlbumItem::key
                             ) { album ->
                                 AlbumItem(
                                     album = album,

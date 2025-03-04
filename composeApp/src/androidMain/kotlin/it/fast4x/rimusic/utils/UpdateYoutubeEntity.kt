@@ -9,10 +9,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.media3.common.util.UnstableApi
 import it.fast4x.compose.persist.persist
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.BrowseBody
-import it.fast4x.innertube.requests.albumPage
-import it.fast4x.innertube.requests.artistPage
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.BrowseBody
+import it.fast4x.environment.requests.albumPage
+import it.fast4x.environment.requests.artistPage
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.models.Album
 import it.fast4x.rimusic.models.Artist
@@ -26,7 +26,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun UpdateYoutubeArtist(browseId: String) {
 
-    var artistPage by persist<Innertube.ArtistInfoPage?>("artist/$browseId/artistPage")
+    var artistPage by persist<Environment.ArtistInfoPage?>("artist/$browseId/artistPage")
     var artist by persist<Artist?>("artist/$browseId/artist")
     val tabIndex by rememberPreference(artistScreenTabIndexKey, defaultValue = 0)
 
@@ -40,7 +40,7 @@ fun UpdateYoutubeArtist(browseId: String) {
 
                 if (artistPage == null && (currentArtist?.timestamp == null || mustFetch)) {
                     withContext(Dispatchers.IO) {
-                        Innertube.artistPage(BrowseBody(browseId = browseId))
+                        Environment.artistPage(BrowseBody(browseId = browseId))
                             ?.onSuccess { currentArtistPage ->
                                 artistPage = currentArtistPage
 
@@ -65,7 +65,7 @@ fun UpdateYoutubeArtist(browseId: String) {
 @Composable
 fun UpdateYoutubeAlbum (browseId: String) {
     var album by persist<Album?>("album/$browseId/album")
-    var albumPage by persist<Innertube.PlaylistOrAlbumPage?>("album/$browseId/albumPage")
+    var albumPage by persist<Environment.PlaylistOrAlbumPage?>("album/$browseId/albumPage")
     val tabIndex by rememberSaveable {mutableStateOf(0)}
     LaunchedEffect(browseId) {
         Database
@@ -76,7 +76,7 @@ fun UpdateYoutubeAlbum (browseId: String) {
 
                 if (albumPage == null && (currentAlbum?.timestamp == null || tabIndex == 1)) {
                     withContext(Dispatchers.IO) {
-                        Innertube.albumPage(BrowseBody(browseId = browseId))
+                        Environment.albumPage(BrowseBody(browseId = browseId))
                             ?.onSuccess { currentAlbumPage ->
                                 albumPage = currentAlbumPage
 
@@ -97,7 +97,7 @@ fun UpdateYoutubeAlbum (browseId: String) {
                                     currentAlbumPage
                                         ?.songsPage
                                         ?.items
-                                        ?.map(Innertube.SongItem::asMediaItem)
+                                        ?.map(Environment.SongItem::asMediaItem)
                                         ?.onEach(Database::insert)
                                         ?.mapIndexed { position, mediaItem ->
                                             SongAlbumMap(

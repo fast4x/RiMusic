@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
@@ -55,6 +56,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
@@ -64,21 +66,28 @@ import coil.compose.AsyncImage
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
+import it.fast4x.rimusic.appContext
 import it.fast4x.rimusic.cleanPrefix
 import it.fast4x.rimusic.colorPalette
+import it.fast4x.rimusic.context
 import it.fast4x.rimusic.enums.BackgroundProgress
 import it.fast4x.rimusic.enums.MiniPlayerType
 import it.fast4x.rimusic.enums.NavRoutes
+import it.fast4x.rimusic.enums.PopupType
+import it.fast4x.rimusic.service.MyDownloadHelper
 import it.fast4x.rimusic.service.modern.PlayerServiceModern
 import it.fast4x.rimusic.thumbnailShape
 import it.fast4x.rimusic.typography
 import it.fast4x.rimusic.ui.components.themed.NowPlayingSongIndicator
 import it.fast4x.rimusic.ui.components.themed.SmartMessage
+import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
 import it.fast4x.rimusic.ui.styling.Dimensions
+import it.fast4x.rimusic.ui.styling.collapsedPlayerProgressBar
 import it.fast4x.rimusic.ui.styling.favoritesIcon
 import it.fast4x.rimusic.ui.styling.favoritesOverlay
 import it.fast4x.rimusic.ui.styling.px
 import it.fast4x.rimusic.utils.DisposableListener
+import it.fast4x.rimusic.utils.addToYtLikedSong
 import it.fast4x.rimusic.utils.backgroundProgressKey
 import it.fast4x.rimusic.utils.conditional
 import it.fast4x.rimusic.utils.disableClosingPlayerSwipingDownKey
@@ -88,6 +97,7 @@ import it.fast4x.rimusic.utils.getLikedIcon
 import it.fast4x.rimusic.utils.getUnlikedIcon
 import it.fast4x.rimusic.utils.intent
 import it.fast4x.rimusic.utils.isExplicit
+import it.fast4x.rimusic.utils.isNetworkConnected
 import it.fast4x.rimusic.utils.mediaItemToggleLike
 import it.fast4x.rimusic.utils.miniPlayerTypeKey
 import it.fast4x.rimusic.utils.playNext
@@ -97,7 +107,10 @@ import it.fast4x.rimusic.utils.rememberPreference
 import it.fast4x.rimusic.utils.semiBold
 import it.fast4x.rimusic.utils.shouldBePlaying
 import it.fast4x.rimusic.utils.thumbnail
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @androidx.annotation.OptIn(UnstableApi::class)
@@ -168,12 +181,20 @@ fun MiniPlayer(
 
     LaunchedEffect(updateLike) {
         if (updateLike) {
-            mediaItemToggleLike(mediaItem)
+            if (!isNetworkConnected(appContext()) && isYouTubeSyncEnabled()) {
+                SmartMessage(appContext().resources.getString(R.string.no_connection), context = appContext(), type = PopupType.Error)
+            } else if (!isYouTubeSyncEnabled()){
+                mediaItemToggleLike(mediaItem)
+                if (likedAt == null)
+                    SmartMessage(context.resources.getString(R.string.added_to_favorites), context = context)
+                else
+                    SmartMessage(context.resources.getString(R.string.removed_from_favorites), context = context)
+            } else {
+                CoroutineScope(Dispatchers.IO).launch {
+                    addToYtLikedSong(mediaItem)
+                }
+            }
             updateLike = false
-            if (likedAt == null)
-                SmartMessage(context.resources.getString(R.string.added_to_favorites), context = context)
-            else
-                SmartMessage(context.resources.getString(R.string.removed_from_favorites), context = context)
         }
     }
 
@@ -394,34 +415,40 @@ fun MiniPlayer(
                         .size(24.dp)
                 )
 
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(playPauseRoundness))
-                        .clickable {
-                            if (shouldBePlaying) {
-                                binder.callPause({})
-                                //binder.player.pause()
-                            } else {
-                                if (binder.player.playbackState == Player.STATE_IDLE) {
-                                    binder.player.prepare()
-                                }
-                                binder.player.play()
-                            }
-                            if (effectRotationEnabled) isRotated = !isRotated
-                        }
-                        .background(colorPalette().background2)
-                        .size(42.dp)
-                ) {
-                    Image(
-                        painter = painterResource(if (shouldBePlaying) R.drawable.pause else R.drawable.play),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(colorPalette().iconButtonPlayer),
+                if (positionAndDuration.second != C.TIME_UNSET) {
+                    Box(
                         modifier = Modifier
-                            .rotate(rotationAngle)
-                            .align(Alignment.Center)
-                            .size(24.dp)
-                    )
-                }
+                            .clip(RoundedCornerShape(playPauseRoundness))
+                            .clickable {
+                                if (shouldBePlaying) {
+                                    binder.callPause({})
+                                    //binder.player.pause()
+                                } else {
+                                    if (binder.player.playbackState == Player.STATE_IDLE) {
+                                        binder.player.prepare()
+                                    }
+                                    binder.player.play()
+                                }
+                                if (effectRotationEnabled) isRotated = !isRotated
+                            }
+                            .background(colorPalette().background2)
+                            .size(42.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(if (shouldBePlaying) R.drawable.pause else R.drawable.play),
+                            contentDescription = null,
+                            colorFilter = ColorFilter.tint(colorPalette().iconButtonPlayer),
+                            modifier = Modifier
+                                .rotate(rotationAngle)
+                                .align(Alignment.Center)
+                                .size(24.dp)
+                        )
+                    }
+                } else CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = colorPalette().collapsedPlayerProgressBar
+                )
+
                if (miniPlayerType == MiniPlayerType.Essential)
                 it.fast4x.rimusic.ui.components.themed.IconButton(
                     icon = R.drawable.play_skip_forward,

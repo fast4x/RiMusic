@@ -142,7 +142,7 @@ import dev.chrisbanes.haze.HazeDefaults
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.haze
 import dev.chrisbanes.haze.hazeChild
-import it.fast4x.innertube.models.NavigationEndpoint
+import it.fast4x.environment.models.NavigationEndpoint
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.LocalPlayerServiceBinder
 import it.fast4x.rimusic.R
@@ -179,7 +179,6 @@ import it.fast4x.rimusic.ui.components.themed.ConfirmationDialog
 import it.fast4x.rimusic.ui.components.themed.DefaultDialog
 import it.fast4x.rimusic.ui.components.themed.DownloadStateIconButton
 import it.fast4x.rimusic.ui.components.themed.IconButton
-import it.fast4x.rimusic.ui.components.themed.MiniPlayerMenu
 import it.fast4x.rimusic.ui.components.themed.NowPlayingSongIndicator
 import it.fast4x.rimusic.ui.components.themed.PlayerMenu
 import it.fast4x.rimusic.ui.components.themed.RotateThumbnailCoverAnimationModern
@@ -234,7 +233,6 @@ import it.fast4x.rimusic.utils.horizontalFadingEdge
 import it.fast4x.rimusic.utils.isDownloadedSong
 import it.fast4x.rimusic.utils.isExplicit
 import it.fast4x.rimusic.utils.isLandscape
-import it.fast4x.rimusic.utils.jumpPreviousKey
 import it.fast4x.rimusic.utils.manageDownload
 import it.fast4x.rimusic.utils.mediaItems
 import it.fast4x.rimusic.utils.miniQueueExpandedKey
@@ -252,7 +250,6 @@ import it.fast4x.rimusic.utils.queueDurationExpandedKey
 import it.fast4x.rimusic.utils.queueLoopTypeKey
 import it.fast4x.rimusic.utils.queueTypeKey
 import it.fast4x.rimusic.utils.rememberPreference
-import it.fast4x.rimusic.utils.resize
 import it.fast4x.rimusic.utils.seamlessPlay
 import it.fast4x.rimusic.utils.semiBold
 import it.fast4x.rimusic.utils.setQueueLoopState
@@ -850,9 +847,9 @@ fun Player(
 
         //val context = LocalContext.current
         //println("Player before getting dynamic color ${dynamicColorPalette}")
-        println("Player url mediaitem ${mediaItem.mediaMetadata.artworkUri}")
-        println("Player url binder ${binder.player.currentWindow?.mediaItem?.mediaMetadata?.artworkUri}")
-        val isSystemDarkMode = isSystemInDarkTheme()
+        //println("Player url mediaitem ${mediaItem.mediaMetadata.artworkUri}")
+        //println("Player url binder ${binder.player.currentWindow?.mediaItem?.mediaMetadata?.artworkUri}")
+        //val isSystemDarkMode = isSystemInDarkTheme()
         LaunchedEffect(mediaItem.mediaId, updateBrush) {
             if (playerBackgroundColors == PlayerBackgroundColors.CoverColorGradient ||
                 playerBackgroundColors == PlayerBackgroundColors.CoverColor ||
@@ -1475,9 +1472,12 @@ fun Player(
                                     modifier = Modifier
                                         .padding(vertical = 7.5.dp)
                                         .weight(0.07f)
+                                        .conditional(pagerStateQueue.currentPage == binder.player.currentMediaItemIndex){padding(horizontal = 3.dp)}
                                 ) {
                                     Icon(
-                                        painter = painterResource(id = if (pagerStateQueue.settledPage >= binder.player.currentMediaItemIndex) R.drawable.chevron_forward else R.drawable.chevron_back),
+                                        painter = painterResource(id = if (pagerStateQueue.currentPage > binder.player.currentMediaItemIndex) R.drawable.chevron_forward
+                                                                       else if (pagerStateQueue.currentPage == binder.player.currentMediaItemIndex) R.drawable.play
+                                                                       else R.drawable.chevron_back),
                                         contentDescription = null,
                                         modifier = Modifier
                                             .size(25.dp)
@@ -1525,8 +1525,15 @@ fun Player(
                                                 onLongClick = {
                                                     if (index < mediaItems.size) {
                                                         binder.player.addNext(
-                                                            binder.player.getMediaItemAt(index + 1)
+                                                            binder.player.getMediaItemAt(index)
                                                         )
+                                                        scope.launch {
+                                                            if (!appRunningInBackground) {
+                                                                pagerStateQueue.animateScrollToPage(binder.player.currentMediaItemIndex + 1)
+                                                            } else {
+                                                                pagerStateQueue.scrollToPage(binder.player.currentMediaItemIndex + 1)
+                                                            }
+                                                        }
                                                         SmartMessage(
                                                             context.resources.getString(R.string.addednext),
                                                             type = PopupType.Info,
@@ -1564,6 +1571,7 @@ fun Player(
                                             horizontalAlignment = Alignment.CenterHorizontally,
                                             modifier = Modifier
                                                 .height(40.dp)
+                                                .fillMaxWidth()
                                         ) {
                                             Box(
 
@@ -1935,6 +1943,9 @@ fun Player(
                                             binder = binder,
                                             onClosePlayer = {
                                                 onDismiss()
+                                            },
+                                            onInfo = {
+                                                navController.navigate("${NavRoutes.videoOrSongInfo.name}/${mediaItem.mediaId}")
                                             },
                                             disableScrollingText = disableScrollingText
                                         )
@@ -2924,6 +2935,9 @@ fun Player(
                                                     binder = binder,
                                                     onClosePlayer = {
                                                         onDismiss()
+                                                    },
+                                                    onInfo = {
+                                                        navController.navigate("${NavRoutes.videoOrSongInfo.name}/${mediaItem.mediaId}")
                                                     },
                                                     disableScrollingText = disableScrollingText
                                                 )

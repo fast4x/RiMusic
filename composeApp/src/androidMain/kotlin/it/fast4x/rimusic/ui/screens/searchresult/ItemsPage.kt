@@ -23,8 +23,8 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import it.fast4x.compose.persist.persist
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.utils.plus
+import it.fast4x.environment.Environment
+import it.fast4x.environment.utils.plus
 import it.fast4x.rimusic.enums.NavigationBarPosition
 import it.fast4x.rimusic.ui.components.ShimmerHost
 import it.fast4x.rimusic.ui.components.themed.FloatingActionsContainerWithScrollToTop
@@ -38,7 +38,7 @@ import it.fast4x.rimusic.typography
 
 @ExperimentalAnimationApi
 @Composable
-inline fun <T : Innertube.Item> ItemsPage(
+inline fun <T : Environment.Item> ItemsPage(
     tag: String,
     crossinline headerContent: @Composable (textButton: (@Composable () -> Unit)?) -> Unit,
     crossinline itemContent: @Composable LazyItemScope.(T) -> Unit,
@@ -47,13 +47,13 @@ inline fun <T : Innertube.Item> ItemsPage(
     initialPlaceholderCount: Int = 8,
     continuationPlaceholderCount: Int = 3,
     emptyItemsText: String = "No items found",
-    noinline itemsPageProvider: (suspend (String?) -> Result<Innertube.ItemsPage<T>?>?)? = null,
+    noinline itemsPageProvider: (suspend (String?) -> Result<Environment.ItemsPage<T>?>?)? = null,
 ) {
     val updatedItemsPageProvider by rememberUpdatedState(itemsPageProvider)
 
     val lazyListState = rememberLazyListState()
 
-    var itemsPage by persist<Innertube.ItemsPage<T>?>(tag)
+    var itemsPage by persist<Environment.ItemsPage<T>?>(tag)
 
     LaunchedEffect(lazyListState, updatedItemsPageProvider) {
         val currentItemsPageProvider = updatedItemsPageProvider ?: return@LaunchedEffect
@@ -67,7 +67,7 @@ inline fun <T : Innertube.Item> ItemsPage(
                 }?.onSuccess {
                     if (it == null) {
                         if (itemsPage == null) {
-                            itemsPage = Innertube.ItemsPage(null, null)
+                            itemsPage = Environment.ItemsPage(null, null)
                         }
                     } else {
                         itemsPage += it
@@ -104,7 +104,7 @@ inline fun <T : Innertube.Item> ItemsPage(
 
             items(
                 items = itemsPage?.items ?: emptyList(),
-                key = Innertube.Item::key,
+                key = Environment.Item::key,
                 itemContent = itemContent
             )
 

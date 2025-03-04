@@ -233,6 +233,7 @@ fun FilterMenu (
     onDismiss: () -> Unit,
     onAll: (() -> Unit)? = null,
     onOnlineSongs: (() -> Unit)? = null,
+    onYoutubeLibrary: (() -> Unit)? = null,
     onVideos: (() -> Unit)? = null,
     onLocal: (() -> Unit)? = null,
     onFavorites: (() -> Unit)? = null,
@@ -293,6 +294,17 @@ fun FilterMenu (
                 }
             )
         }
+        onYoutubeLibrary?.let {
+            MenuEntry(
+                icon = R.drawable.ytmusic,
+                text = stringResource(R.string.ytm_library),
+                onClick = {
+                    onDismiss()
+                    onYoutubeLibrary()
+                }
+            )
+        }
+
         onVideos?.let {
             MenuEntry(
                 icon = R.drawable.video,

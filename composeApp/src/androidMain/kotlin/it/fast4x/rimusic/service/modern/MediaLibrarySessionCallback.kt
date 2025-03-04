@@ -24,10 +24,10 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
 import dagger.hilt.android.qualifiers.ApplicationContext
-import it.fast4x.innertube.Innertube
-import it.fast4x.innertube.models.bodies.SearchBody
-import it.fast4x.innertube.requests.searchPage
-import it.fast4x.innertube.utils.from
+import it.fast4x.environment.Environment
+import it.fast4x.environment.models.bodies.SearchBody
+import it.fast4x.environment.requests.searchPage
+import it.fast4x.environment.utils.from
 import it.fast4x.rimusic.Database
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.cleanPrefix
@@ -111,12 +111,12 @@ class MediaLibrarySessionCallback @Inject constructor(
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         println("PlayerServiceModern MediaLibrarySessionCallback.onGetSearchResult: $query")
         runBlocking(Dispatchers.IO) {
-            searchedSongs = Innertube.searchPage(
+            searchedSongs = Environment.searchPage(
                 body = SearchBody(
                     query = query,
-                    params = Innertube.SearchFilter.Song.value
+                    params = Environment.SearchFilter.Song.value
                 ),
-                fromMusicShelfRendererContent = Innertube.SongItem.Companion::from
+                fromMusicShelfRendererContent = Environment.SongItem.Companion::from
             )?.map {
                 it?.items?.map { it.asSong }
             }?.getOrNull() ?: emptyList()

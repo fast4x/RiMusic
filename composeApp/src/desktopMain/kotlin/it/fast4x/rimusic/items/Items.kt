@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import database.entities.Album
 import database.entities.SongEntity
-import it.fast4x.innertube.Innertube
+import it.fast4x.environment.Environment
 import it.fast4x.rimusic.MONTHLY_PREFIX
 import it.fast4x.rimusic.PINNED_PREFIX
 import it.fast4x.rimusic.PIPED_PREFIX
@@ -160,7 +160,7 @@ fun SongItem(
 
 @Composable
 fun SongItem(
-    song: Innertube.SongItem,
+    song: Environment.SongItem,
     isDownloaded: Boolean = false,
     onDownloadClick: () -> Unit = {},
     thumbnailSizeDp: Dp = 50.dp,
@@ -301,7 +301,7 @@ fun AlbumItem(
 
 @Composable
 fun AlbumItem(
-    album: Innertube.AlbumItem,
+    album: Environment.AlbumItem,
     yearCentered: Boolean? = true,
     thumbnailSizeDp: Dp,
     modifier: Modifier = Modifier,
@@ -410,7 +410,7 @@ fun ArtistItem(
 
 @Composable
 fun ArtistItem(
-    artist: Innertube.ArtistItem,
+    artist: Environment.ArtistItem,
     //thumbnailSizePx: Int,
     thumbnailSizeDp: Dp,
     modifier: Modifier = Modifier,
@@ -594,7 +594,7 @@ fun PlaylistItem(
 
 @Composable
 fun PlaylistItem(
-    playlist: Innertube.PlaylistItem,
+    playlist: Environment.PlaylistItem,
     thumbnailSizeDp: Dp,
     modifier: Modifier = Modifier,
     alternative: Boolean = false,
@@ -614,7 +614,7 @@ fun PlaylistItem(
 
 @Composable
 fun MoodItemColored(
-    mood: Innertube.Mood.Item,
+    mood: Environment.Mood.Item,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
