@@ -98,6 +98,7 @@ import it.fast4x.rimusic.ui.styling.LocalAppearance
 import it.fast4x.rimusic.utils.addToYtPlaylist
 import it.fast4x.rimusic.utils.autoSyncToolbutton
 import it.fast4x.rimusic.utils.autosyncKey
+import it.fast4x.rimusic.utils.filterAlbums
 import it.fast4x.rimusic.utils.filterByKey
 import it.fast4x.rimusic.utils.importYTMLikedAlbums
 import it.fast4x.rimusic.utils.semiBold
@@ -182,11 +183,7 @@ fun HomeAlbums(
         val scrollIndex = lazyGridState.firstVisibleItemIndex
         val scrollOffset = lazyGridState.firstVisibleItemScrollOffset
 
-        itemsOnDisplay = items.filter {
-            it.title?.contains( search.input, true) ?: false
-                    || it.year?.contains( search.input, true) ?: false
-                    || it.authorsText?.contains( search.input, true) ?: false
-        }
+        itemsOnDisplay = filterAlbums(items, search.input)
 
         lazyGridState.scrollToItem( scrollIndex, scrollOffset )
     }

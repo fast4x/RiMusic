@@ -198,6 +198,7 @@ import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
 import it.fast4x.rimusic.utils.addToYtLikedSongs
 import it.fast4x.rimusic.utils.addToYtPlaylist
 import it.fast4x.rimusic.utils.asSong
+import it.fast4x.rimusic.utils.filterSongEntities
 import it.fast4x.rimusic.utils.formatAsDuration
 import it.fast4x.rimusic.utils.isDownloadedSong
 import it.fast4x.rimusic.utils.isNetworkConnected
@@ -316,7 +317,7 @@ fun HomeSongsModern(
     var filteredSongs = songs
 
     var filteredFolders = folders
-    var currentFolder: Folder? = null;
+    var currentFolder: Folder? = null
     var currentFolderPath by remember {
         mutableStateOf(defaultFolder)
     }
@@ -643,28 +644,15 @@ fun HomeSongsModern(
     var filterCharSequence: CharSequence
     filterCharSequence = filter.toString()
     /******** OnDeviceDev */
-    if (builtInPlaylist == BuiltInPlaylist.OnDevice) {
-        if (!filter.isNullOrBlank())
-            filteredSongs = songs
-                .filter {
-                    it.song.title.contains(filterCharSequence,true) ?: false
-                            || it.song.artistsText?.contains(filterCharSequence,true) ?: false
-                            || it.albumTitle?.contains(filterCharSequence,true) ?: false
-                }
-        if (!filter.isNullOrBlank())
+    if (!filter.isNullOrBlank())
+        if (builtInPlaylist == BuiltInPlaylist.OnDevice) {
+            filteredSongs = filterSongEntities(songs, filterCharSequence)
             filteredFolders = folders
                 .filter {
                     it.name.contains(filterCharSequence,true)
                 }
-    } else {
-        if (!filter.isNullOrBlank())
-            items = items
-                .filter {
-                    it.song.title.contains(filterCharSequence,true) ?: false
-                            || it.song.artistsText?.contains(filterCharSequence,true) ?: false
-                            || it.albumTitle?.contains(filterCharSequence,true) ?: false
-                }
-    }
+        } else
+            items = filterSongEntities(items, filterCharSequence)
     /******** */
 
     var searching by rememberSaveable { mutableStateOf(false) }
@@ -1737,7 +1725,7 @@ fun HomeSongsModern(
                                                         thumbnailSizeDp = thumbnailSizeDp,
                                                         disableScrollingText = disableScrollingText
                                                     )
-                                                };
+                                                }
                                                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                             },
                                             onClick = {

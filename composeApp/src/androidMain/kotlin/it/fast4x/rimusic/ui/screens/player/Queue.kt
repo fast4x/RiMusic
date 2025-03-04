@@ -148,6 +148,7 @@ import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
 import it.fast4x.rimusic.utils.addToYtPlaylist
 import it.fast4x.rimusic.utils.asSong
 import it.fast4x.rimusic.utils.enqueue
+import it.fast4x.rimusic.utils.filterWindowSongs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import java.text.SimpleDateFormat
@@ -402,13 +403,7 @@ fun Queue(
         var filterCharSequence: CharSequence
         filterCharSequence = filter.toString()
         if (!filter.isNullOrBlank())
-            windowsFiltered = windowsFiltered
-                .filter {
-                    it.mediaItem.mediaMetadata.title?.contains(filterCharSequence, true) ?: false ||
-                            it.mediaItem.mediaMetadata.artist?.contains(filterCharSequence, true) ?: false ||
-                            it.mediaItem.mediaMetadata.albumTitle?.contains(filterCharSequence, true) ?: false ||
-                            it.mediaItem.mediaMetadata.albumArtist?.contains(filterCharSequence, true) ?: false
-                }
+            windowsFiltered = filterWindowSongs(windows, filterCharSequence)
 
         Column {
             Box(
