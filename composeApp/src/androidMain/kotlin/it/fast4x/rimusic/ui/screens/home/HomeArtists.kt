@@ -170,7 +170,7 @@ fun HomeArtists(
         val scrollOffset = lazyGridState.firstVisibleItemScrollOffset
 
         itemsOnDisplay = items.filter {
-            it.name?.contains( search.input, true ) ?: false // TODO, sort by genre perhaps.
+            it.name?.contains( search.input, true ) ?: false
         }
 
         lazyGridState.scrollToItem( scrollIndex, scrollOffset )

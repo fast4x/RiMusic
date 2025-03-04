@@ -169,7 +169,7 @@ fun HomeDiscovery(
                 var newReleaseAlbumsFiltered by persistList<Environment.AlbumItem>("discovery/newalbumsartist")
                 page.newReleaseAlbums.forEach { album ->
                     preferitesArtists.forEach { artist ->
-                        if (artist.name == album.authors?.first()?.name) { // TODO, only searches first author
+                        if (artist.name == album.authors?.first()?.name) {
                             newReleaseAlbumsFiltered += album
                             //Log.d("mediaItem","artst ok")
                         }

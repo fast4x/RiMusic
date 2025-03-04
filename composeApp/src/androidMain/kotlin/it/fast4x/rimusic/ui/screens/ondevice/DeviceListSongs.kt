@@ -277,7 +277,7 @@ fun DeviceListSongs(
         if (!filter.isNullOrBlank())
             filteredFolders = folders
                 .filter {
-                    it.name.contains(filterCharSequence,true) // TODO OperatorSearch
+                    it.name.contains(filterCharSequence,true)
                 }
 
         var searching by rememberSaveable { mutableStateOf(false) }
