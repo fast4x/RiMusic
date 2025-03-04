@@ -18,7 +18,6 @@ data class Token(val field: String, val value: String,
                  val shouldInclude: Boolean, val valueType: String? = null)
 
 /*
-    TODO explicit operator (?)
     TODO OR localization
     TODO do songs don't have year.
 */
@@ -31,19 +30,23 @@ fun parseSearchQuery(query: String): List<List<Token>> {
     // Find all the search tokens.
     regex.findAll(query).forEach { match ->
         val (neg1, field1, quoted1, neg2, field2, value2, neg3, value3) = match.destructured
-
         val include = !(neg1 == "-" || neg2 == "-" || neg3 == "-")
-
         val field = field1.ifEmpty { field2.ifEmpty { "" } }
         val value = quoted1.ifEmpty { value2.ifEmpty { value3 } }
-
-        // By default, everything is AND (original behavior). This lets OR work.
+        // By default, everything is AND (original behavior). Separate groups based on OR placement.
         if (value.equals("OR", ignoreCase = true) || value == "|") {
             tokens.add(currentGroup)
             currentGroup = mutableListOf()
         } else {
-            val valueType = if (value.contains("-") && value.contains(":")) "DurationRange"
-                else if (value.contains("-")) "IntRange" else null
+            val valueType = when {
+                value.contains("-") -> when {
+                    value.contains(":") -> "DurationRange"
+                    else -> "IntRange"
+                }
+                value.equals(context()
+                    .getString(R.string.explicit).lowercase(), ignoreCase = true) -> "ExplicitValue"
+                else -> null
+            }
             currentGroup.add(Token(field.lowercase(), value, include, valueType))
         }
     }
@@ -65,15 +68,7 @@ fun isWithinDurationRange(duration: String, range: String): Boolean {
     return durationTextToMillis(duration) in min..max == true
 }
 
-fun getSearchFields(metadataFields: Map<String, String>, token: Token) =
-    if (metadataFields.containsKey(token.field)) {
-        listOf(metadataFields[token.field] ?: "")
-    } else {
-        metadataFields.values
-    }
-
 var tokensCache: Pair<String, List<List<Token>>>? = null
-
 fun filterMediaMetadata(metadata: MediaMetadata, filter: String): Boolean {
     val filterTrim = filter.trim()
     if (filterTrim.isBlank()) return true // Default should let everything be shown.
@@ -89,23 +84,29 @@ fun filterMediaMetadata(metadata: MediaMetadata, filter: String): Boolean {
     tokensCache = filter to tokenGroups
 
     // Map labels to what the correspond to.
-    val metadataFields = mapOf(
+    val metadataFields: Map<String, String> = mapOf(
         context().getString(R.string.sort_title).lowercase() to (metadata.title.toString()),
         context().getString(R.string.sort_artist).lowercase() to (metadata.artist.toString()),
         context().getString(R.string.sort_duration).lowercase()
                 to (metadata.extras?.getString("durationText").toString()),
         context().getString(R.string.explicit).lowercase()
-                to (metadata.extras?.getString("explicit").toString()),
+                to (metadata.extras?.getString(EXPLICIT_BUNDLE_TAG) ?: "false"),
         context().getString(R.string.sort_album).lowercase() to (metadata.albumTitle.toString()),
         context().getString(R.string.sort_year).lowercase() to (metadata.releaseYear.toString()),
     )
 
     val included = tokenGroups.any { group ->
         group.all { token ->
-            getSearchFields(metadataFields, token).any {
+            val searchFields = if (metadataFields.containsKey(token.field)) {
+                listOf(metadataFields[token.field] ?: "")
+            } else {
+                metadataFields.values
+            }
+            searchFields.any {
                 val groupApplies = when(token.valueType) {
                     "IntRange" -> isWithinIntRange(it, token.value)
                     "DurationRange" -> isWithinDurationRange(it, token.value)
+                    "ExplicitValue" -> metadata.extras?.getString(EXPLICIT_BUNDLE_TAG).toBoolean()
                     else -> it.contains(token.value, ignoreCase = true)
                 }
                 groupApplies == token.shouldInclude
