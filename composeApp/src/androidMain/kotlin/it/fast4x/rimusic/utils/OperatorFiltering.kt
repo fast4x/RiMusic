@@ -99,7 +99,7 @@ fun filterMediaMetadata(metadata: MediaMetadata, filter: String): Boolean {
         context().getString(R.string.sort_duration).lowercase()
                 to (metadata.extras?.getString("durationText").toString()),
         context().getString(R.string.explicit).lowercase()
-                to (metadata.extras?.getString(EXPLICIT_BUNDLE_TAG) ?: "false"),
+                to (metadata.extras?.getBoolean(EXPLICIT_BUNDLE_TAG) == true).toString(),
         context().getString(R.string.sort_album).lowercase() to (metadata.albumTitle.toString()),
         context().getString(R.string.sort_year).lowercase() to (metadata.releaseYear.toString()),
     )
@@ -115,7 +115,7 @@ fun filterMediaMetadata(metadata: MediaMetadata, filter: String): Boolean {
                 val groupApplies = when(token.valueType) {
                     "IntRange" -> isWithinIntRange(it, token.value)
                     "DurationRange" -> isWithinDurationRange(it, token.value)
-                    "ExplicitValue" -> metadata.extras?.getString(EXPLICIT_BUNDLE_TAG).toBoolean()
+                    "ExplicitValue" -> metadata.extras?.getBoolean(EXPLICIT_BUNDLE_TAG)
                     else -> it.contains(token.value, ignoreCase = true)
                 }
                 groupApplies == token.shouldInclude
