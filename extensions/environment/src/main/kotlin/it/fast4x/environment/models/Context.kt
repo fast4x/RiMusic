@@ -89,7 +89,6 @@ data class Context(
         )
 
 
-        //val hl = if (LocalePreferences.preference?.useLocale == true) LocalePreferences.preference!!.hl else ""
         val hl = LocalePreferences.preference?.hl
         //val gl = LocalePreferences.preference?.gl
 

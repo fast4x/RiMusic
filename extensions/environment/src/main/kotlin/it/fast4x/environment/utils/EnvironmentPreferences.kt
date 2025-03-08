@@ -2,11 +2,16 @@ package it.fast4x.environment.utils
 
 object EnvironmentPreferences {
     var preference: EnvironmentPreferenceItem? = null
-    var cookie: String? = null
-    var visitordata: String? = null
-    var dataSyncId: String? = null
-    var dnsOverHttps: String? = null
+//    var cookie: String? = null
+//    var visitordata: String? = null
+//    var dataSyncId: String? = null
+//    var dnsOverHttps: String? = null
+//    var customDnsOverHttps: String? = null
 }
+
+//fun getDns(dnsOverHttps: String?): String? {
+//    return dnsOverHttps
+//}
 
 data class EnvironmentPreferenceItem(
     var p0: String? = null,
@@ -51,7 +56,5 @@ data class EnvironmentPreferenceItem(
     var p39: String? = null,
     var p40: String? = null,
     var p41: String? = null,
-
-
 
 )

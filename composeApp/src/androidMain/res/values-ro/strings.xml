@@ -937,4 +937,6 @@
     <string name="loudness_boost_level_info">Nivelul suplimentar de zgomot, care trebuie utilizat fără a exagera, poate deteriora dispozitivul</string>
     <string name="export_crash_log">Exportă jurnalul erorilor</string>
     <string name="export_log">Exportă jurnalul</string>
+    <string name="value_must_be_valid_url">Value must be a valid url</string>
+    <string name="caching">Caching...</string>
 </resources>

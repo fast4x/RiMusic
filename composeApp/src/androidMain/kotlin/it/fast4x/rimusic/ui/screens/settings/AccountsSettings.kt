@@ -20,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -70,7 +69,6 @@ import it.fast4x.rimusic.utils.RestartActivity
 import it.fast4x.rimusic.utils.RestartPlayerService
 import it.fast4x.rimusic.utils.bold
 import it.fast4x.rimusic.utils.discordPersonalAccessTokenKey
-import it.fast4x.rimusic.utils.enableYouTubeHistorySyncKey
 import it.fast4x.rimusic.utils.enableYouTubeLoginKey
 import it.fast4x.rimusic.utils.enableYouTubeSyncKey
 import it.fast4x.rimusic.utils.isAtLeastAndroid7
@@ -156,7 +154,6 @@ fun AccountsSettings() {
         var useYtLoginOnlyForBrowse by rememberPreference(useYtLoginOnlyForBrowseKey, true)
         var isYouTubeLoginEnabled by rememberPreference(enableYouTubeLoginKey, false)
         var isYouTubeSyncEnabled by rememberPreference(enableYouTubeSyncKey, false)
-        var isYouTubeHistorySyncEnabled by rememberPreference(enableYouTubeHistorySyncKey, false)
         var loginYouTube by remember { mutableStateOf(false) }
         var visitorData by rememberPreference(key = ytVisitorDataKey, defaultValue = "")
         var dataSyncId by rememberPreference(key = ytDataSyncIdKey, defaultValue = "")
@@ -361,17 +358,6 @@ fun AccountsSettings() {
                 )
 
                 //RestartActivity(restartActivity, onRestart = { restartActivity = false })
-
-                // TODO MANAGE SYNC HISTORY
-//                SwitchSettingEntry(
-//                    //isEnabled = false,
-//                    title = "Sync playback history with YTM account",
-//                    text = "",
-//                    isChecked = isYouTubeHistorySyncEnabled,
-//                    onCheckedChange = {
-//                        isYouTubeHistorySyncEnabled = it
-//                    }
-//                )
 
             }
         }

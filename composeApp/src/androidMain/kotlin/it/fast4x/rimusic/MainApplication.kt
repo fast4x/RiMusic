@@ -23,16 +23,17 @@ class MainApplication : Application(), ImageLoaderFactory {
         //DatabaseInitializer()
         Dependencies.init(this)
 
+        /***** CRASH LOG ALWAYS ENABLED *****/
+        val dir = filesDir.resolve("logs").also {
+            if (it.exists()) return@also
+            it.mkdir()
+        }
+        Thread.setDefaultUncaughtExceptionHandler(CaptureCrash(dir.absolutePath))
+        /***** CRASH LOG ALWAYS ENABLED *****/
+
         /**** LOG *********/
         val logEnabled = preferences.getBoolean(logDebugEnabledKey, false)
         if (logEnabled) {
-            val dir = filesDir.resolve("logs").also {
-                if (it.exists()) return@also
-                it.mkdir()
-            }
-
-            Thread.setDefaultUncaughtExceptionHandler(CaptureCrash(dir.absolutePath))
-
             Timber.plant(FileLoggingTree(File(dir, "RiMusic_log.txt")))
             Timber.d("Log enabled at ${dir.absolutePath}")
         } else {
@@ -44,6 +45,13 @@ class MainApplication : Application(), ImageLoaderFactory {
 
     override fun newImageLoader(): ImageLoader {
         val coilCustomDiskCache = preferences.getInt(coilCustomDiskCacheKey, 128) * 1000 * 1000L
+        val coilDiskCacheMaxSize = preferences.getEnum(coilDiskCacheMaxSizeKey,CoilDiskCacheMaxSize.`128MB`)
+        val coilCacheSize = when (coilDiskCacheMaxSize) {
+            CoilDiskCacheMaxSize.Custom -> coilCustomDiskCache
+            else -> coilDiskCacheMaxSize.bytes
+        }
+
+
         return ImageLoader.Builder(this)
             .crossfade(true)
             .networkCachePolicy(CachePolicy.ENABLED)
@@ -64,14 +72,8 @@ class MainApplication : Application(), ImageLoaderFactory {
                 DiskCache.Builder()
                     .directory(filesDir.resolve("coil"))
                     .maxSizeBytes(
-                        when (val size =
-                            preferences.getEnum(
-                                coilDiskCacheMaxSizeKey,
-                                CoilDiskCacheMaxSize.`128MB`
-                            )) {
-                            CoilDiskCacheMaxSize.Custom -> coilCustomDiskCache
-                            else -> size.bytes
-                        }
+                        if (coilCacheSize == 0L) CoilDiskCacheMaxSize.`128MB`.bytes
+                        else coilCacheSize
                     )
                     .build()
             )

@@ -110,6 +110,7 @@ import it.fast4x.rimusic.utils.color
 import it.fast4x.rimusic.utils.conditional
 import it.fast4x.rimusic.utils.enqueue
 import it.fast4x.rimusic.utils.fadingEdge
+import it.fast4x.rimusic.utils.forcePlay
 import it.fast4x.rimusic.utils.forcePlayAtIndex
 import it.fast4x.rimusic.utils.getDownloadState
 import it.fast4x.rimusic.utils.isDownloadedSong
@@ -690,19 +691,21 @@ fun ArtistOverviewModern(
                                                                 ?.items
                                                                 ?.map{ it as Environment.SongItem }
                                                                 ?.map { it.asMediaItem }
-                                                            val filteredArtistSongs = artistSongs?.filter {Database.getLikedAt(it.mediaId) != -1L}
-                                                            if (filteredArtistSongs != null) {
-                                                                if (item.asMediaItem in filteredArtistSongs){
+
+                                                                val filteredArtistSongs = artistSongs
+                                                                ?.filter { it.mediaId != Database.songDisliked(it.mediaId) }
+
+                                                                //if (artistSongs?.contains(item.asMediaItem) == false){
                                                                     withContext(Dispatchers.Main) {
-                                                                        binder?.player?.forcePlayAtIndex(
-                                                                            filteredArtistSongs,
-                                                                            filteredArtistSongs.indexOf(item.asMediaItem)
-                                                                        )
+                                                                        binder?.player?.forcePlay(item.asMediaItem)
+                                                                        if (filteredArtistSongs != null) {
+                                                                            binder?.player?.addMediaItems(filteredArtistSongs.filterNot { it.mediaId == item.key })
+                                                                        }
                                                                     }
-                                                                } else {
-                                                                    SmartMessage(context.resources.getString(R.string.disliked_this_song),type = PopupType.Error, context = context)
-                                                                }
-                                                            }
+//                                                                } else {
+//                                                                    SmartMessage(context.resources.getString(R.string.disliked_this_song),type = PopupType.Error, context = context)
+//                                                                }
+
                                                         }
                                                     }
                                                 }

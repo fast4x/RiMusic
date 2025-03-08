@@ -451,7 +451,7 @@ class PlayerService : InvincibleService(),
         }
 
         cache = SimpleCache(directory, cacheEvictor, StandaloneDatabaseProvider(this))
-        downloadCache = MyDownloadHelper.getDownloadSimpleCache(applicationContext) as SimpleCache
+        downloadCache = MyDownloadHelper.getDownloadCache(applicationContext) as SimpleCache
 
         player = ExoPlayer.Builder(this, createRendersFactory(), createMediaSourceFactory())
             //.setRenderersFactory(DefaultRenderersFactory(this).setEnableDecoderFallback(true))

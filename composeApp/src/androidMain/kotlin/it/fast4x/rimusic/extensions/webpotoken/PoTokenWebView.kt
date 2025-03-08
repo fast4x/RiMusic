@@ -309,7 +309,12 @@ class PoTokenWebView private constructor(
                     "x-user-agent" to "grpc-web-javascript/0.1",
                 ).toHeaders())
                 .url(url)
-            val response = httpClient.newCall(requestBuilder.build()).execute()
+            val response = try {
+                httpClient.newCall(requestBuilder.build()).execute()
+            } catch (e: Exception) {
+                Timber.e(e)
+                return@runCatching ""
+            }
             return@runCatching response.body!!.string()
         }
 

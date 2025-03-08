@@ -234,7 +234,9 @@ import it.fast4x.rimusic.utils.autoDownloadSongWhenAlbumBookmarkedKey
 import it.fast4x.rimusic.utils.autoDownloadSongWhenLikedKey
 import it.fast4x.rimusic.utils.bassboostEnabledKey
 import it.fast4x.rimusic.utils.bassboostLevelKey
+import it.fast4x.rimusic.utils.customDnsOverHttpsServerKey
 import it.fast4x.rimusic.utils.dnsOverHttpsTypeKey
+import it.fast4x.rimusic.utils.enablePreCacheKey
 import it.fast4x.rimusic.utils.getSystemlanguage
 import it.fast4x.rimusic.utils.handleAudioFocusEnabledKey
 import it.fast4x.rimusic.utils.isConnectionMeteredEnabledKey
@@ -276,6 +278,7 @@ fun GeneralSettings(
     var volumeNormalization by rememberPreference(volumeNormalizationKey, false)
     var audioQualityFormat by rememberPreference(audioQualityFormatKey, AudioQualityFormat.Auto)
     var isConnectionMeteredEnabled by rememberPreference(isConnectionMeteredEnabledKey, true)
+    var isPreCacheEnabled by rememberPreference(enablePreCacheKey, false)
 
     var useDnsOverHttpsType by rememberPreference(dnsOverHttpsTypeKey, DnsOverHttpsType.Google)
 
@@ -356,6 +359,7 @@ fun GeneralSettings(
     var proxyHost by rememberPreference(proxyHostnameKey, "")
     var proxyPort by rememberPreference(proxyPortKey, 1080)
     var proxyMode by rememberPreference(proxyModeKey, Proxy.Type.HTTP)
+    var customDnsOverHttpsServer by rememberPreference(customDnsOverHttpsServerKey, "")
 
     Column(
         modifier = Modifier
@@ -470,8 +474,29 @@ fun GeneralSettings(
                 },
                 valueText = { it.textName }
             )
+
+            AnimatedVisibility(visible = useDnsOverHttpsType == DnsOverHttpsType.Custom) {
+                Column(modifier = Modifier.padding(start = 16.dp)) {
+                    TextDialogSettingEntry(
+                        title = "Custom dns over https server",
+                        text = customDnsOverHttpsServer,
+                        currentText = customDnsOverHttpsServer,
+                        onTextSave = {
+                            customDnsOverHttpsServer = it
+                            restartActivity = true
+                        },
+                        validationType = ValidationType.Url
+                    )
+                    RestartActivity(restartActivity, onRestart = { restartActivity = false })
+                }
+
+            }
+
             SettingsDescription(text = "If you have loading problems, you can use an alternative dns server")
-            RestartActivity(restartActivity, onRestart = { restartActivity = false })
+            if (useDnsOverHttpsType != DnsOverHttpsType.Custom)
+                RestartActivity(restartActivity, onRestart = { restartActivity = false })
+
+
         }
 
         //SettingsEntryGroupText(title = stringResource(R.string.proxy))
@@ -546,6 +571,21 @@ fun GeneralSettings(
             RestartPlayerService(restartService, onRestart = { restartService = false } )
 
         }
+
+        if (search.input.isBlank() || "Pre Cache the whole song at once".contains(search.input,true)) {
+            SwitchSettingEntry(
+                title = "Pre Cache the whole song at once",
+                text = "Songs will be cached in parts if this is disabled",
+                isChecked = isPreCacheEnabled,
+                onCheckedChange = {
+                    isPreCacheEnabled = it
+                    restartService = true
+                }
+            )
+            RestartPlayerService(restartService, onRestart = { restartService = false } )
+        }
+
+        SettingsGroupSpacer()
 
         if (search.input.isBlank() || stringResource(R.string.jump_previous).contains(search.input,true)) {
             BasicText(

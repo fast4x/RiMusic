@@ -2,6 +2,7 @@ package it.fast4x.environment.utils
 
 import io.ktor.http.URLBuilder
 import io.ktor.http.parseQueryString
+import io.ktor.util.toMap
 import it.fast4x.environment.Environment
 import it.fast4x.environment.models.Context
 import it.fast4x.environment.models.PlayerResponse
@@ -76,6 +77,7 @@ object NewPipeUtils {
         runCatching {
             val url = format.url ?: format.signatureCipher?.let { signatureCipher ->
                 val params = parseQueryString(signatureCipher)
+                println("NewPipe getStreamUrl params ${params.toMap().map { it.key }}")
                 val obfuscatedSignature = params["s"]
                     ?: throw ParsingException("Could not parse cipher signature")
                 val signatureParam = params["sp"]
@@ -87,6 +89,7 @@ object NewPipeUtils {
                         videoId,
                         obfuscatedSignature
                     )
+                println("NewPipe getStreamUrl url.parameters ${url.parameters.entries().map { it.key }}")
                 url.toString()
             } ?: throw ParsingException("Could not find format url")
 
@@ -102,6 +105,7 @@ object NewPipeUtils {
     ): String? =
         try {
             val params = parseQueryString(signatureCipher)
+            println("NewPipe decodeSignatureCipher params $params")
             val obfuscatedSignature = params["s"] ?: throw ParsingException("Could not parse cipher signature")
             val signatureParam = params["sp"] ?: throw ParsingException("Could not parse cipher signature parameter")
             val url = params["url"]?.let { URLBuilder(it) } ?: throw ParsingException("Could not parse cipher url")

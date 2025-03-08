@@ -937,4 +937,6 @@
     <string name="loudness_boost_level_info">Додатковий рівень гучності (не зловживайте, оскільки це може пошкодити пристрій)</string>
     <string name="export_crash_log">Експорт журналу збоїв</string>
     <string name="export_log">Експорт журналу</string>
+    <string name="value_must_be_valid_url">Value must be a valid url</string>
+    <string name="caching">Caching...</string>
 </resources>

@@ -937,4 +937,6 @@
     <string name="loudness_boost_level_info">Tingkat kenyaringan tambahan, untuk digunakan tanpa berlebihan, dapat merusak perangkat</string>
     <string name="export_crash_log">Ekspor log kerusakan</string>
     <string name="export_log">Ekspor Log</string>
+    <string name="value_must_be_valid_url">Value must be a valid url</string>
+    <string name="caching">Caching...</string>
 </resources>

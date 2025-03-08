@@ -938,4 +938,6 @@
     <string name="export_crash_log">Export crash log</string>
     <string name="export_log">Export log</string>
     <string name="playlist_description">playlist description</string>
+    <string name="value_must_be_valid_url">Value must be a valid url</string>
+    <string name="caching">Caching...</string>
 </resources>

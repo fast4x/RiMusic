@@ -115,4 +115,3 @@ fun parseCookieString(cookie: String): Map<String, String> =
 
 fun ByteArray.toHex(): String = joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 fun sha1(str: String): String = MessageDigest.getInstance("SHA-1").digest(str.toByteArray()).toHex()
-

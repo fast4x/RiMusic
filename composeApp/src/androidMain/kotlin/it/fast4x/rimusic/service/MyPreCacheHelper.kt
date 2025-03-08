@@ -21,10 +21,12 @@ import coil.imageLoader
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import it.fast4x.rimusic.Database
+import it.fast4x.rimusic.appContext
 import it.fast4x.rimusic.cleanPrefix
 import it.fast4x.rimusic.enums.AudioQualityFormat
 import it.fast4x.rimusic.models.SongEntity
 import it.fast4x.rimusic.utils.DownloadSyncedLyrics
+import it.fast4x.rimusic.utils.asDataSource
 import it.fast4x.rimusic.utils.asSong
 import it.fast4x.rimusic.utils.audioQualityFormatKey
 import it.fast4x.rimusic.utils.autoDownloadSongKey
@@ -33,6 +35,7 @@ import it.fast4x.rimusic.utils.autoDownloadSongWhenLikedKey
 import it.fast4x.rimusic.utils.download
 import it.fast4x.rimusic.utils.getEnum
 import it.fast4x.rimusic.utils.preferences
+import it.fast4x.rimusic.utils.principalCache
 import it.fast4x.rimusic.utils.removeDownload
 import it.fast4x.rimusic.utils.thumbnail
 import kotlinx.coroutines.CancellationException
@@ -50,12 +53,12 @@ import java.io.File
 import java.util.concurrent.Executors
 
 @UnstableApi
-object MyDownloadHelper {
+object MyPreCacheHelper {
     private val executor = Executors.newCachedThreadPool()
     private val coroutineScope = CoroutineScope(
         executor.asCoroutineDispatcher() +
                 SupervisorJob() +
-                CoroutineName("MyDownloadService-Executor-Scope")
+                CoroutineName("MyPreCacheService-Executor-Scope")
     )
 
     // While the class is not a singleton (lifecycle), there should only be one download state at a time
@@ -64,15 +67,17 @@ object MyDownloadHelper {
 //    private val downloadQueue =
 //        Channel<DownloadManager>(onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
-    const val DOWNLOAD_NOTIFICATION_CHANNEL_ID = "download_channel"
+    const val DOWNLOAD_NOTIFICATION_CHANNEL_ID = "precache_channel"
 
-    private const val DOWNLOAD_CONTENT_DIRECTORY = "downloads"
+    val databaseProvider: DatabaseProvider by lazy {
+        principalCache.getDatabaseProvider(appContext())
+    }
 
-    private lateinit var databaseProvider: DatabaseProvider
-    lateinit var downloadCache: Cache
+    val cache: SimpleCache by lazy {
+        principalCache.getInstance(appContext())
+    }
 
     private lateinit var downloadNotificationHelper: DownloadNotificationHelper
-    private lateinit var downloadDirectory: File
     private lateinit var downloadManager: DownloadManager
     lateinit var audioQualityFormat: AudioQualityFormat
 
@@ -99,7 +104,7 @@ object MyDownloadHelper {
 
     @Synchronized
     fun getDownloadNotificationHelper(context: Context?): DownloadNotificationHelper {
-        if (!MyDownloadHelper::downloadNotificationHelper.isInitialized) {
+        if (!MyPreCacheHelper::downloadNotificationHelper.isInitialized) {
             downloadNotificationHelper =
                 DownloadNotificationHelper(context!!, DOWNLOAD_NOTIFICATION_CHANNEL_ID)
         }
@@ -112,41 +117,16 @@ object MyDownloadHelper {
         return downloadManager
     }
 
-    /*
-        @Synchronized
-        fun getDownloadTracker(context: Context): DownloadTracker {
-            ensureDownloadManagerInitialized(context)
-            return downloadTracker
-        }
-
-     */
-
-    @Synchronized
-    fun getDownloadCache(context: Context): Cache {
-        if (!MyDownloadHelper::downloadCache.isInitialized) {
-            val downloadContentDirectory =
-                File(getDownloadDirectory(context), DOWNLOAD_CONTENT_DIRECTORY)
-            downloadCache = SimpleCache(
-                downloadContentDirectory,
-                NoOpCacheEvictor(),
-                getDatabaseProvider(context)
-            )
-        }
-        return downloadCache
-    }
-
-
-
     @Synchronized
     private fun ensureDownloadManagerInitialized(context: Context) {
         audioQualityFormat =
             context.preferences.getEnum(audioQualityFormatKey, AudioQualityFormat.Auto)
 
-        if (!MyDownloadHelper::downloadManager.isInitialized) {
+        if (!MyPreCacheHelper::downloadManager.isInitialized) {
             downloadManager = DownloadManager(
                 context,
-                getDatabaseProvider(context),
-                getDownloadCache(context),
+                databaseProvider,
+                cache,
                 createDataSourceFactory(),
                 //Executor(Runnable::run)
                 executor
@@ -155,25 +135,25 @@ object MyDownloadHelper {
                 minRetryCount = 2
                 requirements = Requirements(Requirements.NETWORK)
 
-                addListener(
-                    object : DownloadManager.Listener {
-
-                        override fun onDownloadChanged(
-                            downloadManager: DownloadManager,
-                            download: Download,
-                            finalException: Exception?
-                        ) = run {
-                            syncDownloads(download)
-                        }
-
-                        override fun onDownloadRemoved(
-                            downloadManager: DownloadManager,
-                            download: Download
-                        ) = run {
-                            syncDownloads(download)
-                        }
-                    }
-                )
+//                addListener(
+//                    object : DownloadManager.Listener {
+//
+//                        override fun onDownloadChanged(
+//                            downloadManager: DownloadManager,
+//                            download: Download,
+//                            finalException: Exception?
+//                        ) = run {
+//                            syncDownloads(download)
+//                        }
+//
+//                        override fun onDownloadRemoved(
+//                            downloadManager: DownloadManager,
+//                            download: Download
+//                        ) = run {
+//                            syncDownloads(download)
+//                        }
+//                    }
+//                )
             }
 
             //downloadTracker =
@@ -190,25 +170,12 @@ object MyDownloadHelper {
         }
     }
 
-    @Synchronized
-    private fun getDatabaseProvider(context: Context): DatabaseProvider {
-        if (!MyDownloadHelper::databaseProvider.isInitialized) databaseProvider =
-            StandaloneDatabaseProvider(context)
-        return databaseProvider
-    }
-
-    @Synchronized
-    fun getDownloadDirectory(context: Context): File {
-        if (!MyDownloadHelper::downloadDirectory.isInitialized) {
-            downloadDirectory = context.getExternalFilesDir(null) ?: context.filesDir
-            downloadDirectory.resolve(DOWNLOAD_CONTENT_DIRECTORY).also { directory ->
-                if (directory.exists()) return@also
-                directory.mkdir()
-            }
-            //Log.d("downloadMedia", downloadDirectory.path)
-        }
-        return downloadDirectory
-    }
+//    @Synchronized
+//    private fun getDatabaseProvider(context: Context): DatabaseProvider {
+//        if (!MyPreCacheHelper::databaseProvider.isInitialized) databaseProvider =
+//            StandaloneDatabaseProvider(context)
+//        return databaseProvider
+//    }
 
     fun addDownload(context: Context, mediaItem: MediaItem) {
         if (mediaItem.isLocal) return
@@ -239,11 +206,11 @@ object MyDownloadHelper {
 //            )
 
         coroutineScope.launch {
-            context.download<MyDownloadService>(downloadRequest).exceptionOrNull()?.let {
+            context.download<MyPreCacheService>(downloadRequest).exceptionOrNull()?.let {
                 if (it is CancellationException) throw it
 
-                Timber.e("MyDownloadHelper scheduleDownload exception ${it.stackTraceToString()}")
-                println("MyDownloadHelper scheduleDownload exception ${it.stackTraceToString()}")
+                Timber.e("MyPreCacheService scheduleDownload exception ${it.stackTraceToString()}")
+                println("MyPreCacheService scheduleDownload exception ${it.stackTraceToString()}")
             }
             DownloadSyncedLyrics(it = SongEntity(mediaItem.asSong), coroutineScope = coroutineScope)
             context.imageLoader.execute(
@@ -265,46 +232,11 @@ object MyDownloadHelper {
 
         //sendRemoveDownload(context,MyDownloadService::class.java,mediaItem.mediaId,false)
         coroutineScope.launch {
-            context.removeDownload<MyDownloadService>(mediaItem.mediaId).exceptionOrNull()?.let {
+            context.removeDownload<MyPreCacheService>(mediaItem.mediaId).exceptionOrNull()?.let {
                 if (it is CancellationException) throw it
 
                 Timber.e(it.stackTraceToString())
-                println("MyDownloadHelper removeDownload exception ${it.stackTraceToString()}")
-            }
-        }
-    }
-
-    fun resumeDownloads(context: Context) {
-        DownloadService.sendResumeDownloads(
-            context,
-            MyDownloadService::class.java,
-            false
-        )
-    }
-
-    fun autoDownload(context: Context, mediaItem: MediaItem) {
-        if (context.preferences.getBoolean(autoDownloadSongKey, false)) {
-            if (downloads.value[mediaItem.mediaId]?.state != Download.STATE_COMPLETED)
-                addDownload(context, mediaItem)
-        }
-    }
-
-    fun autoDownloadWhenLiked(context: Context, mediaItem: MediaItem) {
-        if (context.preferences.getBoolean(autoDownloadSongWhenLikedKey, false)) {
-            Database.asyncQuery {
-                if (getLikedAt(mediaItem.mediaId) !in listOf(-1L,null)) {
-                    autoDownload(context, mediaItem)
-                } else {
-                    removeDownload(context, mediaItem)
-                }
-            }
-        }
-    }
-
-    fun autoDownloadWhenAlbumBookmarked(context: Context, mediaItems: List<MediaItem>) {
-        if (context.preferences.getBoolean(autoDownloadSongWhenAlbumBookmarkedKey, false)) {
-            mediaItems.forEach { mediaItem ->
-                autoDownload(context, mediaItem)
+                println("MyPreCacheHelper removeDownload exception ${it.stackTraceToString()}")
             }
         }
     }

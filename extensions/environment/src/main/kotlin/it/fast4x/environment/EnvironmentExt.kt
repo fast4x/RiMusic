@@ -19,6 +19,7 @@ import it.fast4x.environment.requests.HomePage
 import it.fast4x.environment.requests.NewReleaseAlbumPage
 import it.fast4x.environment.requests.PlaylistContinuationPage
 import it.fast4x.environment.requests.PlaylistPage
+import kotlin.random.Random
 
 object EnvironmentExt {
 
@@ -29,40 +30,40 @@ object EnvironmentExt {
     suspend fun createPlaylist(title: String) = runCatching {
         Environment.createPlaylist(Context.DefaultWeb.client, title).body<CreatePlaylistResponse>().playlistId
     }.onFailure {
-        println("YtMusic createPlaylist error: ${it.stackTraceToString()}")
+        println("EnvironmentExt createPlaylist error: ${it.stackTraceToString()}")
     }
 
     suspend fun deletePlaylist(playlistId: String) = runCatching {
         Environment.deletePlaylist(Context.DefaultWeb.client, playlistId)
     }.onFailure {
-        println("YtMusic deletePlaylist error: ${it.stackTraceToString()}")
+        println("EnvironmentExt deletePlaylist error: ${it.stackTraceToString()}")
     }
 
     suspend fun renamePlaylist(playlistId: String, name: String) = runCatching {
         Environment.renamePlaylist(Context.DefaultWeb.client, playlistId, name)
     }.onFailure {
-        println("YtMusic renamePlaylist error: ${it.stackTraceToString()}")
+        println("EnvironmentExt renamePlaylist error: ${it.stackTraceToString()}")
     }
 
     suspend fun addToPlaylist(playlistId: String, videoId: String) = runCatching {
         Environment.addToPlaylist(Context.DefaultWeb.client, playlistId, videoId)
     }.onFailure {
-        println("YtMusic addToPlaylist(single) error: ${it.stackTraceToString()}")
+        println("EnvironmentExt addToPlaylist(single) error: ${it.stackTraceToString()}")
     }
 
     suspend fun addToPlaylist(playlistId: String, videoIds: List<String>) = runCatching {
         val requestedVideoIds = videoIds.take(PLAYLIST_SIZE_LIMIT)
         val difference = videoIds.size - requestedVideoIds.size
         if (difference > 0) {
-            println("YtMusic addToPlaylist warning: only adding (at most) $PLAYLIST_SIZE_LIMIT ids, (surpassed limit by $difference)")
+            println("EnvironmentExt addToPlaylist warning: only adding (at most) $PLAYLIST_SIZE_LIMIT ids, (surpassed limit by $difference)")
         }
         Environment.addToPlaylist(Context.DefaultWeb.client, playlistId, requestedVideoIds)
     }.onFailure {
-        println("YtMusic addToPlaylist (list of size ${videoIds.size}) error: ${it.stackTraceToString()}")
+        println("EnvironmentExt addToPlaylist (list of size ${videoIds.size}) error: ${it.stackTraceToString()}")
     }
 
     suspend fun removeFromPlaylist(playlistId: String, videoId: String, setVideoId: String? = null) = runCatching {
-        println("YtMusic removeFromPlaylist params: playlistId: $playlistId, videoId: $videoId, setVideoId: $setVideoId")
+        println("EnvironmentExt removeFromPlaylist params: playlistId: $playlistId, videoId: $videoId, setVideoId: $setVideoId")
             Environment.removeFromPlaylist(Context.DefaultWeb.client, playlistId, videoId, setVideoId)
         }.onFailure {
             println("YtMusic removeFromPlaylist error: ${it.stackTraceToString()}")
@@ -71,62 +72,62 @@ object EnvironmentExt {
     suspend fun addPlaylistToPlaylist(playlistId: String, videoId: String) = runCatching {
         Environment.addPlaylistToPlaylist(Context.DefaultWeb.client, playlistId, videoId)
     }.onFailure {
-        println("YtMusic addPlaylistToPlaylist error: ${it.stackTraceToString()}")
+        println("EnvironmentExt addPlaylistToPlaylist error: ${it.stackTraceToString()}")
     }
 
     suspend fun removeFromPlaylist(playlistId: String, videoId: String, setVideoIds: List<String?>) = runCatching {
         Environment.removeFromPlaylist(Context.DefaultWeb.client, playlistId, videoId, setVideoIds)
     }.onFailure {
-        println("YtMusic removeFromPlaylist (list of size ${setVideoIds.size}) error: ${it.stackTraceToString()}")
+        println("EnvironmentExt removeFromPlaylist (list of size ${setVideoIds.size}) error: ${it.stackTraceToString()}")
     }
 
     suspend fun subscribeChannel(channelId: String) = runCatching {
-        println("YtMusic subscribeChannel channelId: $channelId")
+        println("EnvironmentExt subscribeChannel channelId: $channelId")
         Environment.subscribeChannel(channelId)
     }.onFailure {
         println("YtMusic subscribeChannel error: ${it.stackTraceToString()}")
     }
 
     suspend fun unsubscribeChannel(channelId: String) = runCatching {
-        println("YtMusic unsubscribeChannel channelId: $channelId")
+        println("EnvironmentExt unsubscribeChannel channelId: $channelId")
         Environment.unsubscribeChannel(channelId)
     }.onFailure {
-        println("YtMusic unsubscribeChannel error: ${it.stackTraceToString()}")
+        println("EnvironmentExt unsubscribeChannel error: ${it.stackTraceToString()}")
     }
 
     suspend fun likePlaylistOrAlbum(playlistId: String) = runCatching {
-        println("YtMusic likePlaylistOrAlbum playlistId: $playlistId")
+        println("EnvironmentExt likePlaylistOrAlbum playlistId: $playlistId")
         Environment.likePlaylistOrAlbum(playlistId)
     }.onFailure {
-        println("YtMusic likePlaylistOrAlbum error: ${it.stackTraceToString()}")
+        println("EnvironmentExt likePlaylistOrAlbum error: ${it.stackTraceToString()}")
     }
 
     suspend fun removelikePlaylistOrAlbum(playlistId: String) = runCatching {
-        println("YtMusic removelikePlaylistOrAlbum playlistId: $playlistId")
+        println("EnvironmentExt removelikePlaylistOrAlbum playlistId: $playlistId")
         Environment.removelikePlaylistOrAlbum(playlistId)
     }.onFailure {
-        println("YtMusic removelikePlaylistOrAlbum error: ${it.stackTraceToString()}")
+        println("EnvironmentExt removelikePlaylistOrAlbum error: ${it.stackTraceToString()}")
     }
 
     suspend fun likeVideoOrSong(VideoId: String) = runCatching {
-        println("YtMusic likeVideoOrSong VideoId: $VideoId")
+        println("EnvironmentExt likeVideoOrSong VideoId: $VideoId")
         Environment.likeVideoOrSong(VideoId)
     }.onFailure {
-        println("YtMusic likeVideoOrSong error: ${it.stackTraceToString()}")
+        println("EnvironmentExt likeVideoOrSong error: ${it.stackTraceToString()}")
     }
 
     suspend fun removelikeVideoOrSong(VideoId: String) = runCatching {
-        println("YtMusic removelikeVideoOrSong playlistIdId: $VideoId")
+        println("EnvironmentExt removelikeVideoOrSong playlistIdId: $VideoId")
         Environment.removelikeVideoOrSong(VideoId)
     }.onFailure {
-        println("YtMusic removelikeVideoOrSong error: ${it.stackTraceToString()}")
+        println("EnvironmentExt removelikeVideoOrSong error: ${it.stackTraceToString()}")
     }
 
     suspend fun getHomePage(setLogin: Boolean = false): Result<HomePage> = runCatching {
 
         var response = Environment.browse(browseId = "FEmusic_home", setLogin = setLogin).body<BrowseResponse>()
 
-        println("homePage() response sections: ${response.contents?.singleColumnBrowseResultsRenderer?.tabs?.firstOrNull()
+        println("EnvironmentExt homePage() response sections: ${response.contents?.singleColumnBrowseResultsRenderer?.tabs?.firstOrNull()
             ?.tabRenderer?.content?.sectionListRenderer?.contents}" )
 
 
@@ -140,10 +141,10 @@ object EnvironmentExt {
                 HomePage.Section.fromMusicCarouselShelfRenderer(it)
             }.toMutableList()
         while (continuation != null) {
-            println("gethomePage() continuation before:  ${continuation}" )
+            println("EnvironmentExt gethomePage() continuation before:  ${continuation}" )
             response = Environment.browse(continuation = continuation).body<BrowseResponse>()
             continuation = response.continuationContents?.sectionListContinuation?.continuations?.getContinuation()
-            println("gethomePage() continuation after:  ${continuation}" )
+            println("EnvironmentExt gethomePage() continuation after:  ${continuation}" )
 
             sections += response.continuationContents?.sectionListContinuation?.contents
                 ?.mapNotNull { it.musicCarouselShelfRenderer }
@@ -160,7 +161,7 @@ object EnvironmentExt {
         val response = Environment.browse(browseId = "FEmusic_history", setLogin = setLogin)
             .body<BrowseResponse>()
 
-        println("getHistory() response sections: ${response.contents?.singleColumnBrowseResultsRenderer?.tabs?.firstOrNull()
+        println("EnvironmentExt getHistory() response sections: ${response.contents?.singleColumnBrowseResultsRenderer?.tabs?.firstOrNull()
             ?.tabRenderer?.content?.sectionListRenderer?.contents}" )
 
         HistoryPage(
@@ -209,7 +210,7 @@ object EnvironmentExt {
     suspend fun getArtistItemsPage(endpoint: BrowseEndpoint): Result<ArtistItemsPage> = runCatching {
         val response = Environment.browse(browseId = endpoint.browseId, params = endpoint.params).body<BrowseResponse>()
 
-        println("getArtistItemsPage() response continuation: " +
+        println("EnvironmentExt getArtistItemsPage() response continuation: " +
                 "${
                     response.contents?.singleColumnBrowseResultsRenderer?.tabs?.firstOrNull()
                         ?.tabRenderer?.content?.sectionListRenderer?.contents?.firstOrNull()
@@ -252,12 +253,12 @@ object EnvironmentExt {
             )
         }
     }.onFailure {
-        println("YtMusic getArtistItemsPage() error: ${it.stackTraceToString()}")
+        println("EnvironmentExt getArtistItemsPage() error: ${it.stackTraceToString()}")
     }
 
     suspend fun getPlaylist(playlistId: String): Result<PlaylistPage> = runCatching {
         val playlistIdChecked = if (playlistId.startsWith("VL")) playlistId else "VL$playlistId"
-        println("YtMusic getPlaylist playlistId: $playlistId Checked: $playlistIdChecked")
+        println("EnvironmentExt getPlaylist playlistId: $playlistId Checked: $playlistIdChecked")
         val response = Environment.browse(
             browseId = playlistIdChecked,
             setLogin = true
@@ -269,7 +270,7 @@ object EnvironmentExt {
         else
             getPlaylistNewMode(playlistIdChecked, response)
     }.onFailure {
-        println("YtMusic getPlaylist error: ${it.stackTraceToString()}")
+        println("EnvironmentExt getPlaylist error: ${it.stackTraceToString()}")
     }
 
     private fun getPlaylistPreviousMode(playlistId: String, response: BrowseResponse): PlaylistPage {
@@ -332,7 +333,7 @@ object EnvironmentExt {
             ?.tabRenderer?.content?.sectionListRenderer?.contents?.firstOrNull()
             ?.musicEditablePlaylistDetailHeaderRenderer != null
 
-        println("getPlaylist new mode editable : ${isEditable}")
+        println("EnvironmentExt getPlaylist new mode editable : ${isEditable}")
 
 //        println("getPlaylist new mode description: ${response.contents?.twoColumnBrowseResultsRenderer?.tabs?.firstOrNull()
 //            ?.tabRenderer?.content?.sectionListRenderer?.contents?.firstOrNull()?.musicResponsiveHeaderRenderer?.description?.musicDescriptionShelfRenderer?.description}")
@@ -387,7 +388,7 @@ object EnvironmentExt {
             setLogin = true
         ).body<BrowseResponse>()
 
-        println("YtMusic getPlaylistContinuation response: ${response.onResponseReceivedActions?.firstOrNull()
+        println("EnvironmentExt getPlaylistContinuation response: ${response.onResponseReceivedActions?.firstOrNull()
             ?.appendContinuationItemsAction?.continuationItems?.lastOrNull()?.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token}")
 
 //        response.continuationContents?.musicPlaylistShelfContinuation?.contents?.mapNotNull {
@@ -420,7 +421,7 @@ object EnvironmentExt {
         }
 
     }.onFailure {
-        println("YtMusic getPlaylistContinuation error: ${it.stackTraceToString()}")
+        println("EnvironmentExt getPlaylistContinuation error: ${it.stackTraceToString()}")
     }
 
     suspend fun getArtistItemsContinuation(continuation: String) = runCatching {
@@ -449,7 +450,7 @@ object EnvironmentExt {
         }
 
     }.onFailure {
-        println("YtMusic getArtistItemsContinuation error: ${it.stackTraceToString()}")
+        println("EnvironmentExt getArtistItemsContinuation error: ${it.stackTraceToString()}")
     }
 
     suspend fun getAlbum(browseId: String, withSongs: Boolean = true): Result<AlbumPage> = runCatching {
@@ -510,7 +511,7 @@ object EnvironmentExt {
         val songs = contents?.mapNotNull {
             it.musicResponsiveListItemRenderer?.let { it1 -> AlbumPage.getSong(it1) }
         }
-        println("mediaItem getAlbumSongs songs: $songs")
+        println("EnvironmentExt getAlbumSongs songs: $songs")
         songs!!
     }
 
@@ -518,8 +519,29 @@ object EnvironmentExt {
         val response = Environment.getVideoOrSongInfo(videoId)
         return response
     }.onFailure {
-        println("YtMusic getVideOrSongInfo error: ${it.stackTraceToString()}")
+        println("EnvironmentExt getVideOrSongInfo error: ${it.stackTraceToString()}")
     }
 
+    suspend fun addPlaybackToHistory(playlistId: String? = null, playbackTracking: String) = runCatching {
+        val cpn = (1..16).map {
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"[Random.Default.nextInt(
+                0,
+                64
+            )]
+        }.joinToString("")
+
+        val playbackUrl = playbackTracking.replace(
+            "https://s.youtube.com",
+            "https://music.youtube.com",
+        )
+
+        Environment.addPlaybackToHistory(
+            url = playbackUrl,
+            playlistId = playlistId,
+            cpn = cpn
+        )
+    }.onFailure {
+        println("EnvironmentExt addPlaybackToHistory error: ${it.stackTraceToString()}")
+    }
 
 }

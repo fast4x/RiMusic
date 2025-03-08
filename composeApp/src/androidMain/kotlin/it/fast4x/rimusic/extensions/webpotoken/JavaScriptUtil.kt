@@ -11,7 +11,11 @@ import okio.ByteString.Companion.toByteString
  * embedded in a JavaScript snippet.
  */
 fun parseChallengeData(rawChallengeData: String): String {
-    val scrambled = JsonParser.array().from(rawChallengeData)
+    val scrambled = try {
+        JsonParser.array().from(rawChallengeData)
+    } catch (t: Throwable) {
+        return JsonWriter.string(rawChallengeData)
+    }
 
     val challengeData = if (scrambled.size > 1 && scrambled.isString(1)) {
         val descrambled = descramble(scrambled.getString(1))

@@ -499,9 +499,9 @@ fun OtherSettings() {
             }
         )
         ButtonBarSettingEntry(
-            isEnabled = logDebugEnabled,
+            //isEnabled = logDebugEnabled,
             title = stringResource(R.string.export_crash_log),
-            text = "",
+            text = "Is always enabled",
             icon = R.drawable.export,
             onClick = {
                 exportCrashlog = true

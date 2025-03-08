@@ -502,7 +502,7 @@
     <string name="info_reorder_is_possible_only_in_ascending_sort">Reorder is possible only in ascending sort</string>
     <string name="information">जानकारी</string>
     <string name="info_lyrics_found_on_s">बोल मिल गये %s पर </string>
-    <string name="info_lyrics_not_found_on_s_try_on_s"></string>
+    <string name="info_lyrics_not_found_on_s_try_on_s">Lyrics not found on %s, try on %s</string>
     <string name="info_lyrics_not_found_on_s">Lyrics not found on %s</string>
     <string name="info_lyrics_tracks_found_on_s">Lyrics tracks found on %s</string>
     <string name="info_lyrics_tracks_not_found_on_s">Lyrics tracks not found on %s</string>
@@ -937,4 +937,6 @@
     <string name="loudness_boost_level_info">Additional loudness level, to be used without overdoing it, may damage the device</string>
     <string name="export_crash_log">Export crash log</string>
     <string name="export_log">Export log</string>
+    <string name="value_must_be_valid_url">Value must be a valid url</string>
+    <string name="caching">Caching...</string>
 </resources>

@@ -937,4 +937,6 @@
     <string name="loudness_boost_level_info">Eine Erhöhung des Lautstärkepegels kann das Gerät beschädigen und sollte nicht übertrieben werden</string>
     <string name="export_crash_log">Absturzprotokoll exportieren</string>
     <string name="export_log">Protokoll exportieren</string>
+    <string name="value_must_be_valid_url">Value must be a valid url</string>
+    <string name="caching">Caching...</string>
 </resources>

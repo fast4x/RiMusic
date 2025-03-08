@@ -1361,6 +1361,9 @@ interface Database {
     @Query("SELECT likedAt FROM Song WHERE id = :songId")
     fun getLikedAt(songId: String): Long?
 
+    @Query("SELECT id FROM Song WHERE id = :songId AND likedAt < 0")
+    fun songDisliked(songId: String): String?
+
     @Query("UPDATE Album SET bookmarkedAt = :bookmarkedAt WHERE id = :id")
     fun bookmarkAlbum(id: String, bookmarkedAt: Long?): Int
 

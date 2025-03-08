@@ -135,30 +135,25 @@ suspend fun getAvancedInnerTubeStream(
             when(playerResponse.second?.playabilityStatus?.status) {
                 "OK" -> {
                     // SELECT FORMAT BY ITAG
-                    when (audioQualityFormat) {
-                        AudioQualityFormat.Auto -> if (connectionMetered && isConnectionMeteredEnabled()) playerResponse.second?.streamingData?.mediumQualityFormat
-                        else playerResponse.second?.streamingData?.autoMaxQualityFormat
-                        AudioQualityFormat.High -> playerResponse.second?.streamingData?.highestQualityFormat
-                        AudioQualityFormat.Medium -> playerResponse.second?.streamingData?.mediumQualityFormat
-                        AudioQualityFormat.Low -> playerResponse.second?.streamingData?.lowestQualityFormat
-                    }
+//                    when (audioQualityFormat) {
+//                        AudioQualityFormat.Auto -> if (connectionMetered && isConnectionMeteredEnabled()) playerResponse.second?.streamingData?.mediumQualityFormat
+//                        else playerResponse.second?.streamingData?.autoMaxQualityFormat
+//                        AudioQualityFormat.High -> playerResponse.second?.streamingData?.highestQualityFormat
+//                        AudioQualityFormat.Medium -> playerResponse.second?.streamingData?.mediumQualityFormat
+//                        AudioQualityFormat.Low -> playerResponse.second?.streamingData?.lowestQualityFormat
+//                    }
                         // *********************
 
-                        // SELECT FORMAT BY BITRATE
-//                    val selectedFormat = playerResponse.streamingData?.formats?.filter { it.isAudio }
-//                        ?: playerResponse.streamingData?.adaptiveFormats?.map { it.asFormat }?.filter { it.isAudio }
-//                    playerResponse.streamingData?.adaptiveFormats
-//                        ?.filter { it.isAudio }
-//                        ?.maxByOrNull {
-//                            ( it.bitrate?.times(
-//                                when (audioQualityFormat) {
-//                                    AudioQualityFormat.Auto -> if (!isConnectionMeteredEnabled() && !connectionMetered) 2 else 1
-//                                    AudioQualityFormat.High -> 2
-//                                    AudioQualityFormat.Medium -> 1
-//                                    AudioQualityFormat.Low -> 0
-//                                }
-//                            ) ?: 0 ) + (if (it.mimeType.startsWith("audio/webm")) 10240 else 0)
-//                        }
+                    // SELECT FORMAT BY BITRATE
+                    playerResponse.second?.streamingData?.adaptiveFormats
+                        ?.filter { it.isAudio }
+                        ?.maxByOrNull {
+                            it.bitrate * when (audioQualityFormat) {
+                                AudioQualityFormat.Auto -> if (isConnectionMeteredEnabled() && connectionMetered) -1 else 1
+                                AudioQualityFormat.High -> 1
+                                AudioQualityFormat.Medium, AudioQualityFormat.Low -> -1
+                            } + (if (it.mimeType.startsWith("audio/webm")) 10240 else 0)
+                        }
                         // *********************
 
                         .let {
@@ -249,30 +244,26 @@ suspend fun getInnerTubeStream(
             when(playerResponse.second?.playabilityStatus?.status) {
                 "OK" -> {
                     // SELECT FORMAT BY ITAG
-                    when (audioQualityFormat) {
-                        AudioQualityFormat.Auto -> if (connectionMetered && isConnectionMeteredEnabled()) playerResponse.second?.streamingData?.mediumQualityFormat
-                        else playerResponse.second?.streamingData?.autoMaxQualityFormat
-                        AudioQualityFormat.High -> playerResponse.second?.streamingData?.highestQualityFormat
-                        AudioQualityFormat.Medium -> playerResponse.second?.streamingData?.mediumQualityFormat
-                        AudioQualityFormat.Low -> playerResponse.second?.streamingData?.lowestQualityFormat
-                    }
+//                    when (audioQualityFormat) {
+//                        AudioQualityFormat.Auto -> if (connectionMetered && isConnectionMeteredEnabled()) playerResponse.second?.streamingData?.mediumQualityFormat
+//                        else playerResponse.second?.streamingData?.autoMaxQualityFormat
+//                        AudioQualityFormat.High -> playerResponse.second?.streamingData?.highestQualityFormat
+//                        AudioQualityFormat.Medium -> playerResponse.second?.streamingData?.mediumQualityFormat
+//                        AudioQualityFormat.Low -> playerResponse.second?.streamingData?.lowestQualityFormat
+//                    }
                         // *********************
 
                         // SELECT FORMAT BY BITRATE
-//                    val selectedFormat = playerResponse.streamingData?.formats?.filter { it.isAudio }
-//                        ?: playerResponse.streamingData?.adaptiveFormats?.map { it.asFormat }?.filter { it.isAudio }
-//                    playerResponse.streamingData?.adaptiveFormats
-//                        ?.filter { it.isAudio }
-//                        ?.maxByOrNull {
-//                            ( it.bitrate?.times(
-//                                when (audioQualityFormat) {
-//                                    AudioQualityFormat.Auto -> if (!isConnectionMeteredEnabled() && !connectionMetered) 2 else 1
-//                                    AudioQualityFormat.High -> 2
-//                                    AudioQualityFormat.Medium -> 1
-//                                    AudioQualityFormat.Low -> 0
-//                                }
-//                            ) ?: 0 ) + (if (it.mimeType.startsWith("audio/webm")) 10240 else 0)
-//                        }
+                    playerResponse.second?.streamingData?.adaptiveFormats
+                        ?.filter { it.isAudio }
+                        ?.maxByOrNull {
+                            it.bitrate * when (audioQualityFormat) {
+                                AudioQualityFormat.Auto -> if (isConnectionMeteredEnabled() && connectionMetered) -1 else 2
+                                AudioQualityFormat.High -> 1
+                                AudioQualityFormat.Medium -> -1
+                                AudioQualityFormat.Low -> -2
+                            } + (if (it.mimeType.startsWith("audio/webm")) 10240 else 0)
+                        }
                         // *********************
 
                         .let {

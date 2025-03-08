@@ -28,7 +28,7 @@ import io.ktor.http.userAgent
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.serialization.kotlinx.protobuf.protobuf
 import io.ktor.serialization.kotlinx.xml.xml
-import it.fast4x.environment.utils.YouTubeLocale
+import it.fast4x.environment.utils.EnvironmentLocale
 import it.fast4x.environment.models.AccountInfo
 import it.fast4x.environment.models.AccountMenuResponse
 import it.fast4x.environment.models.BrowseResponse
@@ -113,14 +113,8 @@ object Environment {
     val _XsHo8IdebO = EnvironmentPreferences.preference?.p36 ?: ""
     val _1Vv31MecRl = EnvironmentPreferences.preference?.p0 ?: ""
 
-    val getEnvironment = {
-        println("EnvironmentPreferences: ${EnvironmentPreferences}")
-    }
-
-    var dnsToUse: String? = EnvironmentPreferences.dnsOverHttps.toString()  //YoutubePreferences.preference?.dnsOverHttps.toString()
-
     @OptIn(ExperimentalSerializationApi::class)
-    val client = HttpClient(OkHttp) {
+    private fun buildClient() = HttpClient(OkHttp) {
         //BrowserUserAgent()
 
         expectSuccess = true
@@ -155,7 +149,7 @@ object Environment {
                 }
             )
 
-            if (dnsToUse != null) {
+            if (this@Environment.dnsToUse != null) {
                 val appCache = Cache(File("cacheDir", "okhttpcache"), 10 * 1024 * 1024)
                 val bootstrapClient = OkHttpClient.Builder().cache(appCache).build()
                 val googleDns = DnsOverHttps.Builder().client(bootstrapClient)
@@ -167,10 +161,15 @@ object Environment {
                 val openDns = DnsOverHttps.Builder().client(bootstrapClient)
                     .url("https://doh.opendns.com/dns-query".toHttpUrl())
                     .bootstrapDnsHosts(InetAddress.getByName("208.67.222.222"), InetAddress.getByName("208.67.220.220")).build()
-                val dns: DnsOverHttps = when (dnsToUse) {
+                val customDns = this@Environment.customDnsToUse?.let {
+                    DnsOverHttps.Builder().client(bootstrapClient)
+                        .url(it.toHttpUrl()).build()
+                } ?: googleDns
+                val dns: DnsOverHttps = when (this@Environment.dnsToUse) {
                     "google" -> googleDns
                     "cloudflare" -> cloudflareDns
                     "opendns" -> openDns
+                    "custom" -> customDns
                     else -> googleDns
                 }
 
@@ -194,24 +193,37 @@ object Environment {
         }
     }
 
+    var client = buildClient()
 
+    var dnsToUse: String? = null
+        set(value) {
+            field = value
+            client.close()
+            client = buildClient()
+        }
+    var customDnsToUse: String? = null
+        set(value) {
+            field = value
+            client.close()
+            client = buildClient()
+        }
 
     var proxy: Proxy? = null
         set(value) {
             field = value
             client.close()
-            client
+            client = buildClient()
         }
 
-    var locale = YouTubeLocale(
+    var locale = EnvironmentLocale(
         gl = Locale.getDefault().country,
         hl = Locale.getDefault().toLanguageTag()
         //gl = LocalePreferences.preference?.gl ?: "US",
         //hl = LocalePreferences.preference?.hl ?: "en"
     )
-    //var visitorData: String = YoutubePreferences.preference?.visitordata.toString()
-    var visitorData: String = EnvironmentPreferences.visitordata.toString()
-    var dataSyncId: String = EnvironmentPreferences.dataSyncId.toString()
+
+    var visitorData: String? = null
+    var dataSyncId: String? = null
 
     var cookie: String? = null
         set(value) {
@@ -320,7 +332,7 @@ object Environment {
         val durationText: String?,
         override val thumbnail: Thumbnail?
     ) : Item() {
-        override val key get() = info!!.endpoint!!.videoId!!
+        override val key get() = info?.endpoint?.videoId ?: ""
         override val title get() = info?.name
 
         val isOfficialMusicVideo: Boolean
@@ -348,7 +360,7 @@ object Environment {
         val playlistId: String? = null,
         override val thumbnail: Thumbnail?
     ) : Item() {
-        override val key get() = info!!.endpoint!!.browseId!!
+        override val key get() = info?.endpoint?.browseId ?: ""
         override val title get() = info?.name
 
         companion object
@@ -361,7 +373,7 @@ object Environment {
         val channelId: String? = null,
         override val thumbnail: Thumbnail?
     ) : Item() {
-        override val key get() = info!!.endpoint!!.browseId!!
+        override val key get() = info?.endpoint?.browseId ?: ""
         override val title get() = info?.name
 
         companion object
@@ -375,7 +387,7 @@ object Environment {
         val isEditable: Boolean?,
         override val thumbnail: Thumbnail?
     ) : Item() {
-        override val key get() = info!!.endpoint!!.browseId!!
+        override val key get() = info?.endpoint?.browseId ?: ""
         override val title get() = info?.name
 
         companion object
@@ -579,7 +591,7 @@ object Environment {
                     println("HttpRequestBuilder.setLogin visitorData ${visitorData}")
                     cookieMap = parseCookieString(cookieData)
                     append("X-Goog-Authuser", "0")
-                    append("X-Goog-Visitor-Id", visitorData)
+                    append("X-Goog-Visitor-Id", visitorData ?: "")
                     append("Cookie", cookieData)
                     if ("SAPISID" !in cookieMap || "__Secure-3PAPISID" !in cookieMap) return@let
                     val currentTime = System.currentTimeMillis() / 1000
@@ -612,7 +624,7 @@ object Environment {
                 cookie?.let { cookie ->
                     cookieMap = parseCookieString(cookie)
                     append("X-Goog-Authuser", "6")
-                    append("X-Goog-Visitor-Id", visitorData)
+                    append("X-Goog-Visitor-Id", visitorData ?: "")
                     append("cookie", cookie)
                     if ("SAPISID" !in cookieMap) return@let
                     val currentTime = System.currentTimeMillis() / 1000
@@ -1025,6 +1037,23 @@ object Environment {
             }
         }
 
+    suspend fun addPlaybackToHistory(
+        url: String,
+        cpn: String,
+        playlistId: String?,
+        clientType: Client = DefaultWeb.client
+    ) = client.get(url) {
+        setLogin(clientType, true)
+        parameter("ver", "2")
+        parameter("c", clientType.clientName)
+        parameter("cpn", cpn)
+
+        if (playlistId != null) {
+            parameter("list", playlistId)
+            parameter("referrer", "$_XsHo8IdebO/playlist?list=$playlistId")
+        }
+    }
+
     private fun HttpRequestBuilder.poHeader() {
         headers {
             header("accept", "*/*")
@@ -1131,7 +1160,7 @@ object Environment {
             println("Innertube getVisitorData New Cookie $cookie")
             println("Innertube getVisitorData Playback Tracking $playbackTracking")
             if (!visitorData.isNullOrEmpty()) this@Environment.visitorData = visitorData
-            return Triple(cookie, visitorData ?: this@Environment.visitorData, playbackTracking)
+            return Triple(cookie, visitorData ?: this@Environment.visitorData ?: "", playbackTracking)
         } catch (e: Exception) {
             e.printStackTrace()
             return Triple("", "", null)
