@@ -938,6 +938,8 @@ Volume BAS : titre précédent</string>
     <string name="dislikes">N\'aime pas</string>
     <string name="loudness_boost_level">Niveau d\'amplification du volume</string>
     <string name="loudness_boost_level_info">Niveau sonore supplémentaire (à utiliser sans exagérer car cela peut endommager l\'appareil)</string>
-    <string name="export_crash_log">Export crash log</string>
-    <string name="export_log">Export log</string>
+    <string name="export_crash_log">Exporter le journal des plantages</string>
+    <string name="export_log">Journal d\'exportation</string>
+    <string name="value_must_be_valid_url">Value must be a valid url</string>
+    <string name="caching">Caching...</string>
 </resources>

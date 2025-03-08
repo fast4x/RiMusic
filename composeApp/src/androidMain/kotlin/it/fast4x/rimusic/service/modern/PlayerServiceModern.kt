@@ -49,12 +49,10 @@ import androidx.media3.common.Timeline
 import androidx.media3.common.audio.SonicAudioProcessor
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.cache.Cache
-import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
-import androidx.media3.datasource.cache.NoOpCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
@@ -82,7 +80,9 @@ import androidx.media3.session.SessionToken
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.MoreExecutors
 import it.fast4x.environment.Environment
+import it.fast4x.environment.EnvironmentExt
 import it.fast4x.environment.models.NavigationEndpoint
+import it.fast4x.environment.models.bodies.PlayerBody
 import it.fast4x.environment.models.bodies.SearchBody
 import it.fast4x.environment.requests.searchPage
 import it.fast4x.environment.utils.from
@@ -194,11 +194,16 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import it.fast4x.rimusic.appContext
 import it.fast4x.rimusic.enums.PresetsReverb
+import it.fast4x.rimusic.extensions.webpotoken.advancedWebPoTokenPlayer
 import it.fast4x.rimusic.isHandleAudioFocusEnabled
+import it.fast4x.rimusic.isPreCacheEnabled
+import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
 import it.fast4x.rimusic.utils.asMediaItem
 import it.fast4x.rimusic.utils.audioReverbPresetKey
 import it.fast4x.rimusic.utils.bassboostEnabledKey
 import it.fast4x.rimusic.utils.bassboostLevelKey
+import it.fast4x.rimusic.utils.preCacheMedia
+import it.fast4x.rimusic.utils.principalCache
 import it.fast4x.rimusic.utils.volumeBoostLevelKey
 import timber.log.Timber
 import java.io.IOException
@@ -232,7 +237,9 @@ class PlayerServiceModern : MediaLibraryService(),
     private var mediaLibrarySessionCallback: MediaLibrarySessionCallback =
         MediaLibrarySessionCallback(this, Database, MyDownloadHelper)
     lateinit var player: ExoPlayer
-    lateinit var cache: SimpleCache
+    val cache: SimpleCache by lazy {
+        principalCache.getInstance(this)
+    }
     lateinit var downloadCache: SimpleCache
     private lateinit var audioVolumeObserver: AudioVolumeObserver
     private lateinit var bitmapProvider: BitmapProvider
@@ -349,47 +356,7 @@ class PlayerServiceModern : MediaLibraryService(),
         showLikeButton = preferences.getBoolean(showLikeButtonBackgroundPlayerKey, true)
         showDownloadButton = preferences.getBoolean(showDownloadButtonBackgroundPlayerKey, true)
 
-        val exoPlayerCustomCache = preferences.getInt(exoPlayerCustomCacheKey, 32) * 1000 * 1000L
-
-        val cacheEvictor = when (val size =
-            preferences.getEnum(exoPlayerDiskCacheMaxSizeKey, ExoPlayerDiskCacheMaxSize.`2GB`)) {
-            ExoPlayerDiskCacheMaxSize.Unlimited -> NoOpCacheEvictor()
-            ExoPlayerDiskCacheMaxSize.Custom -> LeastRecentlyUsedCacheEvictor(exoPlayerCustomCache)
-            else -> LeastRecentlyUsedCacheEvictor(size.bytes)
-        }
-
-        //val cacheEvictor = NoOpCacheEvictor()
-        val exoPlayerCacheLocation = preferences.getEnum(
-            exoPlayerCacheLocationKey, ExoPlayerCacheLocation.System
-        )
-        val directoryLocation =
-            if (exoPlayerCacheLocation == ExoPlayerCacheLocation.Private) filesDir else cacheDir
-
-        var cacheDirName = "rimusic_cache"
-
-        val cacheSize =
-            preferences.getEnum(exoPlayerDiskCacheMaxSizeKey, ExoPlayerDiskCacheMaxSize.`2GB`)
-
-        if (cacheSize == ExoPlayerDiskCacheMaxSize.Disabled) cacheDirName = "rimusic_no_cache"
-
-        val directory = directoryLocation.resolve(cacheDirName).also { dir ->
-            if (dir.exists()) return@also
-
-            dir.mkdir()
-
-            directoryLocation.listFiles()?.forEach { file ->
-                if (file.isDirectory && file.name.length == 1 && file.name.isDigitsOnly() || file.extension == "uid") {
-                    if (!file.renameTo(dir.resolve(file.name))) {
-                        file.deleteRecursively()
-                    }
-                }
-            }
-
-            filesDir.resolve("coil").deleteRecursively()
-        }
-
-        cache = SimpleCache(directory, cacheEvictor, StandaloneDatabaseProvider(this))
-        downloadCache = MyDownloadHelper.getDownloadSimpleCache(applicationContext) as SimpleCache
+        downloadCache = MyDownloadHelper.getDownloadCache(applicationContext) as SimpleCache
 
 
         player = ExoPlayer.Builder(this)
@@ -407,6 +374,15 @@ class PlayerServiceModern : MediaLibraryService(),
             .setUsePlatformDiagnostics(false)
             .setSeekBackIncrementMs(5000)
             .setSeekForwardIncrementMs(5000)
+            .setLoadControl(
+                DefaultLoadControl.Builder()
+                    .setBufferDurationsMs(
+                        DefaultLoadControl.DEFAULT_MIN_BUFFER_MS, // 50000
+                        DefaultLoadControl.DEFAULT_MAX_BUFFER_MS, // 50000
+                        5000,
+                        10000
+                    ).build()
+            )
             .build()
             .apply {
                 addListener(this@PlayerServiceModern)
@@ -583,6 +559,7 @@ class PlayerServiceModern : MediaLibraryService(),
         eventTime: AnalyticsListener.EventTime,
         playbackStats: PlaybackStats
     ) {
+        println("PlayerServiceModern onPlaybackStatsReady called ")
         // if pause listen history is enabled, don't register statistic event
         if (preferences.getBoolean(pauseListenHistoryKey, false)) return
 
@@ -612,11 +589,16 @@ class PlayerServiceModern : MediaLibraryService(),
                         )
                     )
                 } catch (e: SQLException) {
-                    Timber.e("PlayerService onPlaybackStatsReady SQLException ${e.stackTraceToString()}")
+                    Timber.e("PlayerServiceModern onPlaybackStatsReady SQLException ${e.stackTraceToString()}")
                 }
             }
 
+            updateOnlineHistory(mediaItem)
+
         }
+
+
+
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
@@ -730,6 +712,11 @@ class PlayerServiceModern : MediaLibraryService(),
         println("PlayerServiceModern onMediaItemTransition mediaItem $mediaItem reason $reason")
 
         currentMediaItem.update { mediaItem }
+
+        if (isPreCacheEnabled() && mediaItem != null) {
+            preCacheMedia(this,mediaItem)
+        }
+
         maybeRecoverPlaybackError()
         maybeNormalizeVolume()
 
@@ -745,6 +732,11 @@ class PlayerServiceModern : MediaLibraryService(),
                 updateDefaultNotification()
                 updateWidgets()
             })
+        }
+
+        if (mediaItem != null) {
+            println("PlayerServiceModern onMediaItemTransition call updateOnlineHistory with mediaItem $mediaItem")
+            updateOnlineHistory(mediaItem)
         }
     }
 
@@ -799,24 +791,22 @@ class PlayerServiceModern : MediaLibraryService(),
             println("PlayerServiceModern onPlayerError recovered occurred errorCodeName ${error.errorCodeName}")
             player.stop()
             player.prepare()
-            player.playWhenReady = true
-            //player.play()
+            player.play()
             return
         }
 
-//        if (error.errorCode in PlayerErrorsWithCachePurge) {
-//            Timber.e("PlayerServiceModern onPlayerError error with cache purge errorCodeName ${error.errorCodeName}")
-//            println("PlayerServiceModern onPlayerError error with cache purge errorCodeName ${error.errorCodeName}")
-////            currentMediaItem.value?.mediaId?.let {
-////                cache.removeResource(it) //try to remove from cache if exists
-////                downloadCache.removeResource(it) //try to remove from download cache if exists
-////            }
-//            player.prepare()
-//            //player.seekTo(0L) // seek to start force re cache
-//            player.seekTo(-500)
-//            player.play()
-//            return
-//        }
+        if (error.errorCode in PlayerErrorsToRemoveCorruptedCache) {
+            Timber.e("PlayerServiceModern onPlayerError delete corrupted resource ${currentMediaItem.value?.mediaId} errorCodeName ${error.errorCodeName}")
+            println("PlayerServiceModern onPlayerError delete corrupted resource ${currentMediaItem.value?.mediaId} errorCodeName ${error.errorCodeName}")
+            currentMediaItem.value?.mediaId?.let {
+                cache.removeResource(it) //try to remove from cache if exists
+                downloadCache.removeResource(it) //try to remove from download cache if exists
+            }
+            player.stop()
+            player.prepare()
+            player.play()
+            return
+        }
 
         /*
         if (error.errorCode in PlayerErrorsToSkip) {
@@ -840,7 +830,7 @@ class PlayerServiceModern : MediaLibraryService(),
             return
 
         val prev = player.currentMediaItem ?: return
-        //player.seekToNextMediaItem()
+
         player.playNext()
 
         showSmartMessage(
@@ -851,13 +841,6 @@ class PlayerServiceModern : MediaLibraryService(),
         )
 
     }
-
-//    override fun onPlaybackStateChanged(playbackState: Int) {
-//        if (playbackState == STATE_IDLE) {
-//            player.shuffleModeEnabled = false
-//            //player.clearMediaItems()
-//        }
-//    }
 
     override fun onEvents(player: Player, events: Player.Events) {
         if (events.containsAny(Player.EVENT_PLAYBACK_STATE_CHANGED, Player.EVENT_PLAY_WHEN_READY_CHANGED)) {
@@ -874,6 +857,26 @@ class PlayerServiceModern : MediaLibraryService(),
 //        }
     }
 
+    private fun updateOnlineHistory(mediaItem: MediaItem) {
+        if (preferences.getBoolean(pauseListenHistoryKey, false)) return
+
+        println("PlayerServiceModern updateOnlineHistory called with mediaItem $mediaItem")
+
+        if (!mediaItem.isLocal && isYouTubeSyncEnabled()) {
+            CoroutineScope(Dispatchers.IO).launch {
+                advancedWebPoTokenPlayer(PlayerBody(videoId = mediaItem.mediaId, playlistId = null))
+                    .getOrNull()?.second?.playbackTracking?.videostatsPlaybackUrl?.baseUrl
+                    ?.let { playbackUrl ->
+                        println("PlayerServiceModern updateOnlineHistory addPlaybackToHistory playbackUrl $playbackUrl")
+                        EnvironmentExt.addPlaybackToHistory(null, playbackUrl)
+                            .onFailure {
+                                Timber.e("PlayerServiceModern updateOnlineHistory addPlaybackToHistory ${it.stackTraceToString()}")
+                                println("PlayerServiceModern updateOnlineHistory addPlaybackToHistory ${it.stackTraceToString()}")
+                            }
+                    }
+            }
+        }
+    }
 
     private fun maybeRecoverPlaybackError() {
         if (player.playerError != null) {
@@ -1930,15 +1933,18 @@ class PlayerServiceModern : MediaLibraryService(),
 
         val PlayerErrorsToReload = arrayOf(
             416,
-            //4003
+            4003, // ERROR_CODE_DECODING_FAILED
         )
-        val PlayerErrorsWithCachePurge = arrayOf(
+
+        val PlayerErrorsToRemoveCorruptedCache = arrayOf(
+
             2000, // ERROR_CODE_IO_UNSPECIFIED
             2003, // ERROR_CODE_IO_INVALID_HTTP_CONTENT_TYPE
             2004, // ERROR_CODE_IO_BAD_HTTP_STATUS
             2005, // ERROR_CODE_IO_FILE_NOT_FOUND
             2008 // ERROR_CODE_IO_READ_POSITION_OUT_OF_RANGE
         )
+
 
         const val ROOT = "root"
         const val SONG = "song"

@@ -108,6 +108,11 @@ kotlin {
 }
 
 android {
+    fun Project.propertyOrEmpty(name: String): String {
+        val property = findProperty(name) as String?
+        return property ?: ""
+    }
+
     dependenciesInfo {
         // Disables dependency metadata when building APKs.
         includeInApk = false
@@ -126,8 +131,206 @@ android {
         applicationId = "it.fast4x.rimusic"
         minSdk = 21
         targetSdk = 35
-        versionCode = 86
-        versionName = "0.6.73"
+        versionCode = 87
+        versionName = "0.6.74"
+
+        // INIT ENVIRONMENT
+        resValue(
+            "string",
+            "env_CrQ0JjAXgv",
+            propertyOrEmpty("CrQ0JjAXgv")
+        )
+        resValue(
+            "string",
+            "env_hNpBzzAn7i",
+            propertyOrEmpty("hNpBzzAn7i")
+        )
+        resValue(
+            "string",
+            "env_lEi9YM74OL",
+            propertyOrEmpty("lEi9YM74OL")
+        )
+        resValue(
+            "string",
+            "env_C0ZR993zmk",
+            propertyOrEmpty("C0ZR993zmk")
+        )
+        resValue(
+            "string",
+            "env_w3TFBFL74Y",
+            propertyOrEmpty("w3TFBFL74Y")
+        )
+        resValue(
+            "string",
+            "env_mcchaHCWyK",
+            propertyOrEmpty("mcchaHCWyK")
+        )
+        resValue(
+            "string",
+            "env_L2u4JNdp7L",
+            propertyOrEmpty("L2u4JNdp7L")
+        )
+        resValue(
+            "string",
+            "env_sqDlfmV4Mt",
+            propertyOrEmpty("sqDlfmV4Mt")
+        )
+        resValue(
+            "string",
+            "env_WpLlatkrVv",
+            propertyOrEmpty("WpLlatkrVv")
+        )
+        resValue(
+            "string",
+            "env_1zNshDpFoh",
+            propertyOrEmpty("1zNshDpFoh")
+        )
+        resValue(
+            "string",
+            "env_mPVWVuCxJz",
+            propertyOrEmpty("mPVWVuCxJz")
+        )
+        resValue(
+            "string",
+            "env_auDsjnylCZ",
+            propertyOrEmpty("auDsjnylCZ")
+        )
+        resValue(
+            "string",
+            "env_AW52cvJIJx",
+            propertyOrEmpty("AW52cvJIJx")
+        )
+        resValue(
+            "string",
+            "env_0RGAyC1Zqu",
+            propertyOrEmpty("0RGAyC1Zqu")
+        )
+        resValue(
+            "string",
+            "env_4Fdmu9Jkax",
+            propertyOrEmpty("4Fdmu9Jkax")
+        )
+        resValue(
+            "string",
+            "env_kuSdQLhP8I",
+            propertyOrEmpty("kuSdQLhP8I")
+        )
+        resValue(
+            "string",
+            "env_QrgDKwvam1",
+            propertyOrEmpty("QrgDKwvam1")
+        )
+        resValue(
+            "string",
+            "env_wLwNESpPtV",
+            propertyOrEmpty("wLwNESpPtV")
+        )
+        resValue(
+            "string",
+            "env_JJUQaehRFg",
+            propertyOrEmpty("JJUQaehRFg")
+        )
+        resValue(
+            "string",
+            "env_i7WX2bHV6R",
+            propertyOrEmpty("i7WX2bHV6R")
+        )
+        resValue(
+            "string",
+            "env_XpiuASubrV",
+            propertyOrEmpty("XpiuASubrV")
+        )
+        resValue(
+            "string",
+            "env_lOlIIVw38L",
+            propertyOrEmpty("lOlIIVw38L")
+        )
+        resValue(
+            "string",
+            "env_mtcR0FhFEl",
+            propertyOrEmpty("mtcR0FhFEl")
+        )
+        resValue(
+            "string",
+            "env_DTihHAFaBR",
+            propertyOrEmpty("DTihHAFaBR")
+        )
+        resValue(
+            "string",
+            "env_a4AcHS8CSg",
+            propertyOrEmpty("a4AcHS8CSg")
+        )
+        resValue(
+            "string",
+            "env_krdLqpYLxM",
+            propertyOrEmpty("krdLqpYLxM")
+        )
+        resValue(
+            "string",
+            "env_ye6KGLZL7n",
+            propertyOrEmpty("ye6KGLZL7n")
+        )
+        resValue(
+            "string",
+            "env_ec09m20YH5",
+            propertyOrEmpty("ec09m20YH5")
+        )
+        resValue(
+            "string",
+            "env_LDRlbOvbF1",
+            propertyOrEmpty("LDRlbOvbF1")
+        )
+        resValue(
+            "string",
+            "env_EEqX0yizf2",
+            propertyOrEmpty("EEqX0yizf2")
+        )
+        resValue(
+            "string",
+            "env_i3BRhLrV1v",
+            propertyOrEmpty("i3BRhLrV1v")
+        )
+        resValue(
+            "string",
+            "env_MApdyHLMyJ",
+            propertyOrEmpty("MApdyHLMyJ")
+        )
+        resValue(
+            "string",
+            "env_hizI7yLjL4",
+            propertyOrEmpty("hizI7yLjL4")
+        )
+        resValue(
+            "string",
+            "env_rLoZP7BF4c",
+            propertyOrEmpty("rLoZP7BF4c")
+        )
+        resValue(
+            "string",
+            "env_nza34sU88C",
+            propertyOrEmpty("nza34sU88C")
+        )
+        resValue(
+            "string",
+            "env_dwbUvjWUl3",
+            propertyOrEmpty("dwbUvjWUl3")
+        )
+        resValue(
+            "string",
+            "env_fqqhBZd0cf",
+            propertyOrEmpty("fqqhBZd0cf")
+        )
+        resValue(
+            "string",
+            "env_9sZKrkMg8p",
+            propertyOrEmpty("9sZKrkMg8p")
+        )
+        resValue(
+            "string",
+            "env_aQpNCVOe2i",
+            propertyOrEmpty("aQpNCVOe2i")
+        )
+        // INIT ENVIRONMENT
     }
 
     splits {

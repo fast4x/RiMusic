@@ -194,6 +194,16 @@
             </intent-filter>
         </service>
 
+        <service android:name=".service.MyPreCacheService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync">
+            <!-- This is needed for Scheduler -->
+            <intent-filter>
+                <action android:name="androidx.media3.exoplayer.downloadService.action.RESTART"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </service>
+
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
             android:enabled="false"

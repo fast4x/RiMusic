@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import it.fast4x.rimusic.appContext
+import it.fast4x.rimusic.service.UnknownException
 import it.fast4x.rimusic.service.UnplayableException
 import it.fast4x.rimusic.utils.ConditionalCacheDataSourceFactory
 import it.fast4x.rimusic.utils.InvalidHttpCodeException
@@ -86,13 +87,28 @@ internal fun PlayerServiceModern.createDataSourceFactory(): DataSource.Factory {
     }.retryIf<UnplayableException>(
         maxRetries = 3,
         printStackTrace = true
-    ).retryIf(
+    )
+    .retryIf<InterruptedException>(
+        maxRetries = 3,
+        printStackTrace = true
+    ).retryIf<UnknownException>(
+        maxRetries = 3,
+        printStackTrace = true
+    )
+//    .retryIf<IOException>(
+//        maxRetries = 3,
+//        printStackTrace = true
+//    )
+    .retryIf(
         maxRetries = 1,
         printStackTrace = true
     ) { ex ->
         ex.findCause<InvalidResponseCodeException>()?.responseCode == 403 ||
                 ex.findCause<ClientRequestException>()?.response?.status?.value == 403 ||
                 ex.findCause<InvalidHttpCodeException>() != null
+                || ex.findCause<InterruptedException>() != null
+                || ex.findCause<UnknownException>() != null
+                || ex.findCause<IOException>() != null
     }.handleRangeErrors()
 }
 

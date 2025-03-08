@@ -445,8 +445,12 @@ fun HomeSongsModern(
                         .flowOn(Dispatchers.IO)
                         .map {
                             it.filter { song ->
-                                downloads[song.song.id]?.state == Download.STATE_COMPLETED
+                                binder?.downloadCache?.keys?.contains(song.song.id) == true
+                                        && downloads[song.song.id]?.state == Download.STATE_COMPLETED
                             }
+//                            .filter { song ->
+//                                downloads[song.song.id]?.state == Download.STATE_COMPLETED
+//                            }
                         }
                         .collect {
                             items = it
@@ -478,44 +482,6 @@ fun HomeSongsModern(
                         .collect {
                             items = it
                         }
-
-                    /*
-                    Database
-                        .songsOffline(sortBy, sortOrder)
-                        .map { songs ->
-                            songs.filter { binder?.isCached(it) ?: false }
-                        }
-                        .collect {
-                            items = it
-                        }
-
-                     */
-
-                    //println("mediaItem offline items: ${items.size} filter ${filter}")
-                    /*
-
-                                Database
-                                    .songsOffline(sortBy, sortOrder)
-                                    .map {
-                                        it.filter { song ->
-                                            song.contentLength?.let {
-                                                withContext(Dispatchers.Main) {
-                                                    binder?.cache?.isCached(
-                                                        song.song.id,
-                                                        0,
-                                                        song.contentLength
-                                                    )
-                                                }
-                                            } ?: false
-                                        }.map(SongWithContentLength::song)
-                                    }
-                                    //.flowOn(Dispatchers.IO)
-                                    .collect {
-                                        items = it
-                                    }
-                            }
-
-                    */
                 }
 
                 if (builtInPlaylist == BuiltInPlaylist.Top) {
@@ -551,24 +517,6 @@ fun HomeSongsModern(
                             }
                     }
                 }
-                /*
-                if (builtInPlaylist == BuiltInPlaylist.Top) {
-                    Database.trending(maxTopPlaylistItems.number.toInt())
-                        //.collect { items = it }
-                        .collect {
-                            items = it.filter {
-                                if (excludeSongWithDurationLimit == DurationInMinutes.Disabled)
-                                    true
-                                else
-                                it.durationText?.let { it1 ->
-                                    durationTextToMillis(it1)
-                                }!! < excludeSongWithDurationLimit.minutesInMilliSeconds
-                            }
-                        }
-
-                }
-                */
-
 
             }
         }

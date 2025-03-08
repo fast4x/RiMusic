@@ -1,5 +1,6 @@
 package it.fast4x.rimusic.utils
 
+import android.util.Patterns
 import java.util.StringTokenizer
 
 const val DELIM = "."
@@ -72,3 +73,6 @@ fun isValidPart(s: String): Boolean {
     }
 }
 
+fun isValidUrl(url: String): Boolean {
+    return Patterns.WEB_URL.matcher(url).matches()
+}

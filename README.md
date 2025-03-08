@@ -10,29 +10,6 @@
   <a href="https://github.com/fast4x/RiMusic/releases/latest"><img src="https://img.shields.io/github/v/release/fast4x/RiMusic?label=Release"></a>
 </div>
 
-
-## 📲 BE CAREFUL!
-## RiMusic is not present on Google Play Store, do not search and download RiMusic on Google Play Store because they are fake clones to steal your money and personal information.
-
-<div align="left">
-    <td align="center" style="word-wrap: break-word; width: 90.0; height: 90.0">
-        <a href=https://github.com/fast4x>
-            <img src=https://avatars.githubusercontent.com/u/1484476?v=4 width="60;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Rino Russo/>
-            <br />
-        </a>
-    </td>
-</div>
-Hello Friends, 
-the project is not closed, new releases have been suspended for now waiting to reorganize ideas. I want to thank all of you and not least to thank all the contributors, translators and developers who have joined the project over time. RiMusic is alive and support is active!
-
-Despite this, I am sad and sorry that even on the Google Play Store there are various clones of RiMusic that despite the reports are not deleted from the store. 
-
-I only ask you to report at all levels the violation of the license on all other applications born from the copy of RiMusic source code.
-
-RiMusic is free and anyone who makes a copy, or a forked copy, of it MUST respect the previous developers, translators and also the rules of the GPL.
-
-Thanks ❤️
-
 ## ✨ Features
 - **Multilingual:** English, Italian, German, Russian, French, Spanish, Czech, Turkish, Romanian and more. Contributions for other languages are welcome
 - UI Mode, swtich from RiMusic to classic ViMusic style, viceversa

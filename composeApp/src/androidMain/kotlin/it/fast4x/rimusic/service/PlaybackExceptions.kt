@@ -8,6 +8,8 @@ class PlayableFormatNotFoundException : PlaybackException(null, null, ERROR_CODE
 @UnstableApi
 class UnplayableException : PlaybackException(null, null, ERROR_CODE_REMOTE_ERROR)
 @UnstableApi
+class InterruptedException : PlaybackException(null, null, ERROR_CODE_REMOTE_ERROR)
+@UnstableApi
 class StreamExpiredException : PlaybackException(null, null, ERROR_CODE_REMOTE_ERROR)
 @UnstableApi
 class LoginRequiredException : PlaybackException(null, null, ERROR_CODE_REMOTE_ERROR)

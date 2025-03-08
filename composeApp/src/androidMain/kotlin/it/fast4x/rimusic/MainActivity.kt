@@ -114,6 +114,7 @@ import it.fast4x.rimusic.enums.AudioQualityFormat
 import it.fast4x.rimusic.enums.CheckUpdateState
 import it.fast4x.rimusic.enums.ColorPaletteMode
 import it.fast4x.rimusic.enums.ColorPaletteName
+import it.fast4x.rimusic.enums.DnsOverHttpsType
 import it.fast4x.rimusic.enums.FontType
 import it.fast4x.rimusic.enums.HomeScreenTabs
 import it.fast4x.rimusic.enums.Languages
@@ -123,7 +124,6 @@ import it.fast4x.rimusic.enums.PipModule
 import it.fast4x.rimusic.enums.PlayerBackgroundColors
 import it.fast4x.rimusic.enums.PopupType
 import it.fast4x.rimusic.enums.ThumbnailRoundness
-import it.fast4x.rimusic.extensions.configuration.getConfiguration
 import it.fast4x.rimusic.extensions.pip.PipEventContainer
 import it.fast4x.rimusic.extensions.pip.PipModuleContainer
 import it.fast4x.rimusic.extensions.pip.PipModuleCover
@@ -160,6 +160,7 @@ import it.fast4x.rimusic.utils.closeWithBackButtonKey
 import it.fast4x.rimusic.utils.colorPaletteModeKey
 import it.fast4x.rimusic.utils.colorPaletteNameKey
 import it.fast4x.rimusic.utils.customColorKey
+import it.fast4x.rimusic.utils.customDnsOverHttpsServerKey
 import it.fast4x.rimusic.utils.customThemeDark_Background0Key
 import it.fast4x.rimusic.utils.customThemeDark_Background1Key
 import it.fast4x.rimusic.utils.customThemeDark_Background2Key
@@ -194,6 +195,7 @@ import it.fast4x.rimusic.utils.isAtLeastAndroid8
 import it.fast4x.rimusic.utils.isKeepScreenOnEnabledKey
 import it.fast4x.rimusic.utils.isProxyEnabledKey
 import it.fast4x.rimusic.utils.isValidIP
+import it.fast4x.rimusic.utils.isValidUrl
 import it.fast4x.rimusic.utils.isVideo
 import it.fast4x.rimusic.utils.keepPlayerMinimizedKey
 import it.fast4x.rimusic.utils.languageAppKey
@@ -512,49 +514,6 @@ class MainActivity :
 
             runBlocking {
                 InitializeEnvironment()
-//                EnvironmentPreferences.preference = EnvironmentPreferenceItem(
-//                    p0 = getConfiguration("CrQ0JjAXgv"),
-//                    p1 = getConfiguration("hNpBzzAn7i"),
-//                    p2 = getConfiguration("lEi9YM74OL"),
-//                    p3 = getConfiguration("C0ZR993zmk"),
-//                    p4 = getConfiguration("w3TFBFL74Y"),
-//                    p5 = getConfiguration("mcchaHCWyK"),
-//                    p6 = getConfiguration("L2u4JNdp7L"),
-//                    p7 = getConfiguration("sqDlfmV4Mt"),
-//                    p8 = getConfiguration("WpLlatkrVv"),
-//                    p9 = getConfiguration("1zNshDpFoh"),
-//                    p10 = getConfiguration("mPVWVuCxJz"),
-//                    p11 = getConfiguration("auDsjnylCZ"),
-//                    p12 = getConfiguration("AW52cvJIJx"),
-//                    p13 = getConfiguration("0RGAyC1Zqu"),
-//                    p14 = getConfiguration("4Fdmu9Jkax"),
-//                    p15 = getConfiguration("kuSdQLhP8I"),
-//                    p16 = getConfiguration("QrgDKwvam1"),
-//                    p17 = getConfiguration("wLwNESpPtV"),
-//                    p18 = getConfiguration("JJUQaehRFg"),
-//                    p19 = getConfiguration("i7WX2bHV6R"),
-//                    p20 = getConfiguration("XpiuASubrV"),
-//                    p21 = getConfiguration("lOlIIVw38L"),
-//                    p22 = getConfiguration("mtcR0FhFEl"),
-//                    p23 = getConfiguration("DTihHAFaBR"),
-//                    p24 = getConfiguration("a4AcHS8CSg"),
-//                    p25 = getConfiguration("krdLqpYLxM"),
-//                    p26 = getConfiguration("ye6KGLZL7n"),
-//                    p27 = getConfiguration("ec09m20YH5"),
-//                    p28 = getConfiguration("LDRlbOvbF1"),
-//                    p29 = getConfiguration("EEqX0yizf2"),
-//                    p30 = getConfiguration("i3BRhLrV1v"),
-//                    p31 = getConfiguration("MApdyHLMyJ"),
-//                    p32 = getConfiguration("hizI7yLjL4"),
-//                    p33 = getConfiguration("rLoZP7BF4c"),
-//                    p34 = getConfiguration("nza34sU88C"),
-//                    p35 = getConfiguration("dwbUvjWUl3"),
-//                    p36 = getConfiguration("fqqhBZd0cf"),
-//                    p37 = getConfiguration("9sZKrkMg8p"),
-//                    p38 = getConfiguration("aQpNCVOe2i"),
-//                )
-                //println("MainActivity.onCreate EnvironmentPreferences.preference: ${EnvironmentPreferences.preference}")
-                println("MainActivity.onCreate Environment.getEnvironment() ${Environment.getEnvironment()}")
             }
 
             val coroutineScope = rememberCoroutineScope()
@@ -593,27 +552,14 @@ class MainActivity :
 
                     val cookie = preferences.getString(ytCookieKey, "")
                     println("MainActivity.onCreate cookie: $cookie")
-                    //EnvironmentPreferences.cookie = cookie
+                    val customDnsOverHttpsServer = preferences.getString(customDnsOverHttpsServerKey, "")
+
                     Environment.cookie = cookie
                     Environment.visitorData = visitorData.takeIf { it != "null" }
                         ?: Environment._uMYwa66ycM
                     Environment.dataSyncId = preferences.getString(ytDataSyncIdKey, "").toString()
+                    Environment.customDnsToUse = if (customDnsOverHttpsServer?.let { isValidUrl(it) } == true) customDnsOverHttpsServer else null
                     Environment.dnsToUse = getDnsOverHttpsType().type
-//                    EnvironmentPreferences.visitordata = visitorData.takeIf { it != "null" }
-//                        ?: Environment._uMYwa66ycM
-                    //EnvironmentPreferences.dataSyncId = preferences.getString(ytDataSyncIdKey, "")
-                    //EnvironmentPreferences.dnsOverHttps = getDnsOverHttpsType().type
-//                        YoutubePreferenceItem(
-//                            cookie = preferences.getString(ytCookieKey, ""),
-//                            visitordata = visitorData
-//                                .takeIf { it != "null" }
-//                                ?: Environment._uMYwa66ycM,
-//                            dataSyncId = preferences.getString(ytDataSyncIdKey, ""),
-//                            dnsOverHttps = getDnsOverHttpsType().type
-//                        )
-            //}
-
-            //preferences.getEnum(audioQualityFormatKey, AudioQualityFormat.Auto)
 
             var appearance by rememberSaveable(
                 !lightTheme,
@@ -622,7 +568,7 @@ class MainActivity :
                 with(preferences) {
                     val colorPaletteName =
                         getEnum(colorPaletteNameKey, ColorPaletteName.Dynamic)
-                    val colorPaletteMode = getEnum(colorPaletteModeKey, ColorPaletteMode.Dark)
+                    //val colorPaletteMode = getEnum(colorPaletteModeKey, ColorPaletteMode.Dark)
                     val thumbnailRoundness =
                         getEnum(thumbnailRoundnessKey, ThumbnailRoundness.Heavy)
                     val useSystemFont = getBoolean(useSystemFontKey, false)
@@ -680,8 +626,8 @@ class MainActivity :
 
                 if (!isDynamicPalette) return
 
-                val colorPaletteMode =
-                    preferences.getEnum(colorPaletteModeKey, ColorPaletteMode.Dark)
+//                val colorPaletteMode =
+//                    preferences.getEnum(colorPaletteModeKey, ColorPaletteMode.Dark)
                 coroutineScope.launch(Dispatchers.Main) {
                     val result = imageLoader.execute(
                         ImageRequest.Builder(this@MainActivity)
@@ -838,11 +784,11 @@ class MainActivity :
                                         ColorPaletteName.Dynamic
                                     )
 
-                                val colorPaletteMode =
-                                    sharedPreferences.getEnum(
-                                        colorPaletteModeKey,
-                                        ColorPaletteMode.System
-                                    )
+//                                val colorPaletteMode =
+//                                    sharedPreferences.getEnum(
+//                                        colorPaletteModeKey,
+//                                        ColorPaletteMode.System
+//                                    )
 
                                 var colorPalette = colorPaletteOf(
                                     colorPaletteName,
@@ -1474,47 +1420,47 @@ class MainActivity :
 
     fun InitializeEnvironment() {
         EnvironmentPreferences.preference = EnvironmentPreferenceItem(
-            p0 = getConfiguration("CrQ0JjAXgv"),
-            p1 = getConfiguration("hNpBzzAn7i"),
-            p2 = getConfiguration("lEi9YM74OL"),
-            p3 = getConfiguration("C0ZR993zmk"),
-            p4 = getConfiguration("w3TFBFL74Y"),
-            p5 = getConfiguration("mcchaHCWyK"),
-            p6 = getConfiguration("L2u4JNdp7L"),
-            p7 = getConfiguration("sqDlfmV4Mt"),
-            p8 = getConfiguration("WpLlatkrVv"),
-            p9 = getConfiguration("1zNshDpFoh"),
-            p10 = getConfiguration("mPVWVuCxJz"),
-            p11 = getConfiguration("auDsjnylCZ"),
-            p12 = getConfiguration("AW52cvJIJx"),
-            p13 = getConfiguration("0RGAyC1Zqu"),
-            p14 = getConfiguration("4Fdmu9Jkax"),
-            p15 = getConfiguration("kuSdQLhP8I"),
-            p16 = getConfiguration("QrgDKwvam1"),
-            p17 = getConfiguration("wLwNESpPtV"),
-            p18 = getConfiguration("JJUQaehRFg"),
-            p19 = getConfiguration("i7WX2bHV6R"),
-            p20 = getConfiguration("XpiuASubrV"),
-            p21 = getConfiguration("lOlIIVw38L"),
-            p22 = getConfiguration("mtcR0FhFEl"),
-            p23 = getConfiguration("DTihHAFaBR"),
-            p24 = getConfiguration("a4AcHS8CSg"),
-            p25 = getConfiguration("krdLqpYLxM"),
-            p26 = getConfiguration("ye6KGLZL7n"),
-            p27 = getConfiguration("ec09m20YH5"),
-            p28 = getConfiguration("LDRlbOvbF1"),
-            p29 = getConfiguration("EEqX0yizf2"),
-            p30 = getConfiguration("i3BRhLrV1v"),
-            p31 = getConfiguration("MApdyHLMyJ"),
-            p32 = getConfiguration("hizI7yLjL4"),
-            p33 = getConfiguration("rLoZP7BF4c"),
-            p34 = getConfiguration("nza34sU88C"),
-            p35 = getConfiguration("dwbUvjWUl3"),
-            p36 = getConfiguration("fqqhBZd0cf"),
-            p37 = getConfiguration("9sZKrkMg8p"),
-            p38 = getConfiguration("aQpNCVOe2i"),
+            p0 = resources.getString(R.string.env_CrQ0JjAXgv),
+            p1 = resources.getString(R.string.env_hNpBzzAn7i),
+            p2 = resources.getString(R.string.env_lEi9YM74OL),
+            p3 = resources.getString(R.string.env_C0ZR993zmk),
+            p4 = resources.getString(R.string.env_w3TFBFL74Y),
+            p5 = resources.getString(R.string.env_mcchaHCWyK),
+            p6 = resources.getString(R.string.env_L2u4JNdp7L),
+            p7 = resources.getString(R.string.env_sqDlfmV4Mt),
+            p8 = resources.getString(R.string.env_WpLlatkrVv),
+            p9 = resources.getString(R.string.env_1zNshDpFoh),
+            p10 = resources.getString(R.string.env_mPVWVuCxJz),
+            p11 = resources.getString(R.string.env_auDsjnylCZ),
+            p12 = resources.getString(R.string.env_AW52cvJIJx),
+            p13 = resources.getString(R.string.env_0RGAyC1Zqu),
+            p14 = resources.getString(R.string.env_4Fdmu9Jkax),
+            p15 = resources.getString(R.string.env_kuSdQLhP8I),
+            p16 = resources.getString(R.string.env_QrgDKwvam1),
+            p17 = resources.getString(R.string.env_wLwNESpPtV),
+            p18 = resources.getString(R.string.env_JJUQaehRFg),
+            p19 = resources.getString(R.string.env_i7WX2bHV6R),
+            p20 = resources.getString(R.string.env_XpiuASubrV),
+            p21 = resources.getString(R.string.env_lOlIIVw38L),
+            p22 = resources.getString(R.string.env_mtcR0FhFEl),
+            p23 = resources.getString(R.string.env_DTihHAFaBR),
+            p24 = resources.getString(R.string.env_a4AcHS8CSg),
+            p25 = resources.getString(R.string.env_krdLqpYLxM),
+            p26 = resources.getString(R.string.env_ye6KGLZL7n),
+            p27 = resources.getString(R.string.env_ec09m20YH5),
+            p28 = resources.getString(R.string.env_LDRlbOvbF1),
+            p29 = resources.getString(R.string.env_EEqX0yizf2),
+            p30 = resources.getString(R.string.env_i3BRhLrV1v),
+            p31 = resources.getString(R.string.env_MApdyHLMyJ),
+            p32 = resources.getString(R.string.env_hizI7yLjL4),
+            p33 = resources.getString(R.string.env_rLoZP7BF4c),
+            p34 = resources.getString(R.string.env_nza34sU88C),
+            p35 = resources.getString(R.string.env_dwbUvjWUl3),
+            p36 = resources.getString(R.string.env_fqqhBZd0cf),
+            p37 = resources.getString(R.string.env_9sZKrkMg8p),
+            p38 = resources.getString(R.string.env_aQpNCVOe2i),
 
-        )
+            )
     }
 
 }

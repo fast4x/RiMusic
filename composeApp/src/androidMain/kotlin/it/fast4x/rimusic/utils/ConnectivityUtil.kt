@@ -114,7 +114,7 @@ class ConnectivityUtilSdk29(private val applicationContext: Context) {
 
 
 @RequiresApi(Build.VERSION_CODES.N)
-fun getNetwork(context: Context): String {
+fun getNetworkType(context: Context): String {
     val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val nw = connectivityManager.activeNetwork ?: return "-"

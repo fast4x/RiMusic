@@ -4,7 +4,8 @@ enum class DnsOverHttpsType {
     None,
     Google,
     CloudFlare,
-    OpenDns;
+    OpenDns,
+    Custom;
 
     val type: String?
     get() = when (this) {
@@ -12,6 +13,8 @@ enum class DnsOverHttpsType {
         Google -> "google"
         CloudFlare -> "cloudflare"
         OpenDns -> "opendns"
+        Custom -> "custom"
+
     }
 
     val textName: String
@@ -20,5 +23,6 @@ enum class DnsOverHttpsType {
             Google -> "Google Public Dns"
             CloudFlare -> "Cloudflare Public Dns"
             OpenDns -> "OpenDns Public Dns"
+            Custom -> "Custom Dns"
         }
 }

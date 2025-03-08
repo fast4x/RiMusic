@@ -17,6 +17,7 @@ import it.fast4x.rimusic.utils.logDebugEnabledKey
 import it.fast4x.rimusic.utils.parentalControlEnabledKey
 import it.fast4x.rimusic.utils.rememberPreference
 import it.fast4x.rimusic.colorPalette
+import it.fast4x.rimusic.getColorTheme
 
 @Composable
 internal fun HeaderIcon(
@@ -35,31 +36,13 @@ internal fun HeaderIcon(
     }
 }
 
-internal class Preference {
-
-    internal companion object {
-
-        @Composable
-        fun parentalControl(): Boolean =
-            rememberPreference( parentalControlEnabledKey, false ).value
-
-        @Composable
-        fun debugLog(): Boolean =
-            rememberPreference( logDebugEnabledKey, false ).value
-
-        @Composable
-        fun colorTheme(): ColorPaletteMode =
-            rememberPreference( colorPaletteModeKey, ColorPaletteMode.Dark ).value
-    }
-}
-
 internal class AppBar {
 
     internal companion object {
 
         @Composable
         fun contentColor(): Color =
-             when(Preference.colorTheme()) {
+             when(getColorTheme()) {
                 ColorPaletteMode.Light, ColorPaletteMode.System -> colorPalette().text
                 else -> Color.White
             }
