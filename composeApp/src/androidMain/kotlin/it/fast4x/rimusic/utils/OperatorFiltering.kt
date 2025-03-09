@@ -41,7 +41,7 @@ fun parseSearchQuery(query: String): List<List<Token>> {
     regex.findAll(query).forEach { match ->
         val (neg1, field1, value1, neg2, field2, value2, neg3, value3, neg4, value4) = match.destructured
         val include = !(neg1 == "-" || neg2 == "-" || neg3 == "-" || neg4 == "-")
-        val field = field1.ifEmpty { field2.ifEmpty { "" } }
+        val field = field1.ifEmpty { field2.ifEmpty { "" } }.lowercase()
         val value = value1.ifEmpty { value2.ifEmpty { value3.ifEmpty { value4 } } }
         // By default, everything is AND (original behavior). Separate groups based on OR placement.
         val or = context().getString(R.string.or_operator)
@@ -49,16 +49,17 @@ fun parseSearchQuery(query: String): List<List<Token>> {
             tokens.add(currentGroup)
             currentGroup = mutableListOf()
         } else {
+            val explicitRString = context().getString(R.string.explicit).lowercase();
             val valueType = when {
                 value.contains("-") -> when {
                     value.contains(":") -> "DurationRange"
                     else -> "IntRange"
                 }
-                value.equals(context()
-                    .getString(R.string.explicit).lowercase(), ignoreCase = true) -> "ExplicitValue"
+                value.equals(explicitRString, ignoreCase = true) -> "ExplicitValue"
+                field.equals(explicitRString, ignoreCase = true) -> "BooleanValue"
                 else -> null
             }
-            currentGroup.add(Token(field.lowercase(), value, include, valueType))
+            currentGroup.add(Token(field, value, include, valueType))
         }
     }
 
@@ -118,6 +119,7 @@ fun filterMediaMetadata(metadata: MediaMetadata, filter: String): Boolean {
                     "IntRange" -> isWithinIntRange(it, token.value)
                     "DurationRange" -> isWithinDurationRange(it, token.value)
                     "ExplicitValue" -> metadata.extras?.getBoolean(EXPLICIT_BUNDLE_TAG)
+                    "BooleanValue" -> it.startsWith(token.value, ignoreCase = true)
                     else -> it.contains(token.value, ignoreCase = true)
                 }
                 groupApplies == token.shouldInclude
