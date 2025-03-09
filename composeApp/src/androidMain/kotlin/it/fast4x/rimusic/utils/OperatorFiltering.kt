@@ -56,7 +56,6 @@ fun parseSearchQuery(query: String): List<List<Token>> {
                     else -> "IntRange"
                 }
                 value.equals(explicitRString, ignoreCase = true) -> "ExplicitValue"
-                field.equals(explicitRString, ignoreCase = true) -> "BooleanValue"
                 else -> null
             }
             currentGroup.add(Token(field, value, include, valueType))
@@ -101,8 +100,6 @@ fun filterMediaMetadata(metadata: MediaMetadata, filter: String): Boolean {
         context().getString(R.string.sort_artist).lowercase() to (metadata.artist.toString()),
         context().getString(R.string.sort_duration).lowercase()
                 to (metadata.extras?.getString("durationText").toString()),
-        //context().getString(R.string.explicit).lowercase()
-        //        to (metadata.extras?.getBoolean(EXPLICIT_BUNDLE_TAG) == true).toString(),
         context().getString(R.string.sort_album).lowercase() to (metadata.albumTitle.toString()),
         context().getString(R.string.sort_year).lowercase() to (metadata.releaseYear.toString()),
     )
@@ -119,7 +116,7 @@ fun filterMediaMetadata(metadata: MediaMetadata, filter: String): Boolean {
                     "IntRange" -> isWithinIntRange(it, token.value)
                     "DurationRange" -> isWithinDurationRange(it, token.value)
                     "ExplicitValue" -> metadata.extras?.getBoolean(EXPLICIT_BUNDLE_TAG)
-                    "BooleanValue" -> it.startsWith(token.value, ignoreCase = true)
+                    "BooleanValue" -> it.startsWith(token.value, ignoreCase = true) // Unused
                     else -> it.contains(token.value, ignoreCase = true)
                 }
                 groupApplies == token.shouldInclude
