@@ -30,17 +30,19 @@ data class Token(val field: String, val value: String,
     and I'm not sure how to get them.
 */
 fun parseSearchQuery(query: String): List<List<Token>> {
-    // The search tokens can be labeled (with quotes), labeled (without quotes), and unlabeled.
-    val regex = Regex("""(-?)(\S+):"([^"]+)"|(-?)(\S+):(\S+)|(-?)(\S+)""")
+    // The search tokens can be labeled (with quotes), labeled (without quotes),
+    // unlabeled (with quotes) and unlabeled (without quotes).
+    // Assumption about labels: they will not include numbers, whitespace or quotes.
+    val regex = Regex("""(-?)([^"\s\d]+):"([^"]+)"|(-?)([^"\s\d]+):(\S+)|(-?)"([^"]+)"|(-?)(\S+)""")
     val tokens = mutableListOf<List<Token>>()
     var currentGroup = mutableListOf<Token>()
 
     // Find all the search tokens.
     regex.findAll(query).forEach { match ->
-        val (neg1, field1, quoted1, neg2, field2, value2, neg3, value3) = match.destructured
-        val include = !(neg1 == "-" || neg2 == "-" || neg3 == "-")
+        val (neg1, field1, value1, neg2, field2, value2, neg3, value3, neg4, value4) = match.destructured
+        val include = !(neg1 == "-" || neg2 == "-" || neg3 == "-" || neg4 == "-")
         val field = field1.ifEmpty { field2.ifEmpty { "" } }
-        val value = quoted1.ifEmpty { value2.ifEmpty { value3 } }
+        val value = value1.ifEmpty { value2.ifEmpty { value3.ifEmpty { value4 } } }
         // By default, everything is AND (original behavior). Separate groups based on OR placement.
         val or = context().getString(R.string.or_operator)
         if (value.equals(or, ignoreCase = true) || value == "|") {
