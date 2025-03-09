@@ -49,7 +49,7 @@ fun parseSearchQuery(query: String): List<List<Token>> {
             tokens.add(currentGroup)
             currentGroup = mutableListOf()
         } else {
-            val explicitRString = context().getString(R.string.explicit).lowercase();
+            val explicitRString = context().getString(R.string.explicit).lowercase()
             val valueType = when {
                 value.contains("-") -> when {
                     value.contains(":") -> "DurationRange"
