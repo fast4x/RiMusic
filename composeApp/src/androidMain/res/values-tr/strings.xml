@@ -937,6 +937,6 @@
     <string name="loudness_boost_level_info">Ekstra ses seviyesi, aşırıya kaçılmadan kullanılmalıdır aksi takdirde cihaz zarar görebilir</string>
     <string name="export_crash_log">Çökme günlüğünü dışarı aktar</string>
     <string name="export_log">Günlüğü dışa aktar</string>
-    <string name="value_must_be_valid_url">Value must be a valid url</string>
-    <string name="caching">Caching...</string>
+    <string name="value_must_be_valid_url">Değer geçerli bir URL olmalıdır</string>
+    <string name="caching">Önbelleğe alınıyor...</string>
 </resources>

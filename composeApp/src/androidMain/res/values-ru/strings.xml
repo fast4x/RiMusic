@@ -939,6 +939,6 @@
     <string name="loudness_boost_level_info">Дополнительный уровень громкости (не злоупотребляйте, так как это может повредить устройство)</string>
     <string name="export_crash_log">Экспорт журнала сбоев</string>
     <string name="export_log">Экспорт журнала</string>
-    <string name="value_must_be_valid_url">Value must be a valid url</string>
-    <string name="caching">Caching...</string>
+    <string name="value_must_be_valid_url">Значение должно быть корректным URL-адресом</string>
+    <string name="caching">Кэширование...</string>
 </resources>

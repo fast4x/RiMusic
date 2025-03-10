@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="opensource_multilingual_application">A Open source and multilingual Android application for streaming music from YouTube Music</string>
-    <string name="your_library">Your library.</string>
-    <string name="organized_in_one_place">All organized in one place, favorite songs, downloaded songs, listened songs and all your playlists.</string>
-    <string name="beautiful_player">A beautiful player.</string>
-    <string name="listen_songs_sing_lyrics">Listen to songs, sing with lyrics, translate words with built-in translator.</string>
-    <string name="many_effects">Many effects.</string>
-    <string name="visualizer_preview_timeline">Visualizer, preview, timeline, play button, apply the effects you prefer..</string>
-    <string name="modern">Modern.</string>
-    <string name="rimusic_is_multilingual_modern_powerful">RiMusic is multilingual, modern, powerful, attractive, beautiful and is translated into various languages by project collaborators.</string>
-    <string name="listen_to_your_favourite_music">Listen to your favorite music</string>
-    <string name="download_rimusic_now">Download RiMusic Now.</string>
-    <string name="repository">Repository</string>
-    <string name="releases">Releases</string>
-    <string name="issue_tracker">Issue tracker</string>
-    <string name="custom_version">Custom version</string>
+    <string name="opensource_multilingual_application">YouTube Music-etik musika erreproduzitzeko kode irekiko eta eleanitza den Android aplikazioa</string>
+    <string name="your_library">Zure liburutegia.</string>
+    <string name="organized_in_one_place">Guztia leku bakarrean antolatuta, gogoko abestiak, deskargatutako abestiak, entzundako abestiak eta zure erreprodukzio-zerrenda guztiak.</string>
+    <string name="beautiful_player">Erreproduzitzaile ederra.</string>
+    <string name="listen_songs_sing_lyrics">Abestiak entzun, letrekin abestu, letrak integratutako itzultzailearekin itzuli .</string>
+    <string name="many_effects">Efektu mordoa</string>
+    <string name="visualizer_preview_timeline">Bistaratzailea, aurrebista, denbora-lerroa, erreproduzitzeko botoia, nahi adina efektu aplikatu..</string>
+    <string name="modern">Modernoa</string>
+    <string name="rimusic_is_multilingual_modern_powerful">RiMusic eleanitza, modernoa, indartsua, erakargarria, ederra da eta proiektuko kolaboratzaileek hainbat hizkuntzatara itzultzen dute.</string>
+    <string name="listen_to_your_favourite_music">Zuer musika gogokoena entzun</string>
+    <string name="download_rimusic_now">RiMusic orain deskargatu</string>
+    <string name="repository">Biltegia</string>
+    <string name="releases">Kaleratzeak</string>
+    <string name="issue_tracker">Arazoen jarraipena</string>
+    <string name="custom_version">Bertsio pertsonalizatua</string>
 </resources>

@@ -937,6 +937,6 @@
     <string name="loudness_boost_level_info">Nivel de volumen adicional, usar sin excederse, ya que podría dañar el dispositivo</string>
     <string name="export_crash_log">Exportar registros de errores</string>
     <string name="export_log">Exportar registros</string>
-    <string name="value_must_be_valid_url">Value must be a valid url</string>
-    <string name="caching">Caching...</string>
+    <string name="value_must_be_valid_url">El valor debe ser una URL válida</string>
+    <string name="caching">Almacenando en caché...</string>
 </resources>
