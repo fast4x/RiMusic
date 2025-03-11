@@ -79,6 +79,22 @@ fun isWithinDurationRange(duration: String, range: String): Boolean {
     return durationTextToMillis(duration) in min..max == true
 }
 
+// These are the possible autocomplete buttons: (what they will type in -> the display string).
+val filterTokensForAutocomplete = listOf(
+    context().getString(R.string.sort_title).lowercase() + ":"
+            to context().getString(R.string.sort_title),
+    context().getString(R.string.sort_artist).lowercase() + ":"
+            to context().getString(R.string.sort_artist),
+    context().getString(R.string.sort_duration).lowercase() + ":"
+            to context().getString(R.string.sort_duration),
+    context().getString(R.string.sort_album).lowercase() + ":"
+            to context().getString(R.string.sort_album),
+    context().getString(R.string.sort_year).lowercase() + ":"
+            to context().getString(R.string.sort_year),
+    context().getString(R.string.explicit).lowercase()
+            to context().getString(R.string.explicit),
+);
+
 var tokensCache: Pair<String, List<List<Token>>>? = null
 fun filterMediaMetadata(metadata: MediaMetadata, filter: String): Boolean {
     val filterTrim = filter.trim()

@@ -72,7 +72,9 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
@@ -199,6 +201,7 @@ import it.fast4x.rimusic.utils.addToYtLikedSongs
 import it.fast4x.rimusic.utils.addToYtPlaylist
 import it.fast4x.rimusic.utils.asSong
 import it.fast4x.rimusic.utils.filterSongEntities
+import it.fast4x.rimusic.utils.filterTokensForAutocomplete
 import it.fast4x.rimusic.utils.formatAsDuration
 import it.fast4x.rimusic.utils.isDownloadedSong
 import it.fast4x.rimusic.utils.isNetworkConnected
@@ -1479,92 +1482,125 @@ fun HomeSongsModern(
                     /*        */
 
                     AnimatedVisibility(visible = searching) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            verticalAlignment = Alignment.Bottom,
-                            modifier = Modifier
-                                //.requiredHeight(30.dp)
-                                .padding(all = 10.dp)
-                                .fillMaxWidth()
+                        Column(modifier = Modifier
+                            .fillMaxWidth()
+                            .background(colorPalette().background0)
                         ) {
                             val focusRequester = remember { FocusRequester() }
-                            val focusManager = LocalFocusManager.current
-                            val keyboardController = LocalSoftwareKeyboardController.current
-
-                            LaunchedEffect(searching) {
-                                focusRequester.requestFocus()
+                            var autocompleteButtons by rememberSaveable {
+                                mutableStateOf<List<Pair<String, String>>>(emptyList())
                             }
+                            var textState by remember { mutableStateOf(TextFieldValue("")) }
+                            fun onFilterChange(new: String) {
+                                filter = new
+                                // Update the autocomplete buttons
+                                val word = new.substringBeforeLast(" ") ?: ""
+                                autocompleteButtons = filterTokensForAutocomplete.filter {
+                                    it.first.startsWith(word, ignoreCase = true)
+                                }
+                            }
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                verticalAlignment = Alignment.Bottom,
+                                modifier = Modifier
+                                    //.requiredHeight(30.dp)
+                                    .padding(all = 10.dp)
+                                    .fillMaxWidth()
+                            ) {
+                                val focusManager = LocalFocusManager.current
+                                val keyboardController = LocalSoftwareKeyboardController.current
 
-                            BasicTextField(
-                                value = filter ?: "",
-                                onValueChange = { filter = it },
-                                textStyle = typography().xs.semiBold,
-                                singleLine = true,
-                                maxLines = 1,
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                                keyboardActions = KeyboardActions(onDone = {
-                                    if (filter.isNullOrBlank()) filter = ""
-                                    focusManager.clearFocus()
-                                }),
-                                cursorBrush = SolidColor(colorPalette().text),
-                                decorationBox = { innerTextField ->
-                                    Box(
-                                        contentAlignment = Alignment.CenterStart,
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .padding(horizontal = 10.dp)
-                                    ) {
-                                        IconButton(
-                                            onClick = {},
-                                            icon = R.drawable.search,
-                                            color = colorPalette().favoritesIcon,
+                                LaunchedEffect(searching) {
+                                    focusRequester.requestFocus()
+                                }
+                                BasicTextField(
+                                    value = textState,
+                                    onValueChange = { onFilterChange(it.text) },
+                                    textStyle = typography().xs.semiBold,
+                                    singleLine = true,
+                                    maxLines = 1,
+                                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                                    keyboardActions = KeyboardActions(onDone = {
+                                        if (filter.isNullOrBlank()) filter = ""
+                                        focusManager.clearFocus()
+                                    }),
+                                    cursorBrush = SolidColor(colorPalette().text),
+                                    decorationBox = { innerTextField ->
+                                        Box(
+                                            contentAlignment = Alignment.CenterStart,
                                             modifier = Modifier
-                                                .align(Alignment.CenterStart)
-                                                .size(16.dp)
-                                        )
-                                    }
-                                    Box(
-                                        contentAlignment = Alignment.CenterStart,
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .padding(horizontal = 30.dp)
-                                    ) {
-                                        androidx.compose.animation.AnimatedVisibility(
-                                            visible = filter?.isEmpty() ?: true,
-                                            enter = fadeIn(tween(100)),
-                                            exit = fadeOut(tween(100)),
+                                                .weight(1f)
+                                                .padding(horizontal = 10.dp)
                                         ) {
-                                            BasicText(
-                                                text = stringResource(R.string.search),
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis,
-                                                style = typography().xs.semiBold.secondary.copy(color = colorPalette().textDisabled)
+                                            IconButton(
+                                                onClick = {},
+                                                icon = R.drawable.search,
+                                                color = colorPalette().favoritesIcon,
+                                                modifier = Modifier
+                                                    .align(Alignment.CenterStart)
+                                                    .size(16.dp)
                                             )
                                         }
+                                        Box(
+                                            contentAlignment = Alignment.CenterStart,
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .padding(horizontal = 30.dp)
+                                        ) {
+                                            androidx.compose.animation.AnimatedVisibility(
+                                                visible = filter?.isEmpty() ?: true,
+                                                enter = fadeIn(tween(100)),
+                                                exit = fadeOut(tween(100)),
+                                            ) {
+                                                BasicText(
+                                                    text = stringResource(R.string.search),
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis,
+                                                    style = typography().xs.semiBold.secondary.copy(
+                                                        color = colorPalette().textDisabled
+                                                    )
+                                                )
+                                            }
 
-                                        innerTextField()
-                                    }
-                                },
-                                modifier = Modifier
-                                    .height(30.dp)
-                                    .fillMaxWidth()
-                                    .background(
-                                        colorPalette().background4,
-                                        shape = thumbnailRoundness.shape()
-                                    )
-                                    .focusRequester(focusRequester)
-                                    .onFocusChanged {
-                                        if (!it.hasFocus) {
-                                            keyboardController?.hide()
-                                            if (filter?.isBlank() == true) {
-                                                filter = null
-                                                searching = false
+                                            innerTextField()
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .height(30.dp)
+                                        .fillMaxWidth()
+                                        .background(
+                                            colorPalette().background4,
+                                            shape = thumbnailRoundness.shape()
+                                        )
+                                        .focusRequester(focusRequester)
+                                        .onFocusChanged {
+                                            if (!it.hasFocus) {
+                                                keyboardController?.hide()
+                                                if (filter?.isBlank() == true) {
+                                                    filter = null
+                                                    searching = false
+                                                }
                                             }
                                         }
-                                    }
-                            )
-                        }
+                                )
+                            }
 
+                            ButtonsRow(
+                                chips = autocompleteButtons,
+                                currentValue = null,
+                                onValueUpdate = {
+                                    filter = ((filter?.substringBeforeLast(" ") ?: "") + " $it").trim()
+                                    val filterStr = filter ?: ""
+                                    focusRequester.requestFocus()
+                                    textState = TextFieldValue(filterStr,
+                                        selection = TextRange(filterStr.length))
+                                },
+                                modifier = Modifier
+                                    .padding(all = 2.dp)
+                                    .height(25.dp)
+                                    .fillMaxWidth()
+                            )
+                    }
                     }
                     /*        */
                     //}
