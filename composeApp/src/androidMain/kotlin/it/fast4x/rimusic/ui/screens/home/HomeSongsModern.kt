@@ -1488,15 +1488,19 @@ fun HomeSongsModern(
                         ) {
                             val focusRequester = remember { FocusRequester() }
                             var autocompleteButtons by rememberSaveable {
-                                mutableStateOf<List<Pair<String, String>>>(emptyList())
+                                mutableStateOf(filterTokensForAutocomplete)
+                                //mutableStateOf<List<Pair<String, String>>>(emptyList())
                             }
                             var textState by remember { mutableStateOf(TextFieldValue("")) }
-                            fun onFilterChange(new: String) {
-                                filter = new
+                            fun onFilterChange(newState: TextFieldValue) {
+                                filter = newState.text
+                                textState = newState
                                 // Update the autocomplete buttons
-                                val word = new.substringBeforeLast(" ") ?: ""
+                                val word = newState.text.substringAfterLast(" ")
+                                //if (word != "")
                                 autocompleteButtons = filterTokensForAutocomplete.filter {
                                     it.first.startsWith(word, ignoreCase = true)
+                                            && !word.equals(it.first, ignoreCase = true)
                                 }
                             }
                             Row(
@@ -1515,7 +1519,7 @@ fun HomeSongsModern(
                                 }
                                 BasicTextField(
                                     value = textState,
-                                    onValueChange = { onFilterChange(it.text) },
+                                    onValueChange = { onFilterChange(it) },
                                     textStyle = typography().xs.semiBold,
                                     singleLine = true,
                                     maxLines = 1,
@@ -1589,14 +1593,17 @@ fun HomeSongsModern(
                                 chips = autocompleteButtons,
                                 currentValue = null,
                                 onValueUpdate = {
-                                    filter = ((filter?.substringBeforeLast(" ") ?: "") + " $it").trim()
+                                    // Remove what was being typed and replace it with selected
+                                    filter = (filter?.split(" ")?.dropLast(1)?.joinToString(" ")
+                                            + " $it").trim()
                                     val filterStr = filter ?: ""
                                     focusRequester.requestFocus()
-                                    textState = TextFieldValue(filterStr,
-                                        selection = TextRange(filterStr.length))
+                                    onFilterChange(TextFieldValue(filterStr,
+                                        selection=TextRange(filterStr.length)))
                                 },
                                 modifier = Modifier
                                     .padding(all = 2.dp)
+                                    .padding(bottom = 8.dp)
                                     .height(25.dp)
                                     .fillMaxWidth()
                             )
