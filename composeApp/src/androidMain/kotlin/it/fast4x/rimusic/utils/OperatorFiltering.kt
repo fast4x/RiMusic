@@ -85,12 +85,12 @@ val filterTokensForAutocomplete = listOf(
             to context().getString(R.string.sort_title),
     context().getString(R.string.sort_artist).lowercase() + ":"
             to context().getString(R.string.sort_artist),
-    context().getString(R.string.sort_duration).lowercase() + ":"
-            to context().getString(R.string.sort_duration),
     context().getString(R.string.sort_album).lowercase() + ":"
             to context().getString(R.string.sort_album),
     context().getString(R.string.sort_year).lowercase() + ":"
             to context().getString(R.string.sort_year),
+    context().getString(R.string.sort_duration).lowercase() + ":"
+            to context().getString(R.string.sort_duration),
     context().getString(R.string.explicit).lowercase()
             to context().getString(R.string.explicit),
 );
@@ -120,7 +120,7 @@ fun filterMediaMetadata(metadata: MediaMetadata, filter: String): Boolean {
         context().getString(R.string.sort_year).lowercase() to (metadata.releaseYear.toString()),
     )
 
-    val included = tokenGroups.any { group ->
+    val included = tokenGroups.any { group -> // TODO slight bug with multiple exclusion tokens.
         group.all { token ->
             val searchFields = if (metadataFields.containsKey(token.field)) {
                 listOf(metadataFields[token.field] ?: "")
