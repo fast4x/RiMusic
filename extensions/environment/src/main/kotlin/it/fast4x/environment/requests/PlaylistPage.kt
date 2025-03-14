@@ -186,9 +186,23 @@ suspend fun Environment.playlistPage(body: BrowseBody) = runCatchingCancellable 
             title = header
                 ?.title
                 ?.text,
-            description = null,
-//            description = response.contents.twoColumnBrowseResultsRenderer.tabs?.firstOrNull()?.tabRenderer?.content?.sectionListRenderer
-//                ?.contents?.firstOrNull()?.musicResponsiveHeaderRenderer?.description?.musicDescriptionShelfRenderer?.description?.runs?.joinToString("") { it.text.toString() },
+//            description = null,
+            description = response
+                .contents
+                .twoColumnBrowseResultsRenderer
+                .tabs
+                ?.firstOrNull()
+                ?.tabRenderer
+                ?.content
+                ?.sectionListRenderer
+                ?.contents
+                ?.firstOrNull()
+                ?.musicResponsiveHeaderRenderer
+                ?.description
+                ?.musicDescriptionShelfRenderer
+                ?.description
+                ?.runs
+                ?.joinToString("") { it.text.toString() },
             thumbnail = header
                 ?.thumbnail
                 ?.musicThumbnailRenderer

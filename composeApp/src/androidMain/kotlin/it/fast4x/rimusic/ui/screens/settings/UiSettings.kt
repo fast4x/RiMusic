@@ -238,6 +238,7 @@ import it.fast4x.rimusic.utils.autoDownloadSongKey
 import it.fast4x.rimusic.utils.autoDownloadSongWhenAlbumBookmarkedKey
 import it.fast4x.rimusic.utils.autoDownloadSongWhenLikedKey
 import it.fast4x.rimusic.utils.customColorKey
+import it.fast4x.rimusic.utils.showPlaylistDescriptionEnabledKey
 
 @Composable
 fun DefaultUiSettings() {
@@ -619,6 +620,7 @@ fun UiSettings(
     var showPipedPlaylists by rememberPreference(showPipedPlaylistsKey, true)
     var showPinnedPlaylists by rememberPreference(showPinnedPlaylistsKey, true)
     var showMonthlyPlaylists by rememberPreference(showMonthlyPlaylistsKey, true)
+    var showPlaylistDescription by rememberPreference(showPlaylistDescriptionEnabledKey, false)
 
     var customThemeLight_Background0 by rememberPreference(customThemeLight_Background0Key, DefaultLightColorPalette.background0.hashCode())
     var customThemeLight_Background1 by rememberPreference(customThemeLight_Background1Key, DefaultLightColorPalette.background1.hashCode())
@@ -1497,6 +1499,16 @@ fun UiSettings(
                 isChecked = showMonthlyPlaylists,
                 onCheckedChange = { showMonthlyPlaylists = it }
             )
+
+        SwitchSettingEntry(
+//            title = "Show Playlist Description",
+            title = "${stringResource(R.string.show)} ${stringResource(R.string.playlist_description)}",
+            text = "",
+            isChecked = showPlaylistDescription,
+            onCheckedChange = {
+                showPlaylistDescription = it
+            }
+        )
 
         SettingsGroupSpacer()
         SettingsEntryGroupText(stringResource(R.string.monthly_playlists).uppercase())
