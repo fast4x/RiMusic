@@ -939,4 +939,5 @@
     <string name="export_log">Export log</string>
     <string name="value_must_be_valid_url">Value must be a valid url</string>
     <string name="caching">Caching...</string>
+    <string name="or_operator">Or</string>
 </resources>

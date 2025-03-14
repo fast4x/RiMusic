@@ -148,6 +148,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.typography
+import it.fast4x.rimusic.utils.filterSongEntities
 import timber.log.Timber
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
@@ -272,11 +273,7 @@ fun DeviceListSongs(
         filterCharSequence = filter.toString()
         //Log.d("mediaItemFilter", "<${filter}>  <${filterCharSequence}>")
         if (!filter.isNullOrBlank())
-            filteredSongs = songs
-                .filter {
-                    it.song.title.contains(filterCharSequence,true) ?: false
-                            || it.song.artistsText?.contains(filterCharSequence,true) ?: false
-                }
+            filteredSongs = filterSongEntities(songs, filterCharSequence)
         if (!filter.isNullOrBlank())
             filteredFolders = folders
                 .filter {
