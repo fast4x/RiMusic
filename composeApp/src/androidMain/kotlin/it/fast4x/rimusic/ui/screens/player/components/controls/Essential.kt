@@ -437,6 +437,7 @@ fun ControlsEssential(
     val playerBackgroundColors by rememberPreference(playerBackgroundColorsKey,PlayerBackgroundColors.BlurredCoverColor)
     var jumpPrevious by rememberPreference(jumpPreviousKey,"3")
     val currentMediaItem = binder.player.currentMediaItem
+    var lightTheme = colorPaletteMode == ColorPaletteMode.Light || (colorPaletteMode == ColorPaletteMode.System && (!isSystemInDarkTheme()))
 
     Box {
         IconButton(
@@ -539,23 +540,13 @@ fun ControlsEssential(
             .bounceClick()
             .clip(RoundedCornerShape(playPauseRoundness))
             .background(
-                when (colorPaletteName) {
-                    ColorPaletteName.Dynamic, ColorPaletteName.Default,
-                    ColorPaletteName.MaterialYou, ColorPaletteName.Customized, ColorPaletteName.CustomColor -> {
-                        when (playerPlayButtonType) {
-                            PlayerPlayButtonType.CircularRibbed, PlayerPlayButtonType.Disabled -> Color.Transparent
-                            else -> {
-                                if (isGradientBackgroundEnabled) colorPalette().background1
-                                else colorPalette().background2
-                            }
-                        }
+                when (playerPlayButtonType) {
+                    PlayerPlayButtonType.CircularRibbed, PlayerPlayButtonType.Disabled -> Color.Transparent
+                    else -> {
+                        if (playerBackgroundColors == PlayerBackgroundColors.AnimatedGradient)
+                            if (lightTheme) Color.White else Color.Black
+                        else colorPalette().accent
                     }
-
-                    ColorPaletteName.PureBlack, ColorPaletteName.ModernBlack ->
-                        if (playerPlayButtonType == PlayerPlayButtonType.CircularRibbed)
-                            colorPalette().background1 else
-                            if (playerPlayButtonType != PlayerPlayButtonType.Disabled)
-                                colorPalette().background4 else Color.Transparent
                 }
             )
             .width(playerPlayButtonType.width.dp)
@@ -567,11 +558,9 @@ fun ControlsEssential(
             Image(
                 painter = painterResource(R.drawable.a13shape),
                 colorFilter = ColorFilter.tint(
-                    when (colorPaletteName) {
-                        ColorPaletteName.PureBlack, ColorPaletteName.ModernBlack -> colorPalette().background4
-                        else -> if (isGradientBackgroundEnabled) colorPalette().background1
-                        else colorPalette().background2
-                    }
+                    if (playerBackgroundColors == PlayerBackgroundColors.AnimatedGradient)
+                        if (lightTheme) Color.White else Color.Black
+                    else colorPalette().accent
                 ),
                 modifier = Modifier
                     .fillMaxSize()
@@ -584,7 +573,7 @@ fun ControlsEssential(
         Image(
             painter = painterResource(if (shouldBePlaying) R.drawable.pause else R.drawable.play),
             contentDescription = null,
-            colorFilter = ColorFilter.tint(if ((playerPlayButtonType == PlayerPlayButtonType.Disabled) || ((colorPaletteName == ColorPaletteName.Dynamic) && (colorPaletteMode == ColorPaletteMode.PitchBlack))) colorPalette().accent else colorPalette().text),
+            colorFilter = ColorFilter.tint(if (playerPlayButtonType == PlayerPlayButtonType.Disabled || playerBackgroundColors == PlayerBackgroundColors.AnimatedGradient) colorPalette().accent else colorPalette().text),
             modifier = Modifier
                 .rotate(rotationAngle)
                 .align(Alignment.Center)
