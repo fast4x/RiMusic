@@ -1852,16 +1852,25 @@ fun Player(
 
 
                         if (showButtonPlayerSleepTimer)
-                            IconButton(
-                                icon = R.drawable.sleep,
-                                color = if (sleepTimerMillisLeft != null) colorPalette().accent else Color.Gray,
-                                enabled = true,
-                                onClick = {
-                                    isShowingSleepTimerDialog = true
-                                },
-                                modifier = Modifier
-                                    .size(24.dp),
-                            )
+                            if (sleepTimerMillisLeft == null){
+                                IconButton(
+                                    icon = R.drawable.sleep,
+                                    color = Color.Gray,
+                                    enabled = true,
+                                    onClick = {
+                                        isShowingSleepTimerDialog = true
+                                    },
+                                    modifier = Modifier
+                                        .size(24.dp),
+                                )
+                            } else {
+                                BasicText(
+                                    text = formatAsDuration(sleepTimerMillisLeft!!),
+                                    style = typography().l.semiBold,
+                                    modifier = Modifier
+                                        .clickable(onClick = {isShowingSleepTimerDialog = true})
+                                )
+                            }
 
                         if (showButtonPlayerSystemEqualizer) {
                             val activityResultLauncher =
