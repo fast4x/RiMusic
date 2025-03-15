@@ -127,6 +127,9 @@ import it.fast4x.rimusic.utils.addSongToYtPlaylist
 import it.fast4x.rimusic.utils.addToYtLikedSong
 import org.dailyislam.android.utilities.isNetworkConnected
 import it.fast4x.rimusic.utils.removeYTSongFromPlaylist
+import it.fast4x.rimusic.utils.mediaItemToggleLike
+import it.fast4x.rimusic.utils.setDisLikeState
+import it.fast4x.rimusic.utils.unlikeYtVideoOrSong
 import timber.log.Timber
 import java.time.LocalTime.now
 import java.time.format.DateTimeFormatter
@@ -1327,14 +1330,29 @@ fun MediaItemMenu(
                                     SmartMessage(appContext().resources.getString(R.string.no_connection), context = appContext(), type = PopupType.Error)
                                 } else if (!isYouTubeSyncEnabled()){
                                     Database.asyncTransaction {
-                                        if (like(mediaItem.mediaId, setLikeState(likedAt)) == 0) {
-                                            insert(mediaItem, Song::toggleLike)
-                                        }
+                                        mediaItemToggleLike(mediaItem)
                                         MyDownloadHelper.autoDownloadWhenLiked(context(), mediaItem)
                                     }
                                 } else {
                                     CoroutineScope(Dispatchers.IO).launch {
                                         addToYtLikedSong(mediaItem)
+                                    }
+                                }
+                            },
+                            onLongClick = {
+                                if (!isNetworkConnected(appContext()) && isYouTubeSyncEnabled()) {
+                                    SmartMessage(appContext().resources.getString(R.string.no_connection), context = appContext(), type = PopupType.Error)
+                                } else if (!isYouTubeSyncEnabled()){
+                                    Database.asyncTransaction {
+                                        if (like(mediaItem.mediaId, setDisLikeState(likedAt)) == 0) {
+                                            insert(mediaItem, Song::toggleDislike)
+                                        }
+                                        MyDownloadHelper.autoDownloadWhenLiked(context(), mediaItem)
+                                    }
+                                } else {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        // currently disliking can not be implemented for syncing so just unliking songs
+                                        unlikeYtVideoOrSong(mediaItem)
                                     }
                                 }
                             },

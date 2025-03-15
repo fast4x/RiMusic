@@ -29,6 +29,7 @@ import it.fast4x.rimusic.utils.showFavoritesPlaylistKey
 import it.fast4x.rimusic.utils.showMyTopPlaylistKey
 import it.fast4x.rimusic.utils.showOnDevicePlaylistKey
 import it.fast4x.rimusic.ui.components.Skeleton
+import it.fast4x.rimusic.utils.showDislikedPlaylistKey
 
 @ExperimentalMaterialApi
 @ExperimentalTextApi
@@ -52,7 +53,8 @@ fun BuiltInPlaylistScreen(
             BuiltInPlaylist.Downloaded -> 2
             BuiltInPlaylist.Top -> 3
             BuiltInPlaylist.OnDevice -> 4
-            else -> 5
+            BuiltInPlaylist.Disliked -> 5
+            else -> 6
         })
     }
 
@@ -65,6 +67,7 @@ fun BuiltInPlaylistScreen(
     val showMyTopPlaylist by rememberPreference(showMyTopPlaylistKey, true)
     val showDownloadedPlaylist by rememberPreference(showDownloadedPlaylistKey, true)
     val showOnDevicePlaylist by rememberPreference(showOnDevicePlaylistKey, true)
+    val showDislikedPlaylist by rememberPreference(showDislikedPlaylistKey, false)
 
     PersistMapCleanup(tagPrefix = "${builtInPlaylist.name}/")
 
@@ -84,6 +87,8 @@ fun BuiltInPlaylistScreen(
                         item(3, stringResource(R.string.my_playlist_top).format(maxTopPlaylistItems.number) , R.drawable.trending)
                     if(showOnDevicePlaylist)
                         item(4, stringResource(R.string.on_device), R.drawable.musical_notes)
+                    if(showDislikedPlaylist)
+                        item(5, stringResource(R.string.disliked), R.drawable.heart_dislike)
                 }
             ) { currentTabIndex ->
                 saveableStateHolder.SaveableStateProvider(key = currentTabIndex) {
@@ -93,7 +98,8 @@ fun BuiltInPlaylistScreen(
                             1 -> BuiltInPlaylist.Offline
                             2 -> BuiltInPlaylist.Downloaded
                             3 -> BuiltInPlaylist.Top
-                            else -> BuiltInPlaylist.OnDevice
+                            4 -> BuiltInPlaylist.OnDevice
+                            else -> BuiltInPlaylist.Disliked
                         }
 
                     if( playlist == BuiltInPlaylist.OnDevice )

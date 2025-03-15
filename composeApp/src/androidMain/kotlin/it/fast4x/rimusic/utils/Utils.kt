@@ -104,18 +104,33 @@ fun getTimestampFromDate(date: String): Long {
 fun mediaItemToggleLike( mediaItem: MediaItem) {
     Database.asyncTransaction {
         if (songExist(mediaItem.mediaId) == 0)
-            insert(mediaItem, Song::toggleLike)
-        //else {
-            if (songliked(mediaItem.mediaId) == 0)
-                like(
-                    mediaItem.mediaId,
-                    System.currentTimeMillis()
-                )
-            else like(
+            insert(mediaItem)
+        if (getLikedAt(mediaItem.mediaId) in listOf(null, -1L))
+            like(
                 mediaItem.mediaId,
-                null
+                System.currentTimeMillis()
             )
-        //}
+        else like(
+            mediaItem.mediaId,
+            null
+        )
+        MyDownloadHelper.autoDownloadWhenLiked(
+            context(),
+            mediaItem
+        )
+    }
+}
+
+@UnstableApi
+fun mediaItemSetLiked( mediaItem: MediaItem ) {
+    Database.asyncTransaction {
+        if (songExist(mediaItem.mediaId) == 0)
+            insert(mediaItem)
+        if (getLikedAt(mediaItem.mediaId) in listOf(null, -1L))
+            like(
+                mediaItem.mediaId,
+                System.currentTimeMillis()
+            )
         MyDownloadHelper.autoDownloadWhenLiked(
             context(),
             mediaItem
@@ -1005,29 +1020,39 @@ suspend fun addToYtLikedSong(mediaItem: MediaItem){
                     )
                 }
         } else {
-            removelikeVideoOrSong(mediaItem.mediaId)
-                .onSuccess {
-                    Database.asyncTransaction {
-                        like(mediaItem.mediaId, null)
-                        MyDownloadHelper.autoDownloadWhenLiked(
-                            context(),
-                            mediaItem
-                        )
-                    }
-                    SmartMessage(
-                        appContext().resources.getString(R.string.song_unliked_yt),
-                        context = appContext(),
-                        durationLong = false
-                    )
-                }
-                .onFailure {
-                    SmartMessage(
-                        appContext().resources.getString(R.string.songs_unliked_yt_failed),
-                        context = appContext(),
-                        durationLong = false
-                    )
-                }
+            unlikeYtVideoOrSong(mediaItem)
         }
+    }
+}
+
+@OptIn(UnstableApi::class)
+suspend fun unlikeYtVideoOrSong(mediaItem: MediaItem){
+    if(isYouTubeSyncEnabled()){
+        removelikeVideoOrSong(mediaItem.mediaId)
+            .onSuccess {
+                Database.asyncTransaction {
+                    if(songExist(mediaItem.mediaId) == 0){
+                        insert(mediaItem)
+                    }
+                    like(mediaItem.mediaId, null)
+                    MyDownloadHelper.autoDownloadWhenLiked(
+                        context(),
+                        mediaItem
+                    )
+                }
+                SmartMessage(
+                    appContext().resources.getString(R.string.song_unliked_yt),
+                    context = appContext(),
+                    durationLong = false
+                )
+            }
+            .onFailure {
+                SmartMessage(
+                    appContext().resources.getString(R.string.songs_unliked_yt_failed),
+                    context = appContext(),
+                    durationLong = false
+                )
+            }
     }
 }
 

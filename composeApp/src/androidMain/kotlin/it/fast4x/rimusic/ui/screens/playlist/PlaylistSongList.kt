@@ -151,6 +151,7 @@ import it.fast4x.rimusic.utils.formatAsDuration
 import org.dailyislam.android.utilities.getHttpClient
 import org.dailyislam.android.utilities.isNetworkConnected
 import it.fast4x.rimusic.utils.languageDestination
+import it.fast4x.rimusic.utils.mediaItemSetLiked
 import it.fast4x.rimusic.utils.setLikeState
 import kotlinx.coroutines.flow.filterNotNull
 import me.bush.translator.Language
@@ -777,12 +778,7 @@ fun PlaylistSongList(
                                             } else if (!isYouTubeSyncEnabled()){
                                                 Database.asyncTransaction {
                                                     playlistPage!!.songs.filter { getLikedAt(it.asMediaItem.mediaId) in listOf(-1L,null) }.forEachIndexed { _, song ->
-                                                        Database.asyncTransaction {
-                                                            if (like(song.asMediaItem.mediaId, setLikeState(song.asSong.likedAt)) == 0
-                                                            ) {
-                                                                insert(song.asMediaItem, Song::toggleLike)
-                                                            }
-                                                        }
+                                                        mediaItemSetLiked(song.asMediaItem)
                                                     }
                                                     SmartMessage(
                                                         context.resources.getString(R.string.done),

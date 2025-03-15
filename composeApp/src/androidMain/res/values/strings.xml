@@ -23,6 +23,7 @@
     <string name="enter_the_playlist_name">Enter the playlist name</string>
     <string name="playlists">Playlists</string>
     <string name="favorites">Favorites</string>
+    <string name="disliked">Disliked</string>
     <string name="quick_picks">Quick picks</string>
     <string name="songs">Songs</string>
     <string name="other_versions">Other versions</string>
@@ -556,6 +557,7 @@
     <string name="position_bottom">Bottom</string>
     <string name="added_to_favorites">Added to favorites</string>
     <string name="removed_from_favorites">Removed from favorites</string>
+    <string name="added_to_disliked">Added to disliked</string>
     <string name="lang_filipino">Filipino</string>
     <string name="action_bar_transparent_background">Transparent background</string>
     <string name="pinfo_type">Info type</string>

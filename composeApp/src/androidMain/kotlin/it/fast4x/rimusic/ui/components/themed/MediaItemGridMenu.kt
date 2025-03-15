@@ -93,11 +93,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.enums.PopupType
+import it.fast4x.rimusic.models.Song
+import it.fast4x.rimusic.service.MyDownloadHelper
 import it.fast4x.rimusic.typography
 import it.fast4x.rimusic.ui.screens.settings.isYouTubeSyncEnabled
 import it.fast4x.rimusic.utils.addSongToYtPlaylist
 import it.fast4x.rimusic.utils.addToYtLikedSong
 import org.dailyislam.android.utilities.isNetworkConnected
+import it.fast4x.rimusic.utils.getLikeState
+import it.fast4x.rimusic.utils.setDisLikeState
+import it.fast4x.rimusic.utils.unlikeYtVideoOrSong
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -447,7 +452,7 @@ fun MediaItemGridMenu (
 
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 IconButton(
-                    icon = if (likedAt == null) R.drawable.heart_outline else R.drawable.heart,
+                    icon = getLikeState(mediaItem.mediaId),
                     color = colorPalette().favoritesIcon,
                     onClick = {
                         if (!isNetworkConnected(appContext()) && isYouTubeSyncEnabled()) {
@@ -458,6 +463,25 @@ fun MediaItemGridMenu (
                         } else {
                             CoroutineScope(Dispatchers.IO).launch {
                                 addToYtLikedSong(mediaItem)
+                            }
+                        }
+                    },
+                    onLongClick = {
+                        if (!isNetworkConnected(appContext()) && isYouTubeSyncEnabled()) {
+                            SmartMessage(appContext().resources.getString(R.string.no_connection), context = appContext(), type = PopupType.Error)
+                        } else if (!isYouTubeSyncEnabled()){
+                            Database.asyncTransaction {
+                                if (like(mediaItem.mediaId, setDisLikeState(likedAt)) == 0){
+                                    insert(mediaItem, Song::toggleDislike)
+                                }
+                                MyDownloadHelper.autoDownloadWhenLiked(context, mediaItem)
+                                updateData = !updateData
+                            }
+                        } else {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                // currently can not implement dislike for sync so only unliking song
+                                unlikeYtVideoOrSong(mediaItem)
+                                updateData = !updateData
                             }
                         }
                     },
