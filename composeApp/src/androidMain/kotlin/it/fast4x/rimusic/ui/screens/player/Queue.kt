@@ -125,6 +125,7 @@ import it.fast4x.rimusic.utils.backgroundProgressKey
 import it.fast4x.rimusic.utils.disableScrollingTextKey
 import it.fast4x.rimusic.utils.discoverKey
 import it.fast4x.rimusic.utils.enqueue
+import it.fast4x.rimusic.utils.filterWindowSongs
 import it.fast4x.rimusic.utils.getDownloadState
 import it.fast4x.rimusic.utils.getIconQueueLoopState
 import it.fast4x.rimusic.utils.isDownloadedSong
@@ -383,24 +384,7 @@ fun Queue(
     var filterCharSequence: CharSequence
     filterCharSequence = filter.toString()
     if (!filter.isNullOrBlank())
-        windowsFiltered = windowsFiltered
-            .filter {
-                it.mediaItem.mediaMetadata.title?.contains(filterCharSequence, true) ?: false ||
-                        it.mediaItem.mediaMetadata.artist?.contains(
-                            filterCharSequence,
-                            true
-                        ) ?: false ||
-                        it.mediaItem.mediaMetadata.albumTitle?.contains(
-                            filterCharSequence,
-                            true
-                        ) ?: false ||
-                        it.mediaItem.mediaMetadata.albumArtist?.contains(
-                            filterCharSequence,
-                            true
-                        ) ?: false
-            }
-
-
+        windowsFiltered = filterWindowSongs(windows, filterCharSequence)
 
     Box(
         modifier = Modifier
