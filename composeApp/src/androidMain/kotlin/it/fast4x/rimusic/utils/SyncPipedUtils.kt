@@ -43,7 +43,10 @@ fun syncSongsInPipedPlaylist(context: Context,coroutineScope: CoroutineScope, pi
                 Database.asyncTransaction { clearPlaylist(it) }
             }
 
-            playlist.videos.forEach {video ->
+            playlist.videos
+                .filter { it.id != null }
+                .distinctBy { it.id }
+                .forEach {video ->
                 val song = video.id?.let { id ->
                     Song(
                         id = id,
@@ -57,7 +60,10 @@ fun syncSongsInPipedPlaylist(context: Context,coroutineScope: CoroutineScope, pi
                     Database.insert(song)
                 }
             }
-            playlist.videos.forEachIndexed { index, song ->
+            playlist.videos
+                .filter { it.id != null }
+                .distinctBy { it.id }
+                .forEachIndexed { index, song ->
                 Database.insert(
                     SongPlaylistMap(
                         songId = song.id.toString(),
@@ -109,9 +115,12 @@ fun ImportPipedPlaylists(){
                                         session = pipedSession.toApiSession(),
                                         id = it.id
                                     )
-                                }.await()?.map {playlist ->
+                                }.await()?.map { playlist ->
 
-                                    playlist.videos.forEach {video ->
+                                    playlist.videos
+                                        .filter { it.id != null }
+                                        .distinctBy { it.id }
+                                        .forEach {video ->
                                         val song = video.id?.let { id ->
                                             Song(
                                                 id = id,
@@ -123,7 +132,10 @@ fun ImportPipedPlaylists(){
                                         }
                                         if (song != null) insert(song)
                                     }
-                                    playlist.videos.forEachIndexed { index, song ->
+                                    playlist.videos
+                                        .filter { it.id != null }
+                                        .distinctBy { it.id }
+                                        .forEachIndexed { index, song ->
                                         if (!song.id.isNullOrBlank() || !song.id.isNullOrEmpty()) {
                                             insert(
                                                 SongPlaylistMap(

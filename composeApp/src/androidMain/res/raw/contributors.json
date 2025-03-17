@@ -658,5 +658,27 @@
     "user_view_type": "public",
     "site_admin": false,
     "contributions": 1
+  },
+  {
+    "login": "chayotic",
+    "id": 152018343,
+    "node_id": "",
+    "avatar_url": "https://avatars.githubusercontent.com/u/152018343?v=4",
+    "gravatar_id": "",
+    "url": "https://github.com/chayotic",
+    "html_url": "https://github.com/chayotic",
+    "followers_url": "https://api.github.com/users/chayotic/followers",
+    "following_url": "https://api.github.com/users/chayotic/following{/other_user}",
+    "gists_url": "https://api.github.com/users/chayotic/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/chayotic/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/chayotic/subscriptions",
+    "organizations_url": "https://api.github.com/users/chayotic/orgs",
+    "repos_url": "https://api.github.com/users/chayotic/repos",
+    "events_url": "https://api.github.com/users/chayotic/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/chayotic/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false,
+    "contributions": 2
   }
 ]

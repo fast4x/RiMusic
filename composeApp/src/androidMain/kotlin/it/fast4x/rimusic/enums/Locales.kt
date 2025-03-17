@@ -6,6 +6,7 @@ enum class Languages {
     Arabic,
     Azerbaijani,
     Bashkir,
+    Basque,
     Bengali,
     Catalan,
     Danish,
@@ -59,6 +60,7 @@ enum class Languages {
             Azerbaijani -> "az"
             Arabic -> "ar"
             Bashkir -> "ba"
+            Basque -> "eu"
             Bengali -> "bn"
             Catalan -> "ca"
             ChineseSimplified -> "zh-CN"

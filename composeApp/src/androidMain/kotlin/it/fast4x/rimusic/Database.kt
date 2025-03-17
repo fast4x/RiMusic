@@ -73,6 +73,8 @@ interface Database {
     private val _internal: RoomDatabase
         get() = DatabaseInitializer.Instance
 
+    val getInstance: RoomDatabase
+        get() = _internal
 
     //**********************************************
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)

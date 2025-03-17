@@ -53,9 +53,7 @@ import it.fast4x.rimusic.models.Mood
 import it.fast4x.rimusic.models.SearchQuery
 import it.fast4x.rimusic.ui.components.CustomModalBottomSheet
 import it.fast4x.rimusic.ui.screens.album.AlbumScreen
-import it.fast4x.rimusic.ui.screens.artist.ArtistOverviewItems
 import it.fast4x.rimusic.ui.screens.artist.ArtistScreen
-import it.fast4x.rimusic.ui.screens.artist.ArtistScreenModern
 import it.fast4x.rimusic.ui.screens.builtinplaylist.BuiltInPlaylistScreen
 import it.fast4x.rimusic.ui.screens.history.HistoryScreen
 import it.fast4x.rimusic.ui.screens.home.HomeScreen
@@ -262,7 +260,7 @@ fun AppNavigation(
             )
         ) { navBackStackEntry ->
             val id = navBackStackEntry.arguments?.getString("id") ?: ""
-            ArtistScreenModern(
+            ArtistScreen(
                 navController = navController,
                 browseId = id,
                 miniPlayer = miniPlayer,

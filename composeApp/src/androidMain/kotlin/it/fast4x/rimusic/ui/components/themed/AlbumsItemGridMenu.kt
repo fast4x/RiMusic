@@ -63,7 +63,7 @@ import kotlinx.coroutines.Dispatchers
 import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.enums.NavRoutes
 import it.fast4x.rimusic.typography
-import it.fast4x.rimusic.utils.isNetworkConnected
+import org.dailyislam.android.utilities.isNetworkConnected
 
 @ExperimentalTextApi
 @SuppressLint("SuspiciousIndentation")

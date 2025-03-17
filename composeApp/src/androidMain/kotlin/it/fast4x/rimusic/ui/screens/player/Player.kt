@@ -2030,13 +2030,15 @@ fun Player(
                  )
                  pagerStateFS.LaunchedEffectScrollToPage(binder.player.currentMediaItemIndex)
 
-                 LaunchedEffect(pagerStateFS) {
-                     var previousPage = pagerStateFS.settledPage
-                     snapshotFlow { pagerStateFS.settledPage }.distinctUntilChanged().collect {
-                         if (previousPage != it) {
-                             if (it != binder.player.currentMediaItemIndex) binder.player.playAtIndex(it)
+                 if (!showQueue) {
+                     LaunchedEffect(pagerStateFS) {
+                         var previousPage = pagerStateFS.settledPage
+                         snapshotFlow { pagerStateFS.settledPage }.distinctUntilChanged().collect {
+                             if (previousPage != it) {
+                                 if (it != binder.player.currentMediaItemIndex) binder.player.playAtIndex(it)
+                             }
+                             previousPage = it
                          }
-                         previousPage = it
                      }
                  }
 
@@ -2294,13 +2296,15 @@ fun Player(
                                          }
                                      }
 
-                                     LaunchedEffect(pagerState) {
-                                         var previousPage = pagerState.settledPage
-                                         snapshotFlow { pagerState.settledPage }.distinctUntilChanged().collect {
-                                             if (previousPage != it) {
-                                                 if (it != binder.player.currentMediaItemIndex) binder.player.playAtIndex(it)
-                                             }
-                                             previousPage = it
+                                     if (!showQueue) {
+                                         LaunchedEffect(pagerState) {
+                                             var previousPage = pagerState.settledPage
+                                             snapshotFlow { pagerState.settledPage }.distinctUntilChanged().collect {
+                                                     if (previousPage != it) {
+                                                         if (it != binder.player.currentMediaItemIndex) binder.player.playAtIndex(it)
+                                                     }
+                                                     previousPage = it
+                                                 }
                                          }
                                      }
                                      HorizontalPager(
@@ -2626,17 +2630,18 @@ fun Player(
                    )
                    pagerStateFS.LaunchedEffectScrollToPage(binder.player.currentMediaItemIndex)
 
-                    LaunchedEffect(pagerStateFS) {
-                        var previousPage = pagerStateFS.settledPage
-                        snapshotFlow { pagerStateFS.settledPage }.distinctUntilChanged().collect {
-                            if (previousPage != it) {
-                                delay(if (swipeAnimationNoThumbnail == SwipeAnimationNoThumbnail.Fade) 0
-                                      else 400)
-                                if (it != binder.player.currentMediaItemIndex) binder.player.playAtIndex(it)
-                            }
-                            previousPage = it
-                        }
-                    }
+                   if (!showQueue) {
+                       LaunchedEffect(pagerStateFS) {
+                           var previousPage = pagerStateFS.settledPage
+                           snapshotFlow { pagerStateFS.settledPage }.distinctUntilChanged().collect {
+                                   if (previousPage != it) {
+                                       delay(if (swipeAnimationNoThumbnail == SwipeAnimationNoThumbnail.Fade) 0 else 400)
+                                       if (it != binder.player.currentMediaItemIndex) binder.player.playAtIndex(it)
+                                   }
+                                   previousPage = it
+                               }
+                       }
+                   }
                     HorizontalPager(
                         state = pagerStateFS,
                         beyondViewportPageCount = if (swipeAnimationNoThumbnail != SwipeAnimationNoThumbnail.Circle || albumCoverRotation && (isShowingLyrics || showthumbnail)) 1 else 0,
@@ -2987,13 +2992,15 @@ fun Player(
 
                                  pagerState.LaunchedEffectScrollToPage(binder.player.currentMediaItemIndex)
 
-                                 LaunchedEffect(pagerState) {
-                                     var previousPage = pagerState.settledPage
-                                     snapshotFlow { pagerState.settledPage }.distinctUntilChanged().collect {
-                                         if (previousPage != it) {
-                                             if (it != binder.player.currentMediaItemIndex) binder.player.playAtIndex(it)
+                                 if (!showQueue) {
+                                     LaunchedEffect(pagerState) {
+                                         var previousPage = pagerState.settledPage
+                                         snapshotFlow { pagerState.settledPage }.distinctUntilChanged().collect {
+                                             if (previousPage != it) {
+                                                 if (it != binder.player.currentMediaItemIndex) binder.player.playAtIndex(it)
+                                             }
+                                             previousPage = it
                                          }
-                                         previousPage = it
                                      }
                                  }
 

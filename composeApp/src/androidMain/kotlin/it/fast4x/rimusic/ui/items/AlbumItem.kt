@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import coil.compose.AsyncImage
 import it.fast4x.environment.Environment
 import it.fast4x.rimusic.R
@@ -42,6 +43,8 @@ fun AlbumItem(
     thumbnailSizePx: Int,
     thumbnailSizeDp: Dp,
     modifier: Modifier = Modifier,
+    homePage: Boolean = false,
+    iconSize: Dp = 0.dp,
     alternative: Boolean = false,
     yearCentered: Boolean = true,
     showAuthors: Boolean = false,
@@ -56,6 +59,8 @@ fun AlbumItem(
         yearCentered = yearCentered,
         thumbnailSizePx = thumbnailSizePx,
         thumbnailSizeDp = thumbnailSizeDp,
+        homePage = homePage,
+        iconSize = iconSize,
         alternative = alternative,
         showAuthors = showAuthors,
         modifier = modifier,
@@ -101,6 +106,8 @@ fun AlbumItem(
     thumbnailSizePx: Int,
     thumbnailSizeDp: Dp,
     modifier: Modifier = Modifier,
+    homePage: Boolean = false,
+    iconSize: Dp = 0.dp,
     alternative: Boolean = false,
     showAuthors: Boolean? = false,
     disableScrollingText: Boolean,
@@ -126,7 +133,7 @@ fun AlbumItem(
                     painter = painterResource(R.drawable.ytmusic),
                     colorFilter = ColorFilter.tint(Color.Red.copy(0.75f).compositeOver(Color.White)),
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(if (homePage) 0.3*iconSize else 40.dp)
                         .padding(all = 5.dp),
                     contentDescription = "Background Image",
                     contentScale = ContentScale.Fit

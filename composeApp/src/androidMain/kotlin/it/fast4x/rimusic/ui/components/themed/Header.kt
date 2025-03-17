@@ -30,6 +30,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import it.fast4x.rimusic.R
 import it.fast4x.rimusic.enums.NavigationBarPosition
 import it.fast4x.rimusic.enums.UiType
 import it.fast4x.rimusic.ui.styling.Dimensions
@@ -39,6 +42,7 @@ import it.fast4x.rimusic.utils.conditional
 import it.fast4x.rimusic.utils.medium
 import it.fast4x.rimusic.utils.semiBold
 import it.fast4x.rimusic.colorPalette
+import it.fast4x.rimusic.enums.NavRoutes
 import it.fast4x.rimusic.typography
 import kotlin.random.Random
 
@@ -158,7 +162,8 @@ fun HeaderWithIcon (
     @DrawableRes iconId: Int,
     showIcon: Boolean = true,
     enabled: Boolean = true,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    navController: NavController = rememberNavController()
 ){
     //val disableIconButtonOnTop by rememberPreference(disableIconButtonOnTopKey, false)
     Row (
@@ -169,30 +174,46 @@ fun HeaderWithIcon (
             .padding(all = 8.dp)
 
     ){
-
-        BasicText(
-            text = title,
-            style = TextStyle(
-                fontSize = typography().xxl.bold.fontSize,
-                fontWeight = typography().xxl.bold.fontWeight,
-                color = colorPalette().text,
-                textAlign = if( UiType.ViMusic.isNotCurrent()) TextAlign.Center else TextAlign.End
-
-            ),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+        Box(
             modifier = Modifier
-                .fillMaxSize(if( showIcon && UiType.ViMusic.isCurrent() ) 0.9f else 1f)
-        )
+                .fillMaxSize()
+        ) {
+            if (UiType.ViMusic.isCurrent() &&
+                (NavigationBarPosition.Top.isCurrent() || NavigationBarPosition.Bottom.isCurrent())
+            ) {
+                SecondaryButton(
+                    iconId = R.drawable.settings,
+                    onClick = {
+                        navController.navigate(NavRoutes.settings.name)
+                    },
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+            }
 
-        if ( showIcon && UiType.ViMusic.isCurrent() &&
-            ( NavigationBarPosition.Left.isCurrent() || NavigationBarPosition.Right.isCurrent()) )
-            SecondaryButton(
-                iconId = iconId,
-                enabled = enabled,
-                onClick = onClick,
+            BasicText(
+                text = title,
+                style = TextStyle(
+                    fontSize = typography().xxl.bold.fontSize,
+                    fontWeight = typography().xxl.bold.fontWeight,
+                    color = colorPalette().text,
+                    textAlign = if (UiType.ViMusic.isNotCurrent()) TextAlign.Center else TextAlign.End
+
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .fillMaxSize(if (showIcon && UiType.ViMusic.isCurrent()) 0.9f else 1f)
             )
 
+            if (showIcon && UiType.ViMusic.isCurrent() &&
+                (NavigationBarPosition.Left.isCurrent() || NavigationBarPosition.Right.isCurrent())
+            )
+                SecondaryButton(
+                    iconId = iconId,
+                    enabled = enabled,
+                    onClick = onClick,
+                )
+        }
     }
 }
 

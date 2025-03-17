@@ -31,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import it.fast4x.environment.Environment
@@ -58,6 +59,8 @@ import kotlinx.coroutines.flow.map
 import it.fast4x.rimusic.colorPalette
 import it.fast4x.rimusic.thumbnailShape
 import it.fast4x.rimusic.typography
+import it.fast4x.rimusic.ui.components.tab.ItemSize
+import it.fast4x.rimusic.utils.Preference.HOME_LIBRARY_ITEM_SIZE
 import timber.log.Timber
 
 @Composable
@@ -105,6 +108,8 @@ fun PlaylistItem(
     thumbnailSizePx: Int,
     thumbnailSizeDp: Dp,
     modifier: Modifier = Modifier,
+    homepage: Boolean = false,
+    iconSize: Dp = 0.dp,
     alternative: Boolean = false,
     showName: Boolean = true,
     disableScrollingText: Boolean,
@@ -193,6 +198,8 @@ fun PlaylistItem(
         thumbnailSizeDp = thumbnailSizeDp,
         modifier = modifier,
         alternative = alternative,
+        homePage = homepage,
+        iconSize = iconSize,
         showName = showName,
         disableScrollingText = disableScrollingText,
         isYoutubePlaylist = isYoutubePlaylist,
@@ -273,6 +280,8 @@ fun PlaylistItem(
     channelName: String?,
     thumbnailSizeDp: Dp,
     modifier: Modifier = Modifier,
+    homePage: Boolean = false,
+    iconSize: Dp = 0.dp,
     alternative: Boolean = false,
     showName: Boolean = true,
     showSongsCount: Boolean = true,
@@ -305,7 +314,7 @@ fun PlaylistItem(
                         painter = painterResource(R.drawable.piped_logo),
                         colorFilter = ColorFilter.tint(colorPalette().red),
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(if (homePage) 0.3*iconSize else 40.dp)
                             .padding(all = 5.dp),
                         contentDescription = "Background Image",
                         contentScale = ContentScale.Fit
@@ -316,7 +325,7 @@ fun PlaylistItem(
                         painter = painterResource(R.drawable.pin),
                         colorFilter = ColorFilter.tint(colorPalette().accent),
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(if (homePage) 0.3*iconSize else 40.dp)
                             .padding(all = 5.dp),
                         contentDescription = "Background Image",
                         contentScale = ContentScale.Fit
@@ -327,7 +336,7 @@ fun PlaylistItem(
                         painter = painterResource(R.drawable.stat_month),
                         colorFilter = ColorFilter.tint(colorPalette().accent),
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(if (homePage) 0.3*iconSize else 40.dp)
                             .padding(all = 5.dp),
                         contentDescription = "Background Image",
                         contentScale = ContentScale.Fit
@@ -340,7 +349,7 @@ fun PlaylistItem(
                     painter = painterResource(R.drawable.ytmusic),
                     colorFilter = ColorFilter.tint(if (isYoutubePlaylist) Color.Red.copy(0.75f).compositeOver(Color.White) else colorPalette().text),
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(if (homePage) 0.3*iconSize else 40.dp)
                         .padding(all = 5.dp),
                     contentDescription = "Background Image",
                     contentScale = ContentScale.Fit
@@ -355,7 +364,7 @@ fun PlaylistItem(
                         .padding(all = 5.dp)
                         .background(colorPalette().text, CircleShape)
                         .padding(all = 5.dp)
-                        .size(18.dp)
+                        .size(if (homePage) 0.2*iconSize else 40.dp)
                         .align(Alignment.BottomStart),
                     contentDescription = "Background Image",
                     contentScale = ContentScale.Fit

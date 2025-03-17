@@ -199,9 +199,9 @@ private fun SeekBarContent(
             drawPath(
                 wavePath(size.copy(height = size.height * 2), progress),
                 color,
-                style = Stroke(width = 15f)
+                //style = Stroke(width = 15f)
                 //style = Stroke(width = 10f)
-                //style = Stroke(width = 5f)
+                style = Stroke(width = 5f)
             )
         }
     }

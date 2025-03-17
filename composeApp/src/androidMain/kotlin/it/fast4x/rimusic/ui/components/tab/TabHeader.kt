@@ -70,7 +70,7 @@ interface TabHeader {
         fun style(): TextStyle =
             when( UiType.current() ) {
                 UiType.RiMusic -> typography().xl.bold
-                UiType.ViMusic -> typography().xxxl.bold
+                UiType.ViMusic -> typography().xxl.bold
             }
 
         @Composable

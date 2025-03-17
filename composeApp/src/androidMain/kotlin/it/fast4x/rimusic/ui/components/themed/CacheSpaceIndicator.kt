@@ -64,15 +64,27 @@ fun CacheSpaceIndicator(
     val binder = LocalPlayerServiceBinder.current
 
     val imageDiskCacheSize = remember {
-        Coil.imageLoader(context).diskCache?.size
+        try {
+            Coil.imageLoader(context).diskCache?.size
+        } catch (e: Exception) {
+            0L
+        }
     }
 
     val cachedSongsDiskCacheSize = remember {
-        binder?.cache?.cacheSpace
+        try {
+            binder?.cache?.cacheSpace
+        } catch (e: Exception) {
+            0L
+        }
     }
 
     val downloadedSongsDiskCacheSize = remember {
-        binder?.downloadCache?.cacheSpace
+        try {
+            binder?.downloadCache?.cacheSpace
+        } catch (e: Exception) {
+            0L
+        }
     }
 
     val progressValue = remember { mutableStateOf(0f) }

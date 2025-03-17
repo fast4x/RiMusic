@@ -63,7 +63,8 @@ fun Title(
             Icon(
                 painter = painterResource(icon ?: R.drawable.arrow_forward),
                 contentDescription = null,
-                tint = colorPalette().text
+                tint = colorPalette().text,
+                modifier = Modifier.size(22.dp)
             )
         }
     }
@@ -122,8 +123,9 @@ fun Title2Actions(
                 tint = colorPalette().text,
                 modifier = Modifier
                     .clickable {
-                    onClick1.invoke()
-                }
+                        onClick1.invoke()
+                    }
+                    .size(20.dp)
             )
         }
 

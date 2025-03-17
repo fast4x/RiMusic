@@ -133,8 +133,11 @@ fun AppTitle(
         Box {
             AppLogoText( navController )
             if (isAtLeastAndroid7) {
-                val dataTypeIcon = if (getNetworkType(context) == "WIFI") R.drawable.datawifi
-                else R.drawable.datamobile
+                val dataTypeIcon = when (getNetworkType(context)) {
+                    "WIFI" -> R.drawable.datawifi
+                    "CELLULAR" -> R.drawable.datamobile
+                    else -> R.drawable.alert_circle_not_filled
+                }
                 Image(
                     painter = painterResource(dataTypeIcon),
                     contentDescription = null,

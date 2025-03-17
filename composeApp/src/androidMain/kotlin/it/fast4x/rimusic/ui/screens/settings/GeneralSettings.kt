@@ -464,9 +464,9 @@ fun GeneralSettings(
                 }
             )
 
-        if (search.input.isBlank() || "Use alternative dns".contains(search.input,true)) {
+        if (search.input.isBlank() || stringResource(R.string.use_alternative_dns).contains(search.input,true)) {
             EnumValueSelectorSettingsEntry(
-                title = "Use dns over https",
+                title = stringResource(R.string.use_dns_over_https_title),
                 selectedValue = useDnsOverHttpsType,
                 onValueSelected = {
                     useDnsOverHttpsType = it
@@ -478,7 +478,7 @@ fun GeneralSettings(
             AnimatedVisibility(visible = useDnsOverHttpsType == DnsOverHttpsType.Custom) {
                 Column(modifier = Modifier.padding(start = 16.dp)) {
                     TextDialogSettingEntry(
-                        title = "Custom dns over https server",
+                        title = stringResource(R.string.custom_dns_over_https_server),
                         text = customDnsOverHttpsServer,
                         currentText = customDnsOverHttpsServer,
                         onTextSave = {
@@ -492,7 +492,7 @@ fun GeneralSettings(
 
             }
 
-            SettingsDescription(text = "If you have loading problems, you can use an alternative dns server")
+            SettingsDescription(text = stringResource(R.string.info_aternative_dns_server))
             if (useDnsOverHttpsType != DnsOverHttpsType.Custom)
                 RestartActivity(restartActivity, onRestart = { restartActivity = false })
 

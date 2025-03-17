@@ -43,13 +43,13 @@
             android:action="it.fast4x.rimusic.action.library" />
     </shortcut>
     <shortcut
-        android:shortcutId="crashlog"
+        android:shortcutId="rescuecenter"
         android:enabled="true"
-        android:icon="@drawable/copy"
-        android:shortcutShortLabel="@string/copy_crash_log_to_clipboard">
+        android:icon="@drawable/rescue"
+        android:shortcutShortLabel="@string/rescue_center">
         <intent
             android:targetClass="it.fast4x.rimusic.MainActivity"
             android:targetPackage="it.fast4x.rimusic"
-            android:action="it.fast4x.rimusic.action.copy_crash_log" />
+            android:action="it.fast4x.rimusic.action.rescuecenter" />
     </shortcut>
 </shortcuts>

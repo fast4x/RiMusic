@@ -8,6 +8,11 @@ import android.net.NetworkInfo
 import android.os.Build
 import android.telephony.TelephonyManager
 import androidx.annotation.RequiresApi
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.UserAgent
+import it.fast4x.environment.utils.ProxyPreferences
+import it.fast4x.environment.utils.getProxy
+import it.fast4x.rimusic.utils.isAtLeastAndroid6
 import java.net.InetAddress
 
 /***********
@@ -121,7 +126,7 @@ fun getNetworkType(context: Context): String {
     val actNw = connectivityManager.getNetworkCapabilities(nw) ?: return "-"
     when {
         actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> return "WIFI"
-        actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> return "ETHERNET"
+        //actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> return "ETHERNET"
         actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
             return "CELLULAR"
             /* dataNetworkType require READ_PHONE_BASIC_STATE permission */
@@ -152,5 +157,36 @@ fun getNetworkType(context: Context): String {
              */
         }
         else -> return "?"
+    }
+}
+
+fun isNetworkConnected(context: Context): Boolean {
+    val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    if (isAtLeastAndroid6) {
+        val networkInfo = cm.getNetworkCapabilities(cm.activeNetwork)
+        return networkInfo?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+                && networkInfo.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+    } else {
+        return try {
+            if (cm.activeNetworkInfo == null) {
+                false
+            } else {
+                cm.activeNetworkInfo?.isConnected!!
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
+}
+
+fun getHttpClient() = HttpClient() {
+    install(UserAgent) {
+        agent = "Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0"
+    }
+    engine {
+        ProxyPreferences.preference?.let {
+            proxy = getProxy(it)
+        }
+
     }
 }

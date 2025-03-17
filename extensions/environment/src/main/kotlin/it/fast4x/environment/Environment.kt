@@ -7,6 +7,7 @@ import com.zionhuang.innertube.pages.LibraryPage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.plugins.compression.brotli
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -142,6 +143,8 @@ object Environment {
             deflate(0.8F)
         }
 
+        install(HttpCache)
+
         engine {
             addInterceptor(
                 HttpLoggingInterceptor().apply {
@@ -150,8 +153,10 @@ object Environment {
             )
 
             if (this@Environment.dnsToUse != null) {
-                val appCache = Cache(File("cacheDir", "okhttpcache"), 10 * 1024 * 1024)
-                val bootstrapClient = OkHttpClient.Builder().cache(appCache).build()
+               // Used in memory cache insted of this, it seems that actually there is a bug in file cache with ktor
+               // val dnsCache = Cache(File("cacheDir", "okhttpcache"), 10 * 1024 * 1024)
+               // val bootstrapClient = OkHttpClient.Builder().cache(dnsCache).build()
+                val bootstrapClient = OkHttpClient.Builder().build()
                 val googleDns = DnsOverHttps.Builder().client(bootstrapClient)
                     .url("https://dns.google/dns-query".toHttpUrl())
                     .bootstrapDnsHosts(InetAddress.getByName("8.8.8.8"), InetAddress.getByName("8.8.4.4")).build()
@@ -161,6 +166,8 @@ object Environment {
                 val openDns = DnsOverHttps.Builder().client(bootstrapClient)
                     .url("https://doh.opendns.com/dns-query".toHttpUrl())
                     .bootstrapDnsHosts(InetAddress.getByName("208.67.222.222"), InetAddress.getByName("208.67.220.220")).build()
+                val adGuardDns = DnsOverHttps.Builder().client(bootstrapClient)
+                    .url("https://unfiltered.adguard-dns.com/dns-query".toHttpUrl()).build()
                 val customDns = this@Environment.customDnsToUse?.let {
                     DnsOverHttps.Builder().client(bootstrapClient)
                         .url(it.toHttpUrl()).build()
@@ -169,6 +176,7 @@ object Environment {
                     "google" -> googleDns
                     "cloudflare" -> cloudflareDns
                     "opendns" -> openDns
+                    "adguard" -> adGuardDns
                     "custom" -> customDns
                     else -> googleDns
                 }

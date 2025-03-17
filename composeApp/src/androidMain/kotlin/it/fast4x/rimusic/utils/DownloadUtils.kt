@@ -1,6 +1,7 @@
 package it.fast4x.rimusic.utils
 
 
+import android.content.Context
 import androidx.annotation.OptIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,11 +29,10 @@ import it.fast4x.rimusic.service.MyPreCacheHelper
 import it.fast4x.rimusic.service.isLocal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import org.dailyislam.android.utilities.isNetworkConnected
 
 @UnstableApi
 @Composable
@@ -108,6 +108,9 @@ fun preCacheMedia(
     val cache: SimpleCache by lazy {
         principalCache.getInstance(context)
     }
+    val downloadCache: SimpleCache by lazy {
+        MyDownloadHelper.getDownloadCache(context) as SimpleCache
+    }
     var contentLength = 0L
     CoroutineScope(Dispatchers.IO).launch {
          contentLength = Database.formatContentLength(mediaItem.mediaId).also {
@@ -120,10 +123,15 @@ fun preCacheMedia(
     } catch (e: Exception) {
         false
     }
-    if (!isCached) {
-        println("preCacheMedia: mediaId ${mediaItem.mediaId} not cached")
+    val isDownloaded = try {
+        downloadCache.isCached(mediaItem.mediaId,0L, contentLength)
+    } catch (e: Exception) {
+        false
+    }
+    if (!isCached && !isDownloaded) {
+        println("preCacheMedia: mediaId ${mediaItem.mediaId} not cached or downloaded")
         MyPreCacheHelper.addDownload(context = context, mediaItem = mediaItem)
-    } else println("preCacheMedia: mediaId ${mediaItem.mediaId} is cached")
+    } else println("preCacheMedia: mediaId ${mediaItem.mediaId} is cached $isCached or downloaded $isDownloaded ")
 
 
 }
@@ -147,4 +155,38 @@ fun isDownloadedSong(mediaId: String): Boolean {
         DownloadedStateMedia.CACHED_AND_DOWNLOADED, DownloadedStateMedia.DOWNLOADED -> true
         else -> false
     }
+}
+
+@UnstableApi
+fun isCachedOrDownloaded(
+    context: Context,
+    mediaId: String
+): Pair<Boolean, Boolean> {
+    //if (!isNetworkConnected(appContext())) return false to false
+    val cache: SimpleCache by lazy {
+        principalCache.getInstance(context)
+    }
+    val downloadCache: SimpleCache by lazy {
+        MyDownloadHelper.getDownloadCache(context) as SimpleCache
+    }
+    var contentLength = 0L
+    CoroutineScope(Dispatchers.IO).launch {
+        contentLength = Database.formatContentLength(mediaId).also {
+            println("isCachedOrDownloaded: contentLength inside is $it")
+        }
+    }
+    println("isCachedOrDownloaded: mediaId ${mediaId} $contentLength")
+    val isCached = try {
+        cache.isCached(mediaId,0L, contentLength)
+    } catch (e: Exception) {
+        false
+    }
+    val isDownloaded = try {
+        downloadCache.isCached(mediaId,0L, contentLength)
+    } catch (e: Exception) {
+        false
+    }
+
+    return isCached to isDownloaded
+
 }

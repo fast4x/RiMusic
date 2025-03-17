@@ -24,7 +24,7 @@ fun cacheImage(context: Context, url: String, key: String) {
         .data(url.thumbnail(256))
         .allowHardware(false)
         .listener(listener)
-        .dispatcher(Dispatchers.Main)
+        .dispatcher(Dispatchers.IO)
         .memoryCacheKey(url.thumbnail(256))
         .diskCacheKey(url.thumbnail(256))
         .diskCachePolicy(CachePolicy.ENABLED)

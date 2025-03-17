@@ -224,7 +224,7 @@
     <string name="listen_on_piped">האזינו ב Piped</string>
     <string name="listen_on_invidious">האזינו ב Invidious</string>
     <string name="disable_horizontal_swipe">השבת החלקה אופקית</string>
-    <string name="disable_vertical_swipe">השבת את החלפת השיר באמצעות החלקה</string>
+    <string name="disable_vertical_swipe">השבת את החלפת השיר באמצעות החלקה אופקית</string>
     <string name="disable_vertical_swipe_secondary">It affects only when the Expanded Player is off</string>
     <string name="disable_song_switching_via_swipe">השבת את החלפת השיר באמצעות החלקה</string>
     <string name="interface_in_use">ממשק בשימוש</string>
@@ -939,4 +939,11 @@
     <string name="export_log">Export log</string>
     <string name="value_must_be_valid_url">Value must be a valid url</string>
     <string name="caching">Caching...</string>
+    <string name="lang_basque">Basque</string>
+    <string name="custom_dns_is_invalid">Custom DNS is invalid</string>
+    <string name="custom_dns_over_https_server">Custom dns over https server</string>
+    <string name="info_aternative_dns_server">If you have loading problems, you can use an alternative dns server</string>
+    <string name="use_alternative_dns">Use alternative dns</string>
+    <string name="use_dns_over_https_title">Use dns over https</string>
+    <string name="also_delete_playback_data">Also delete playback data</string>
 </resources>

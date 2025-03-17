@@ -5,6 +5,7 @@ enum class DnsOverHttpsType {
     Google,
     CloudFlare,
     OpenDns,
+    AdGuard,
     Custom;
 
     val type: String?
@@ -13,6 +14,7 @@ enum class DnsOverHttpsType {
         Google -> "google"
         CloudFlare -> "cloudflare"
         OpenDns -> "opendns"
+        AdGuard -> "adguard"
         Custom -> "custom"
 
     }
@@ -23,6 +25,7 @@ enum class DnsOverHttpsType {
             Google -> "Google Public Dns"
             CloudFlare -> "Cloudflare Public Dns"
             OpenDns -> "OpenDns Public Dns"
+            AdGuard -> "AdGuard Public Dns"
             Custom -> "Custom Dns"
         }
 }

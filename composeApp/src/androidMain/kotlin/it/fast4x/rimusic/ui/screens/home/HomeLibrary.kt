@@ -402,6 +402,8 @@ fun HomeLibrary(
                                 playlist = preview,
                                 thumbnailSizeDp = itemSize.size.dp,
                                 thumbnailSizePx = itemSize.size.px,
+                                homepage = true,
+                                iconSize = itemSize.size.dp,
                                 alternative = false,
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -465,6 +467,8 @@ fun HomeLibrary(
                                 thumbnailSizeDp = itemSize.size.dp,
                                 thumbnailSizePx = itemSize.size.px,
                                 alternative = true,
+                                homepage = true,
+                                iconSize = itemSize.size.dp,
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .animateItem(fadeInSpec = null, fadeOutSpec = null)

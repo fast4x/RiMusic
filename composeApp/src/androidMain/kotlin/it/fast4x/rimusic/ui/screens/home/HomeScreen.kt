@@ -20,7 +20,6 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.lifecycle.Lifecycle
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
-import it.fast4x.compose.persist.PersistMapCleanup
 import it.fast4x.rimusic.R
 import it.fast4x.rimusic.enums.CheckUpdateState
 import it.fast4x.rimusic.enums.HomeScreenTabs
@@ -109,7 +108,7 @@ fun HomeScreen(
             ) { currentTabIndex ->
                 saveableStateHolder.SaveableStateProvider(key = currentTabIndex) {
                     when (currentTabIndex) {
-                        0 -> HomeQuickPicks(
+                        0 -> HomePage(
                             onAlbumClick = {
                                 navController.navigate(route = "${NavRoutes.album.name}/$it")
                             },
@@ -132,7 +131,7 @@ fun HomeScreen(
                             navController = navController
                         )
 
-                        1 -> HomeSongsModern(
+                        1 -> HomeSongs(
                             navController = navController,
                             onSearchClick = {
                                 //searchRoute("")

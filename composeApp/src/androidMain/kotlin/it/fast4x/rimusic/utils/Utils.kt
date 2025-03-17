@@ -3,10 +3,7 @@ package it.fast4x.rimusic.utils
 
 import android.annotation.SuppressLint
 import android.content.ContentUris
-import android.content.Context
 import android.content.pm.PackageManager
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -25,9 +22,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import com.zionhuang.innertube.pages.LibraryPage
-import io.ktor.client.HttpClient
 import io.ktor.client.plugins.ClientRequestException
-import io.ktor.client.plugins.UserAgent
 import io.ktor.http.HttpStatusCode
 import it.fast4x.environment.Environment
 import it.fast4x.environment.EnvironmentExt
@@ -38,9 +33,7 @@ import it.fast4x.environment.models.bodies.ContinuationBody
 import it.fast4x.environment.models.bodies.SearchBody
 import it.fast4x.environment.requests.playlistPage
 import it.fast4x.environment.requests.searchPage
-import it.fast4x.environment.utils.ProxyPreferences
 import it.fast4x.environment.utils.from
-import it.fast4x.environment.utils.getProxy
 import it.fast4x.kugou.KuGou
 import it.fast4x.lrclib.LrcLib
 import it.fast4x.rimusic.Database
@@ -86,6 +79,11 @@ import kotlin.time.Duration.Companion.minutes
 
 const val EXPLICIT_BUNDLE_TAG = "is_explicit"
 
+fun <T> MutableList<T>.move(fromIndex: Int, toIndex: Int): MutableList<T> {
+    add(toIndex, removeAt(fromIndex))
+    return this
+}
+
 fun getDateTimeAsFormattedString(dateAsLongInMs: Long): String? {
     try {
         return SimpleDateFormat("dd/MM/yyyy").format(Date(dateAsLongInMs))
@@ -99,24 +97,6 @@ fun getTimestampFromDate(date: String): Long {
         SimpleDateFormat("dd-MM-yyyy").parse(date).time
     } catch (e: Exception) {
         return 0
-    }
-}
-
-fun songToggleLike( song: Song ) {
-    Database.asyncTransaction {
-        if (songExist(song.asMediaItem.mediaId) == 0)
-            insert(song.asMediaItem, Song::toggleLike)
-        //else {
-            if (songliked(song.asMediaItem.mediaId) == 0)
-                like(
-                    song.asMediaItem.mediaId,
-                    System.currentTimeMillis()
-                )
-            else like(
-                song.asMediaItem.mediaId,
-                null
-            )
-        //}
     }
 }
 
@@ -140,24 +120,6 @@ fun mediaItemToggleLike( mediaItem: MediaItem) {
             context(),
             mediaItem
         )
-    }
-}
-
-fun albumItemToggleBookmarked( albumItem: Environment.AlbumItem ) {
-    Database.asyncTransaction {
-        //if (Database.albumExist(albumItem.key) == 0)
-        //    Database.insert(albumItem.asAlbum, Album::toggleLike)
-        //else {
-        if (albumBookmarked(albumItem.key) == 0)
-            bookmarkAlbum(
-                albumItem.key,
-                System.currentTimeMillis()
-            )
-        else bookmarkAlbum(
-            albumItem.key,
-            null
-        )
-        //}
     }
 }
 
@@ -425,24 +387,6 @@ fun formatAsTime(millis: Long): String {
 fun formatTimelineSongDurationToTime(millis: Long) =
     Duration.ofMillis(millis*1000).toMinutes().minutes.toString()
 
-/*
-fun TimeToString(timeMs: Int): String {
-    val mFormatBuilder = StringBuilder()
-    val mFormatter = Formatter(mFormatBuilder, Locale.getDefault())
-    val totalSeconds = timeMs / 1000
-    //  videoDurationInSeconds = totalSeconds % 60;
-    val seconds = totalSeconds % 60
-    val minutes = totalSeconds / 60 % 60
-    val hours = totalSeconds / 3600
-    mFormatBuilder.setLength(0)
-    return if (hours > 0) {
-        mFormatter.format("%d:%02d:%02d", hours, minutes, seconds).toString()
-    } else {
-        mFormatter.format("%02d:%02d", minutes, seconds).toString()
-    }
-}
-*/
-
 @SuppressLint("SimpleDateFormat")
 fun getCalculatedMonths( month: Int): String? {
     val c: Calendar = GregorianCalendar()
@@ -556,83 +500,6 @@ fun CheckAvailableNewVersion(
     } else {
         updateAvailable(false)
         onDismiss()
-    }
-}
-
-fun isNetworkConnected(context: Context): Boolean {
-    val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    if (isAtLeastAndroid6) {
-        val networkInfo = cm.getNetworkCapabilities(cm.activeNetwork)
-        return networkInfo?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
-                && networkInfo.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-    } else {
-        return try {
-            if (cm.activeNetworkInfo == null) {
-                false
-            } else {
-                cm.activeNetworkInfo?.isConnected!!
-            }
-        } catch (e: Exception) {
-            false
-        }
-    }
-}
-
-fun isNetworkAvailable(context: Context): Boolean {
-    val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        ?: return false
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        val networkInfo = cm.getNetworkCapabilities(cm.activeNetwork)
-        // if no network is available networkInfo will be null
-        // otherwise check if we are connected to internet
-        //return networkInfo != null
-        return networkInfo?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ?: false
-    } else {
-        return try {
-            if (cm.activeNetworkInfo == null) {
-                false
-            } else {
-                cm.activeNetworkInfo?.isConnected!!
-            }
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-}
-
-@Composable
-fun isNetworkAvailableComposable(): Boolean {
-    val context = LocalContext.current
-    val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        ?: return false
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        val networkInfo = cm.getNetworkCapabilities(cm.activeNetwork)
-        // if no network is available networkInfo will be null
-        // otherwise check if we are connected
-        return networkInfo?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ?: false
-    } else {
-        return try {
-            if (cm.activeNetworkInfo == null) {
-                false
-            } else {
-                cm.activeNetworkInfo?.isConnected!!
-            }
-        } catch (e: Exception) {
-            false
-        }
-    }
-}
-
-fun getHttpClient() = HttpClient() {
-    install(UserAgent) {
-        agent = "Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0"
-    }
-    engine {
-        ProxyPreferences.preference?.let{
-            proxy = getProxy(it)
-        }
-
     }
 }
 

@@ -17,7 +17,6 @@ import androidx.media3.datasource.cache.SimpleCache
 import it.fast4x.rimusic.appContext
 import it.fast4x.rimusic.enums.ExoPlayerCacheLocation
 import it.fast4x.rimusic.enums.ExoPlayerDiskCacheMaxSize
-import it.fast4x.rimusic.utils.principalCache.exoPlayerCustomCache
 import java.io.File
 
 object principalCache {

@@ -75,6 +75,7 @@ kotlin {
             implementation(libs.newpipe.extractor)
             implementation(libs.nanojson)
             implementation(libs.androidx.webkit)
+            implementation(libs.room.backup)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -102,6 +103,7 @@ kotlin {
             implementation(libs.coil.mp)
 
             implementation(libs.translator)
+            implementation(libs.reorderable)
 
         }
     }
@@ -131,8 +133,8 @@ android {
         applicationId = "it.fast4x.rimusic"
         minSdk = 21
         targetSdk = 35
-        versionCode = 87
-        versionName = "0.6.74"
+        versionCode = 88
+        versionName = "0.6.75"
 
         // INIT ENVIRONMENT
         resValue(
@@ -482,7 +484,6 @@ dependencies {
 
 dependencies {
     implementation(projects.composePersist)
-    implementation(projects.composeReordering)
     implementation(libs.compose.activity)
     implementation(libs.compose.foundation)
     implementation(libs.compose.ui)

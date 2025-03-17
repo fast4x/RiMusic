@@ -61,11 +61,17 @@ internal suspend fun PlayerService.dataSpecProcess(
     val songUri = dataSpec.uri.toString()
     val videoId = songUri.substringAfter("watch?v=")
     val chunkLength = 512 * 1024L
-
-    if( dataSpec.isLocal ||
-        cache.isCached(videoId, dataSpec.position, chunkLength) ||
+    val isCached = try {
+        cache.isCached(videoId, dataSpec.position, chunkLength)
+    } catch (e: Exception) {
+        false
+    }
+    val isDownloaded = try {
         downloadCache.isCached(videoId, dataSpec.position, if (dataSpec.length >= 0) dataSpec.length else 1)
-    ) {
+    } catch (e: Exception) {
+        false
+    }
+    if( dataSpec.isLocal || isCached || isDownloaded ) {
         println("PlayerService DataSpecProcess Playing song ${videoId} from cached or local file")
         return dataSpec.withUri(Uri.parse(dataSpec.uri.toString()))
     }
@@ -112,11 +118,15 @@ internal suspend fun MyDownloadHelper.dataSpecProcess(
     val chunkLength = 512 * 1024L
     val length = if (dataSpec.length >= 0) dataSpec.length else 1
 
+    val isDownloaded = try {
+        downloadCache.isCached(videoId, dataSpec.position, length)
+    } catch (e: Exception) {
+        false
+    }
+
     Timber.d("MyDownloadHelper DataSpecProcess Playing song ${videoId} dataSpec position ${dataSpec.position} length ${dataSpec.length}")
     println("MyDownloadHelper DataSpecProcess Playing song ${videoId} dataSpec position ${dataSpec.position} length ${dataSpec.length}")
-    if( dataSpec.isLocal ||
-        downloadCache.isCached(videoId, dataSpec.position, length)
-    ) {
+    if( dataSpec.isLocal || isDownloaded ) {
         Timber.d("MyDownloadHelper DataSpecProcess download song ${videoId} from cached or local file")
         println("MyDownloadHelper DataSpecProcess download song ${videoId} from cached or local file")
         return dataSpec.withUri(Uri.parse(dataSpec.uri.toString()))
@@ -173,12 +183,14 @@ internal suspend fun MyPreCacheHelper.dataSpecProcess(
     val videoId = songUri.substringAfter("watch?v=")
     val chunkLength = 512 * 1024L
     val length = if (dataSpec.length >= 0) dataSpec.length else 1
-
+    val isCached = try {
+        cache.isCached(videoId, dataSpec.position, length)
+    } catch (e: Exception) {
+        false
+    }
     Timber.d("MyPreCacheHelper DataSpecProcess Playing song ${videoId} dataSpec position ${dataSpec.position} length ${dataSpec.length}")
     println("MyPreCacheHelper DataSpecProcess Playing song ${videoId} dataSpec position ${dataSpec.position} length ${dataSpec.length}")
-    if( dataSpec.isLocal ||
-        cache.isCached(videoId, dataSpec.position, length)
-    ) {
+    if( dataSpec.isLocal || isCached) {
         Timber.d("MyPreCacheHelper DataSpecProcess download song ${videoId} from cached or local file")
         println("MyPreCacheHelper DataSpecProcess download song ${videoId} from cached or local file")
         return dataSpec.withUri(Uri.parse(dataSpec.uri.toString()))

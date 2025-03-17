@@ -88,11 +88,23 @@ fun StatsForNerds(
         exit = fadeOut(),
     ) {
         var cachedBytes by remember(mediaId) {
-            mutableStateOf(binder.cache.getCachedBytes(mediaId, 0, -1))
+            mutableStateOf(
+                try {
+                    binder.cache.getCachedBytes(mediaId, 0, -1)
+                } catch (e: Exception) {
+                    0L
+                }
+            )
         }
 
         var downloadCachedBytes by remember(mediaId) {
-            mutableStateOf(binder.downloadCache.getCachedBytes(mediaId, 0, -1))
+            mutableStateOf(
+                try {
+                    binder.downloadCache.getCachedBytes(mediaId, 0, -1)
+                } catch (e: Exception) {
+                    0L
+                }
+            )
         }
 
         var format by remember {

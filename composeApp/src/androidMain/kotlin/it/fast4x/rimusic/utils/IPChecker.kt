@@ -76,3 +76,7 @@ fun isValidPart(s: String): Boolean {
 fun isValidUrl(url: String): Boolean {
     return Patterns.WEB_URL.matcher(url).matches()
 }
+
+fun isValidHttpUrl(url: String): Boolean {
+    return ((url.startsWith("http://") || url.startsWith("https://"))) && isValidUrl(url)
+}

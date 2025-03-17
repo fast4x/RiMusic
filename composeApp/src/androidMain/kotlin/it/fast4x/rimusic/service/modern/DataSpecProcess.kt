@@ -45,12 +45,18 @@ internal suspend fun PlayerServiceModern.dataSpecProcess(
     val videoId = songUri.substringAfter("watch?v=")
     val chunkLength = 512 * 1024L
     val length = if (dataSpec.length >= 0) dataSpec.length else 1
-
-    println("PlayerServiceModern DataSpecProcess Playing song ${videoId} dataSpec position ${dataSpec.position} length ${dataSpec.length}")
-    if( dataSpec.isLocal ||
-        cache.isCached(videoId, dataSpec.position, chunkLength) ||
+    val isCached = try {
+        cache.isCached(videoId, dataSpec.position, chunkLength)
+    } catch (e: Exception) {
+        false
+    }
+    val isDownloaded = try {
         downloadCache.isCached(videoId, dataSpec.position, length)
-    ) {
+    } catch (e: Exception) {
+        false
+    }
+    println("PlayerServiceModern DataSpecProcess Playing song ${videoId} dataSpec position ${dataSpec.position} length ${dataSpec.length}")
+    if( dataSpec.isLocal || isCached || isDownloaded ) {
         println("PlayerServiceModern DataSpecProcess Playing song ${videoId} from cached or local file")
         return dataSpec //.withUri(Uri.parse(dataSpec.uri.toString()))
     }

@@ -318,6 +318,8 @@ fun HomeArtists(
                                 artist = artist,
                                 thumbnailSizeDp = itemSize.size.dp,
                                 thumbnailSizePx = itemSize.size.px,
+                                homePage = true,
+                                iconSize = itemSize.size.dp,
                                 alternative = false,
                                 modifier = Modifier
                                     .animateItem(
@@ -347,6 +349,8 @@ fun HomeArtists(
                                 artist = artist,
                                 thumbnailSizeDp = itemSize.size.dp,
                                 thumbnailSizePx = itemSize.size.px,
+                                homePage = true,
+                                iconSize = itemSize.size.dp,
                                 alternative = true,
                                 modifier = Modifier
                                     .animateItem(

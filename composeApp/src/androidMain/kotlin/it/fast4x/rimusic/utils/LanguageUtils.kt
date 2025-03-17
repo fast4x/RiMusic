@@ -30,6 +30,7 @@ fun languageDestination (
         Languages.Arabic -> Language.ARABIC
         Languages.Azerbaijani -> Language.AZERBAIJANI
         Languages.Bashkir -> Language.BASQUE
+        Languages.Basque -> Language.BASQUE
         Languages.Bengali -> Language.BENGALI
         Languages.Catalan -> Language.CATALAN
         Languages.ChineseSimplified -> Language.CHINESE_SIMPLIFIED
@@ -91,6 +92,7 @@ fun languageDestinationName (
         Languages.Arabic -> stringResource(R.string.arabic)
         Languages.Azerbaijani -> stringResource(R.string.lang_azerbaijani)
         Languages.Bashkir -> stringResource(R.string.bashkir)
+        Languages.Basque -> stringResource(R.string.lang_basque)
         Languages.Bengali -> stringResource(R.string.lang_bengali)
         Languages.Catalan -> stringResource(R.string.catalan)
         Languages.ChineseSimplified -> stringResource(R.string.chinese_simplified)

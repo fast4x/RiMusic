@@ -728,10 +728,24 @@
     "profileUrl": "https://crowdin.com/profile/teaminh"
   },
   {
-    "username": "LinuxUsersLinuxMint ",
-    "displayName": "LinuxUsersLinuxMint ",
+    "username": "LinuxUsersLinuxMint",
+    "displayName": "LinuxUsersLinuxMint",
     "languages": "Turkish",
     "avatarUrl": "https://avatars.githubusercontent.com/u/143949134?v=4",
     "profileUrl": "https://github.com/LinuxUsersLinuxMint"
+  },
+  {
+    "username": "chayotic",
+    "displayName": "π",
+    "languages": "Malayalam",
+    "avatarUrl": "https://avatars.githubusercontent.com/u/152018343?v=4",
+    "profileUrl": "https://github.com/chayotic"
+  },
+  {
+    "username": "iazkue",
+    "displayName": "Iñaki Azkue Portularrume",
+    "languages": "Basque",
+    "avatarUrl": "https://avatars.githubusercontent.com/u/40274828?v=4",
+    "profileUrl": "https://github.com/iazkue"
   }
 ]

@@ -22,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import coil.compose.AsyncImage
 import it.fast4x.environment.Environment
 import it.fast4x.rimusic.R
@@ -43,6 +44,8 @@ fun ArtistItem(
     thumbnailSizePx: Int,
     thumbnailSizeDp: Dp,
     modifier: Modifier = Modifier,
+    homePage: Boolean = false,
+    iconSize: Dp = 0.dp,
     alternative: Boolean = false,
     showName: Boolean = true,
     disableScrollingText: Boolean,
@@ -56,6 +59,8 @@ fun ArtistItem(
         thumbnailSizeDp = thumbnailSizeDp,
         modifier = modifier,
         alternative = alternative,
+        homePage = homePage,
+        iconSize = iconSize,
         showName = showName,
         disableScrollingText = disableScrollingText,
         isYoutubeArtist = isYoutubeArtist
@@ -95,6 +100,8 @@ fun ArtistItem(
     thumbnailSizePx: Int,
     thumbnailSizeDp: Dp,
     modifier: Modifier = Modifier,
+    homePage: Boolean = false,
+    iconSize: Dp = 0.dp,
     alternative: Boolean = false,
     showName: Boolean = true,
     disableScrollingText: Boolean,
@@ -123,7 +130,7 @@ fun ArtistItem(
                         Color.Red.copy(0.75f).compositeOver(Color.White)
                     ),
                     modifier = Modifier
-                        .size(if (smallThumbnail) 30.dp else 40.dp)
+                        .size(if (smallThumbnail) 30.dp else if (homePage) 0.3*iconSize else 40.dp)
                         .padding(all = 5.dp),
                     contentDescription = "Background Image",
                     contentScale = ContentScale.Fit

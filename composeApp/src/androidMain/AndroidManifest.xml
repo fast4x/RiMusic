@@ -29,6 +29,7 @@
     <uses-feature    android:name="android.software.leanback" android:required="false" />
     <uses-feature    android:name="android.hardware.touchscreen" android:required="false" />
     <uses-feature    android:name="android.hardware.microphone" android:required="false" />
+    <uses-feature    android:name="android.hardware.type.automotive" android:required="false" />
 
     <queries>
         <intent>
@@ -38,13 +39,20 @@
             <action android:name="android.intent.action.WEB_SEARCH" />
         </intent>
     </queries>
+    <queries>
+        <package android:name="it.fast4x.rimusic" />
+    </queries>
+    <queries>
+        <intent>
+            <action android:name="androidx.media3.session.MediaSessionService" />
+        </intent>
+    </queries>
 
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
         android:banner="@mipmap/ic_banner"
         android:configChanges="colorMode|density|fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode"
-        android:hardwareAccelerated="true"
         android:appCategory="audio"
         android:icon="@mipmap/ic_launcher"
         android:label="${appName}"
@@ -54,8 +62,10 @@
         android:enableOnBackInvokedCallback="true"
         android:networkSecurityConfig="@xml/network_security_config"
         android:usesCleartextTraffic="false"
-        tools:targetApi="tiramisu">
-
+        tools:targetApi="tiramisu"
+        android:largeHeap="true"
+        android:hardwareAccelerated="true">
+        <!-- android:largeHeap="true" and  android:hardwareAccelerated="false" it seems resolve crash for old devices -->
 
         <activity
             android:name=".MainActivity"
@@ -170,9 +180,9 @@
             android:foregroundServiceType="mediaPlayback"
             tools:ignore="ExportedService">
             <intent-filter>
-                <action android:name="androidx.media3.session.MediaSessionService" />
                 <action android:name="androidx.media3.session.MediaLibraryService" />
                 <action android:name="android.media.browse.MediaBrowserService" />
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </service>
 

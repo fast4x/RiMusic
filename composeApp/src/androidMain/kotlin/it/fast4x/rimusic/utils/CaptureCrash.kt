@@ -32,7 +32,9 @@ class CaptureCrash (private val LOG_PATH: String) : Thread.UncaughtExceptionHand
             }
 
             FileWriter(logFile, true).use { writer ->
-                writer.append("${LocalDateTime.now()}:\t")
+                writer.append("------------------------------------------------- \n")
+                writer.append("--- Crash Event ${LocalDateTime.now()} \n")
+                writer.append("------------------------------------------------- \n")
                 printFullStackTrace(throwable,PrintWriter(writer))
             }
         } catch (e: Exception) {
@@ -41,7 +43,9 @@ class CaptureCrash (private val LOG_PATH: String) : Thread.UncaughtExceptionHand
     }
 
     private fun printFullStackTrace(throwable: Throwable, printWriter: PrintWriter) {
-        printWriter.println(throwable.toString())
+        //printWriter.println()
+        printWriter.print("FullStackTrace: \n")
+        printWriter.print(throwable.toString()+"\n")
         throwable.stackTrace.forEach { element ->
             printWriter.print("\t $element \n")
         }

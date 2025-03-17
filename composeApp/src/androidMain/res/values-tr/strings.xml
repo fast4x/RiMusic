@@ -937,6 +937,13 @@
     <string name="loudness_boost_level_info">Ekstra ses seviyesi, aşırıya kaçılmadan kullanılmalıdır aksi takdirde cihaz zarar görebilir</string>
     <string name="export_crash_log">Çökme günlüğünü dışarı aktar</string>
     <string name="export_log">Günlüğü dışa aktar</string>
-    <string name="value_must_be_valid_url">Value must be a valid url</string>
-    <string name="caching">Caching...</string>
+    <string name="value_must_be_valid_url">Değer geçerli bir URL olmalıdır</string>
+    <string name="caching">Önbelleğe alınıyor...</string>
+    <string name="lang_basque">Baskça</string>
+    <string name="custom_dns_is_invalid">Özel DNS geçersiz</string>
+    <string name="custom_dns_over_https_server">Https sunucusu üzerinden özel DNS</string>
+    <string name="info_aternative_dns_server">Yükleme sorunları yaşıyorsanız, alternatif bir dns sunucusu kullanabilirsiniz</string>
+    <string name="use_alternative_dns">Alternatif DNS kullan</string>
+    <string name="use_dns_over_https_title">Https üzerinden DNS kullan</string>
+    <string name="also_delete_playback_data">Oynatma verilerini de sil</string>
 </resources>

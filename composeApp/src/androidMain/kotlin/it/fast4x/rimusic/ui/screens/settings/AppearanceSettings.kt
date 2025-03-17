@@ -152,6 +152,8 @@ import it.fast4x.rimusic.enums.ColorPaletteMode
 import it.fast4x.rimusic.enums.ColorPaletteName
 import it.fast4x.rimusic.enums.PopupType
 import it.fast4x.rimusic.enums.SwipeAnimationNoThumbnail
+import it.fast4x.rimusic.enums.UiType
+import it.fast4x.rimusic.getUiType
 import it.fast4x.rimusic.models.Song
 import it.fast4x.rimusic.typography
 import it.fast4x.rimusic.ui.components.themed.Search
@@ -265,7 +267,11 @@ fun DefaultAppearanceSettings() {
         navigationBarPositionKey,
         NavigationBarPosition.Bottom
     )
-    navigationBarPosition = NavigationBarPosition.Bottom
+    if (getUiType()==UiType.RiMusic)
+        navigationBarPosition = NavigationBarPosition.Bottom
+    else
+        navigationBarPosition = NavigationBarPosition.Left
+
     var showTotalTimeQueue by rememberPreference(showTotalTimeQueueKey, true)
     showTotalTimeQueue = true
     var backgroundProgress by rememberPreference(
@@ -684,15 +690,266 @@ fun AppearanceSettings(
                             if (row["SettingsType"] == "Appearance") {
                                 println("Import appearance settings parameter ${row["Parameter"]}")
                                 when (row["Parameter"]) {
+                                    "showthumbnail" -> {
+                                        showthumbnail = row["Value"]!!.toBoolean()
+                                    }
+                                    "playerBackgroundColors" -> {
+                                        playerBackgroundColors = PlayerBackgroundColors.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "thumbnailRoundness" -> {
+                                        thumbnailRoundness = ThumbnailRoundness.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "playerType" -> {
+                                        playerType = PlayerType.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "queueType" -> {
+                                        queueType = QueueType.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "noblur" -> {
+                                        noblur = row["Value"]!!.toBoolean()
+                                    }
+                                    "fadingedge" -> {
+                                        fadingedge = row["Value"]!!.toBoolean()
+                                    }
+                                    "carousel" -> {
+                                        carousel = row["Value"]!!.toBoolean()
+                                    }
+                                    "carouselSize" -> {
+                                        carouselSize =
+                                            CarouselSize.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "keepPlayerMinimized" -> {
+                                        keepPlayerMinimized = row["Value"]!!.toBoolean()
+                                    }
+                                    "playerInfoShowIcons" -> {
+                                        playerInfoShowIcons = row["Value"]!!.toBoolean()
+                                    }
+                                    "showTopActionsBar" -> {
+                                        showTopActionsBar = row["Value"]!!.toBoolean()
+                                    }
+                                    "playerControlsType" -> {
+                                        playerControlsType = PlayerControlsType.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "playerInfoType" -> {
+                                        playerInfoType = PlayerInfoType.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "transparentBackgroundActionBarPlayer" -> {
+                                        transparentBackgroundActionBarPlayer = row["Value"]!!.toBoolean()
+                                    }
+                                    "iconLikeType" -> {
+                                        iconLikeType = IconLikeType.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "playerSwapControlsWithTimeline" -> {
+                                        playerSwapControlsWithTimeline = row["Value"]!!.toBoolean()
+                                    }
+                                    "playerEnableLyricsPopupMessage" -> {
+                                        playerEnableLyricsPopupMessage = row["Value"]!!.toBoolean()
+                                    }
+                                    "actionspacedevenly" -> {
+                                        actionspacedevenly = row["Value"]!!.toBoolean()
+                                    }
+                                    "thumbnailType" -> {
+                                        thumbnailType = ThumbnailType.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "showvisthumbnail" -> {
+                                        showvisthumbnail = row["Value"]!!.toBoolean()
+                                    }
+                                    "buttonzoomout" -> {
+                                        buttonzoomout = row["Value"]!!.toBoolean()
+                                    }
+                                    "thumbnailpause" -> {
+                                        thumbnailpause = row["Value"]!!.toBoolean()
+                                    }
+                                    "showsongs" -> {
+                                        showsongs = SongsNumber.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "showalbumcover" -> {
+                                        showalbumcover = row["Value"]!!.toBoolean()
+                                    }
+                                    "prevNextSongs" -> {
+                                        prevNextSongs = PrevNextSongs.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "tapqueue" -> {
+                                        tapqueue = row["Value"]!!.toBoolean()
+                                    }
+                                    "swipeUpQueue" -> {
+                                        swipeUpQueue = row["Value"]!!.toBoolean()
+                                    }
+                                    "statsfornerds" -> {
+                                        statsfornerds = row["Value"]!!.toBoolean()
+                                    }
+                                    "transparentbar" -> {
+                                        transparentbar = row["Value"]!!.toBoolean()
+                                    }
+                                    "blackgradient" -> {
+                                        blackgradient = row["Value"]!!.toBoolean()
+                                    }
+                                    "showlyricsthumbnail" -> {
+                                        showlyricsthumbnail = row["Value"]!!.toBoolean()
+                                    }
+                                    "expandedplayer" -> {
+                                        expandedplayer = row["Value"]!!.toBoolean()
+                                    }
+                                    "playerPlayButtonType" -> {
+                                        playerPlayButtonType = PlayerPlayButtonType.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "bottomgradient" -> {
+                                        bottomgradient = row["Value"]!!.toBoolean()
+                                    }
+                                    "textoutline" -> {
+                                        textoutline = row["Value"]!!.toBoolean()
+                                    }
+                                    "effectRotationEnabled" -> {
+                                        effectRotationEnabled = row["Value"]!!.toBoolean()
+                                    }
+                                    "thumbnailTapEnabled" -> {
+                                        thumbnailTapEnabled = row["Value"]!!.toBoolean()
+                                    }
+                                    "showButtonPlayerAddToPlaylist" -> {
+                                        showButtonPlayerAddToPlaylist = row["Value"]!!.toBoolean()
+                                    }
+                                    "showButtonPlayerArrow" -> {
+                                        showButtonPlayerArrow = row["Value"]!!.toBoolean()
+                                    }
+                                    "showButtonPlayerDownload" -> {
+                                        showButtonPlayerDownload = row["Value"]!!.toBoolean()
+                                    }
+                                    "showButtonPlayerLoop" -> {
+                                        showButtonPlayerLoop = row["Value"]!!.toBoolean()
+                                    }
+                                    "showButtonPlayerLyrics" -> {
+                                        showButtonPlayerLyrics = row["Value"]!!.toBoolean()
+                                    }
+                                    "expandedplayertoggle" -> {
+                                        expandedplayertoggle = row["Value"]!!.toBoolean()
+                                    }
+                                    "showButtonPlayerShuffle" -> {
+                                        showButtonPlayerShuffle = row["Value"]!!.toBoolean()
+                                    }
+                                    "showButtonPlayerSleepTimer" -> {
+                                        showButtonPlayerSleepTimer = row["Value"]!!.toBoolean()
+                                    }
+                                    "showButtonPlayerMenu" -> {
+                                        showButtonPlayerMenu = row["Value"]!!.toBoolean()
+                                    }
+                                    "showButtonPlayerStartradio" -> {
+                                        showButtonPlayerStartradio = row["Value"]!!.toBoolean()
+                                    }
+                                    "showButtonPlayerSystemEqualizer" -> {
+                                        showButtonPlayerSystemEqualizer = row["Value"]!!.toBoolean()
+                                    }
+                                    "showButtonPlayerDiscover" -> {
+                                        showButtonPlayerDiscover = row["Value"]!!.toBoolean()
+                                    }
+                                    "showButtonPlayerVideo" -> {
+                                        showButtonPlayerVideo = row["Value"]!!.toBoolean()
+                                    }
+                                    "showBackgroundLyrics" -> {
+                                        showBackgroundLyrics = row["Value"]!!.toBoolean()
+                                    }
+                                    "showTotalTimeQueue" -> {
+                                        showTotalTimeQueue = row["Value"]!!.toBoolean()
+                                    }
+                                    "backgroundProgress" -> {
+                                        backgroundProgress = BackgroundProgress.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "showNextSongsInPlayer" -> {
+                                        showNextSongsInPlayer = row["Value"]!!.toBoolean()
+                                    }
+                                    "showRemainingSongTime" -> {
+                                        showRemainingSongTime = row["Value"]!!.toBoolean()
+                                    }
+                                    "clickLyricsText" -> {
+                                        clickLyricsText = row["Value"]!!.toBoolean()
+                                    }
+                                    "queueDurationExpanded" -> {
+                                        queueDurationExpanded = row["Value"]!!.toBoolean()
+                                    }
+                                    "titleExpanded" -> {
+                                        titleExpanded = row["Value"]!!.toBoolean()
+                                    }
+                                    "timelineExpanded" -> {
+                                        timelineExpanded = row["Value"]!!.toBoolean()
+                                    }
+                                    "controlsExpanded" -> {
+                                        controlsExpanded = row["Value"]!!.toBoolean()
+                                    }
+                                    "miniQueueExpanded" -> {
+                                        miniQueueExpanded = row["Value"]!!.toBoolean()
+                                    }
+                                    "statsExpanded" -> {
+                                        statsExpanded = row["Value"]!!.toBoolean()
+                                    }
+                                    "actionExpanded" -> {
+                                        actionExpanded = row["Value"]!!.toBoolean()
+                                    }
+                                    "showCoverThumbnailAnimation" -> {
+                                        showCoverThumbnailAnimation = row["Value"]!!.toBoolean()
+                                    }
+                                    "coverThumbnailAnimation" -> {
+                                        coverThumbnailAnimation =
+                                            ThumbnailCoverType.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "notificationPlayerFirstIcon" -> {
+                                        notificationPlayerFirstIcon =
+                                            NotificationButtons.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "notificationPlayerSecondIcon" -> {
+                                        notificationPlayerSecondIcon =
+                                            NotificationButtons.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "enableWallpaper" -> {
+                                        enableWallpaper = row["Value"]!!.toBoolean()
+                                    }
+                                    "wallpaperType" -> {
+                                        wallpaperType = WallpaperType.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "topPadding" -> {
+                                        topPadding = row["Value"]!!.toBoolean()
+                                    }
                                     "animatedGradient" -> {
                                         animatedGradient = AnimatedGradient.entries.toTypedArray()[row["Value"]!!.toInt()]
                                     }
                                     "albumCoverRotation" -> {
                                         albumCoverRotation = row["Value"]!!.toBoolean()
                                     }
-                                    "enableWallpaper" -> {
-                                        enableWallpaper = row["Value"]!!.toBoolean()
+                                    "blurStrength" -> {
+                                        blurStrength = row["Value"]!!.toFloat()
                                     }
+                                    "thumbnailFadeEx" -> {
+                                        thumbnailFadeEx = row["Value"]!!.toFloat()
+                                    }
+                                    "thumbnailFade" -> {
+                                        thumbnailFade = row["Value"]!!.toFloat()
+                                    }
+                                    "thumbnailSpacing" -> {
+                                        thumbnailSpacing = row["Value"]!!.toFloat()
+                                    }
+                                    "colorPaletteName" -> {
+                                        colorPaletteName =
+                                            ColorPaletteName.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "colorPaletteMode" -> {
+                                        colorPaletteMode =
+                                            ColorPaletteMode.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "swipeAnimationNoThumbnail" -> {
+                                        swipeAnimationNoThumbnail =
+                                            SwipeAnimationNoThumbnail.entries.toTypedArray()[row["Value"]!!.toInt()]
+                                    }
+                                    "showLikeButtonBackgroundPlayer" -> {
+                                        showLikeButtonBackgroundPlayer = row["Value"]!!.toBoolean()
+                                    }
+                                    "showDownloadButtonBackgroundPlayer" -> {
+                                        showDownloadButtonBackgroundPlayer = row["Value"]!!.toBoolean()
+                                    }
+                                    "visualizerEnabled" -> {
+                                        visualizerEnabled = row["Value"]!!.toBoolean()
+                                    }
+
+
+
+
                                 }
                             }
 
