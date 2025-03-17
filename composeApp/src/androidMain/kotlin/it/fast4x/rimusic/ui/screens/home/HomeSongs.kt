@@ -1474,7 +1474,8 @@ fun HomeSongs(
                                 mutableStateOf(filterTokensForAutocomplete)
                                 //mutableStateOf<List<Pair<String, String>>>(emptyList())
                             }
-                            var textState by remember { mutableStateOf(TextFieldValue("")) }
+                            var textState by remember { mutableStateOf(TextFieldValue(filter ?: "",
+                                selection=TextRange(filter?.length ?: 0))) }
                             fun onFilterChange(newState: TextFieldValue) {
                                 filter = newState.text
                                 textState = newState
