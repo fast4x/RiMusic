@@ -252,7 +252,7 @@ fun HomeAlbums(
             Column( Modifier.fillMaxSize() ) {
                 // Sticky tab's title
                 TabHeader(R.string.albums) {
-                    HeaderInfo(items.size.toString(), R.drawable.album)
+                    HeaderInfo(itemsOnDisplay.size.toString(), R.drawable.album)
                 }
 
                 // Sticky tab's tool bar

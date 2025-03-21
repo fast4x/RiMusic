@@ -354,7 +354,7 @@ fun HomeLibrary(
             Column( Modifier.fillMaxSize() ) {
                 // Sticky tab's title
                 TabHeader( R.string.playlists ) {
-                    HeaderInfo( items.size.toString(), R.drawable.playlist )
+                    HeaderInfo( itemsOnDisplay.size.toString(), R.drawable.playlist )
                 }
 
                 // Sticky tab's tool bar

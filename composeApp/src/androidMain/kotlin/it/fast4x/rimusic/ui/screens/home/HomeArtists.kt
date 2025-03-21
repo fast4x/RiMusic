@@ -133,11 +133,19 @@ fun HomeArtists(
         override fun onClick(index: Int) = onArtistClick(itemsOnDisplay[index])
 
     }
+    var artistType by rememberPreference(artistTypeKey, ArtistsType.Favorites )
+
     val shuffle = SongsShuffle.init {
-        Database.songsInAllFollowedArtists().map{ it.map( Song::asMediaItem ) }
+        when( artistType ) {
+            ArtistsType.Favorites -> {
+                Database.songsInAllFollowedArtistsFiltered(itemsOnDisplay.map { it.id }).map{ it.map( Song::asMediaItem ) }
+            }
+            ArtistsType.Library -> {
+                Database.songsInLibraryArtistsFiltered(itemsOnDisplay.map { it.id }).map{ it.map( Song::asMediaItem ) }
+            }
+        }
     }
 
-    var artistType by rememberPreference(artistTypeKey, ArtistsType.Favorites )
     val buttonsList = ArtistsType.entries.map { it to it.textName }
 
     var filterBy by rememberPreference(filterByKey, FilterBy.All)
@@ -155,8 +163,8 @@ fun HomeArtists(
             ArtistsType.Library -> Database.artistsInLibrary( sort.sortBy, sort.sortOrder ).collect { itemsToFilter = it }
             //ArtistsType.All -> Database.artistsWithSongsSaved( sort.sortBy, sort.sortOrder ).collect { items = it }
         }
-
     }
+
     LaunchedEffect( Unit, itemsToFilter, filterBy ) {
         items = when(filterBy) {
             FilterBy.All -> itemsToFilter
@@ -234,7 +242,7 @@ fun HomeArtists(
             Column( Modifier.fillMaxSize() ) {
                 // Sticky tab's title
                 TabHeader( R.string.artists ) {
-                    HeaderInfo(items.size.toString(), R.drawable.artists)
+                    HeaderInfo(itemsOnDisplay.size.toString(), R.drawable.artists)
                 }
 
                 // Sticky tab's tool bar
