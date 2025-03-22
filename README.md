@@ -436,6 +436,13 @@ WARNING, the custom version is **not** an official release, download only if inv
             <sub style="font-size:14px"><b>TheRedCyclops</b></sub>
         </a>
     </td>
+    <td align="center" style="word-wrap: break-word; width: 90.0; height: 90.0">
+        <a href=https://github.com/chayotic>
+            <img src=https://avatars.githubusercontent.com/u/152018343?v=4 width="60;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=TheRedCyclops/>
+            <br />
+            <sub style="font-size:14px"><b>Rohith Pai</b></sub>
+        </a>
+    </td>
     
 </tr>
 </table>
@@ -463,6 +470,7 @@ WARNING, the custom version is **not** an official release, download only if inv
 - [SuhasDissa](https://github.com/SuhasDissa)
 - [twistios](https://github.com/twistios)
 - [wispl](https://github.com/wispl)
+- [chayotic](https://github.com/chayotic)
 -->  
 
 
