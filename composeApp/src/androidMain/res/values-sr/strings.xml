@@ -194,7 +194,7 @@
     <string name="mood">Расположење</string>
     <string name="new_albums">Нови албуми</string>
     <string name="moods_and_genres">Расположења и жанрови</string>
-    <string name="search_queries">" упити за претрагу"</string>
+    <string name="search_queries">" упита за претрагу"</string>
     <string name="not_find_battery_optimization_settings">Нисмо успели да пронађемо подешавања за оптимизацију батерије, ручно ставите на белу листу</string>
     <string name="search">Претрага</string>
     <string name="no">Не</string>
@@ -706,7 +706,7 @@
     <string name="info_pauses_player_when_volume_zero">Паузира плејер када јачина звука достигне 0 и наставља када је јачина звука већа од 0</string>
     <string name="quality">Квалитет</string>
     <string name="value_must_be_ip_address">Вредност мора бити ип адреса</string>
-    <string name="value_must_be_hex">Value must be an hex code</string>
+    <string name="value_must_be_hex">Вредност мора бити хексадецимални код</string>
     <string name="swipe_up_to_open_the_queue">Превуци на горе да би отворили Редослед</string>
     <string name="pinfo_show_icons">Прикажи информације са иконама</string>
     <string name="format_ms">%1$s мс</string>
@@ -950,7 +950,7 @@
     <string name="use_dns_over_https_title">Користи днс преко хттпс</string>
     <string name="also_delete_playback_data">Такође избриши податке о репродукцији</string>
     <string name="rescue_center">Центар За Спасавање</string>
-    <string name="midnightodyssey">Midnight Odyssey</string>
-    <string name="circle">Circle</string>
-    <string name="enter_hex">Enter the 7-digit HEX code</string>
+    <string name="midnightodyssey">Поноћна Одисеја</string>
+    <string name="circle">Круг</string>
+    <string name="enter_hex">Унесите 7-цифрени ХЕКС код</string>
 </resources>

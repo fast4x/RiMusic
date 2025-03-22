@@ -23,7 +23,7 @@
     <string name="enter_the_playlist_name">Digite o nome da lista de reprodução</string>
     <string name="playlists">Listas de reprodução</string>
     <string name="favorites">Favoritos</string>
-    <string name="disliked">Disliked</string>
+    <string name="disliked"></string>
     <string name="quick_picks">Escolhas rápidas</string>
     <string name="songs">Músicas</string>
     <string name="other_versions">Outras versões</string>

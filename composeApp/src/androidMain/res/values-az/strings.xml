@@ -952,5 +952,5 @@
     <string name="rescue_center">Bərpa Mərkəzi</string>
     <string name="midnightodyssey">Gecə yarısı Odyssey</string>
     <string name="circle">Dairə</string>
-    <string name="enter_hex">Enter the 7-digit HEX code</string>
+    <string name="enter_hex">7 rəqəmli HEX kodunu daxil et</string>
 </resources>

@@ -707,7 +707,7 @@
     <string name="info_pauses_player_when_volume_zero">Приостановит проигрывание, когда громкость достигнет 0 и возобновит, когда громкость будет больше 0</string>
     <string name="quality">Качество</string>
     <string name="value_must_be_ip_address">Значение должно быть ip адресом</string>
-    <string name="value_must_be_hex">Value must be an hex code</string>
+    <string name="value_must_be_hex">Значение должно быть hex кодом</string>
     <string name="swipe_up_to_open_the_queue">Смахните вверх, чтобы открыть очередь</string>
     <string name="pinfo_show_icons">Показать информацию с иконками</string>
     <string name="format_ms"> %1$s мс</string>
@@ -954,5 +954,5 @@
     <string name="rescue_center">Служба поддержки</string>
     <string name="midnightodyssey">Полуночная Одиссея</string>
     <string name="circle">Круг</string>
-    <string name="enter_hex">Enter the 7-digit HEX code</string>
+    <string name="enter_hex">Введите 7-значный HEX-код</string>
 </resources>

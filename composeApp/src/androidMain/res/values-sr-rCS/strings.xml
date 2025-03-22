@@ -194,7 +194,7 @@
     <string name="mood">Raspoloženje</string>
     <string name="new_albums">Novi albumi</string>
     <string name="moods_and_genres">Raspoloženja i žanrovi</string>
-    <string name="search_queries">" upiti za pretragu"</string>
+    <string name="search_queries">" upita za pretragu"</string>
     <string name="not_find_battery_optimization_settings">Nismo uspeli da pronađemo podešavanja za optimizaciju baterije, ručno stavite na belu listu</string>
     <string name="search">Pretraga</string>
     <string name="no">Ne</string>
@@ -203,7 +203,7 @@
     <string name="listen_on_youtube_music">Slušaj na YouTube Music</string>
     <string name="on_device">Na uređaju</string>
     <string name="wavy_timeline">Talasasta </string>
-    <string name="play_next">Pusti sledeću</string>
+    <string name="play_next">Pusti sledeće</string>
     <string name="toggle_lyrics">Prikaži stihove</string>
     <string name="by_tapping_on_the_thumbnail">Dodirom na sličicu</string>
     <string name="require_mic_permission">Za efekat vizuelizatora je potrebna dozvola mikrofona, molim vas odobrite.</string>
@@ -706,7 +706,7 @@
     <string name="info_pauses_player_when_volume_zero">Pauzira plejer kada jačina zvuka dostigne 0 i nastavlja kada je jačina zvuka veća od 0</string>
     <string name="quality">Kvalitet</string>
     <string name="value_must_be_ip_address">Vrednost mora biti ip adresa</string>
-    <string name="value_must_be_hex">Value must be an hex code</string>
+    <string name="value_must_be_hex">Vrednost mora biti heksadecimalni kod</string>
     <string name="swipe_up_to_open_the_queue">Prevuci na gore da bi otvorili Redosled</string>
     <string name="pinfo_show_icons">Prikaži informacije sa ikonama</string>
     <string name="format_ms">%1$s ms</string>
@@ -950,7 +950,7 @@
     <string name="use_dns_over_https_title">Koristi dns preko https</string>
     <string name="also_delete_playback_data">Takođe izbriši podatke o reprodukciji</string>
     <string name="rescue_center">Centar Za Spasavanje</string>
-    <string name="midnightodyssey">Midnight Odyssey</string>
-    <string name="circle">Circle</string>
-    <string name="enter_hex">Enter the 7-digit HEX code</string>
+    <string name="midnightodyssey">Ponoćna Odiseja</string>
+    <string name="circle">Krug</string>
+    <string name="enter_hex">Unesite 7-cifreni HEKS kod</string>
 </resources>

@@ -709,7 +709,7 @@ Volume BAS : titre précédent</string>
     <string name="info_pauses_player_when_volume_zero">Met en pause le lecteur lorsque le volume atteint 0 et reprend lorsque le volume est supérieur à 0</string>
     <string name="quality">Qualité</string>
     <string name="value_must_be_ip_address">La valeur doit être une adresse ip</string>
-    <string name="value_must_be_hex">Value must be an hex code</string>
+    <string name="value_must_be_hex">La valeur doit être un code hexadécimal</string>
     <string name="swipe_up_to_open_the_queue">Glisser vers le haut pour ouvrir la file d\'attente</string>
     <string name="pinfo_show_icons">Afficher les informations avec les icônes</string>
     <string name="format_ms">%1$d ms</string>
@@ -953,7 +953,7 @@ Volume BAS : titre précédent</string>
     <string name="use_dns_over_https_title">Utiliser DNS plutôt que https</string>
     <string name="also_delete_playback_data">Supprimer également les données de lecture</string>
     <string name="rescue_center">Centre de Sauvetage</string>
-    <string name="midnightodyssey">Midnight Odyssey</string>
-    <string name="circle">Circle</string>
-    <string name="enter_hex">Enter the 7-digit HEX code</string>
+    <string name="midnightodyssey">Odyssée de Minuit</string>
+    <string name="circle">Cercle</string>
+    <string name="enter_hex">Entrer le code HEX à 7 chiffres</string>
 </resources>
