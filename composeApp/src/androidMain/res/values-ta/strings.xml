@@ -581,7 +581,7 @@
     <string name="info_prevent_play_songs_with_age_limitation">Prevent play songs with age limitation</string>
     <string name="cache_location_private">Private</string>
     <string name="cache_location_system">System</string>
-    <string name="info_cannot_rename_a_monthly_or_piped_playlist">Cannot rename a monthly, online, YTM Liked or piped playlist</string>
+    <string name="info_cannot_rename_a_monthly_or_piped_playlist">Cannot rename a monthly or piped playlist</string>
     <string name="debug">DEBUG</string>
     <string name="enable_log_debug">Enable log debug</string>
     <string name="if_enabled_create_a_log_file_to_highlight_errors">If enabled, create a log file to highlight errors</string>

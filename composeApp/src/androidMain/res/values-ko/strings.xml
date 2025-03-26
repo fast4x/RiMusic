@@ -581,7 +581,7 @@
     <string name="info_prevent_play_songs_with_age_limitation">연령 제한 곡들을 막습니다</string>
     <string name="cache_location_private">비공개</string>
     <string name="cache_location_system">시스템</string>
-    <string name="info_cannot_rename_a_monthly_or_piped_playlist">Cannot rename a monthly, online, YTM Liked or piped playlist</string>
+    <string name="info_cannot_rename_a_monthly_or_piped_playlist">월간, 온라인 또는 piped 재생 목록의 이름을 변경할 수 없습니다</string>
     <string name="debug">디버그</string>
     <string name="enable_log_debug">디버그 로그 활성화</string>
     <string name="if_enabled_create_a_log_file_to_highlight_errors">활성화시, 오류를 강조하는 로그 파일이 생성됩니다</string>

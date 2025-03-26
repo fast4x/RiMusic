@@ -706,7 +706,7 @@
     <string name="info_pauses_player_when_volume_zero">Pausa el reproductor cuando el volumen alcanza 0 y se reanuda cuando el volumen es mayor que 0</string>
     <string name="quality">Calidad</string>
     <string name="value_must_be_ip_address">El valor debe ser una dirección IP</string>
-    <string name="value_must_be_hex">Value must be an hex code</string>
+    <string name="value_must_be_hex">El valor debe ser un código Hex</string>
     <string name="swipe_up_to_open_the_queue">Deslizar hacia arriba para abrir la cola</string>
     <string name="pinfo_show_icons">Mostrar información con iconos</string>
     <string name="format_ms">%1$s ms</string>
@@ -951,6 +951,6 @@
     <string name="also_delete_playback_data">Eliminar también los datos de reproducción</string>
     <string name="rescue_center">Centro de rescate</string>
     <string name="midnightodyssey">Midnight Odyssey</string>
-    <string name="circle">Circle</string>
-    <string name="enter_hex">Enter the 7-digit HEX code</string>
+    <string name="circle">Círculo</string>
+    <string name="enter_hex">Introduzca el código HEX de 7 dígitos</string>
 </resources>

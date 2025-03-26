@@ -581,7 +581,7 @@
     <string name="info_prevent_play_songs_with_age_limitation">Evita reproducir cancións con limitación de idade</string>
     <string name="cache_location_private">Privado</string>
     <string name="cache_location_system">Sistema</string>
-    <string name="info_cannot_rename_a_monthly_or_piped_playlist">Cannot rename a monthly, online, YTM Liked or piped playlist</string>
+    <string name="info_cannot_rename_a_monthly_or_piped_playlist">Non se pode renomear unha lista de reprodución mensual, en liña ou pipped</string>
     <string name="debug">DEPURAR</string>
     <string name="enable_log_debug">Activar a depuración do rexistro</string>
     <string name="if_enabled_create_a_log_file_to_highlight_errors">Se está activado, crea un ficheiro de rexistro para resaltar os erros</string>

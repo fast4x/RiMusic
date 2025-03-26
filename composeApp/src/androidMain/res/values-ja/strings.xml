@@ -581,7 +581,7 @@
     <string name="info_prevent_play_songs_with_age_limitation">年齢制限のある曲を再生しない</string>
     <string name="cache_location_private">プライベート</string>
     <string name="cache_location_system">システム</string>
-    <string name="info_cannot_rename_a_monthly_or_piped_playlist">Cannot rename a monthly, online, YTM Liked or piped playlist</string>
+    <string name="info_cannot_rename_a_monthly_or_piped_playlist">月間プレイリストやPipedの再生リストの名前は変更できません</string>
     <string name="debug">デバッグ</string>
     <string name="enable_log_debug">ログのデバッグを有効化</string>
     <string name="if_enabled_create_a_log_file_to_highlight_errors">有効なら、エラーに焦点を当てたログファイルを作成します</string>
