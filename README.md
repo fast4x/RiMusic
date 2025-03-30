@@ -114,8 +114,7 @@ WARNING, the custom version is **not** an official release, download only if inv
 - [Wiki page FAQs](https://github.com/fast4x/RiMusic/wiki/FAQs)
 - [Group on Telegram ](https://t.me/rimusic_app)
 - [Community on Reddit](https://www.reddit.com/r/RiMusicApp/)
-- [Server on Discord](https://discord.gg/h7eS2PcGeW)
-
+  
 ## 🤝 Contributing
 **Pull requests are welcome**
 - If you want:
