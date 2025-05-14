@@ -1,98 +1,53 @@
-name: 🐛 Bug report
-description: Something isn't working, uh?
-title: Short description
-labels: [bug]
+name: 🐛 Bug Report & Feedback
+description: Something isn't working, or you'd like to suggest an improvement?
+title: "[BUG] Short description or suggestion"
+labels: [bug, feedback]
 body:
   - type: markdown
     attributes:
       value: >-
-        <h1 align="center">!! IMPORTANT !! PLEASE READ</h1>
-        
-        
-        # Media cannot be played / Unknown Error / Login required
-        
-        
-        If you received one of these messages, chances are, YT is blocking you
-        and it is not our fault. Please don't open a ticket for this.
-        
-        
-        # Download unsuccessful
-        
-        
-        If you click download (all or individually), and the download icons aren't changed. 
-        Only open ticket if none of your songs downloaded.\
-        If some are and some aren't, you are blocked by YT, please manually download them with
-        some break time in between
-        
-        # Don't think that's YT? Read me
-        
-        
-        If you can't play songs even on those you've downloaded, please try these steps:
-        
-        
-        1. Re-download the song
-        2. Clear cache
-        3. Play songs that are physically on your device
-        
-        
-        Then, if the problem persists. Please follow the steps below to open a ticket
+        <h1 align="center">🚨 PLEASE READ BEFORE SUBMITTING 🚨</h1>
+
+        ## Common Issues – Do NOT Report These
+
+        - **Media Cannot Be Played / Login Required / Unknown Error**  
+          Likely caused by YouTube blocking the content. Not a bug in RiMusic.
+
+        - **Download Unsuccessful**  
+          If *some* songs download and others don’t, you’re being rate-limited by YouTube. Use manual downloads with time gaps.
+
+        - **Downloaded Songs Don’t Play**  
+          Try:
+          1. Re-downloading the song
+          2. Clearing cache
+          3. Playing the file directly from your device
+
+        ✅ Only proceed if your issue is **not listed above**.
 
   - type: markdown
     attributes:
       value: >-
-        # Please complete the form to the best of your ability
+        ## 📋 Bug Report Form
 
+        > Please complete this form accurately. More detail = faster fix!
 
-        > Indepth details provide us foundation to fix your problem as fast as
-        possible
-
-
-        <h3 align="center">Required fields are marked with <b>*</b></h3>
   - type: input
     id: bug_occurs_in_version
     attributes:
-      label: Version of RiMusic
-      description: >-
-        Before we start, please specify which version of RiMusic you were using
-        when the bug occurs.
-      placeholder: 0.6.56 - customVersion
+      label: * App Version
+      description: Which version of RiMusic are you using?
+      placeholder: e.g., 0.6.56 - customVersion
     validations:
       required: true
-  - type: markdown
-    attributes:
-      value: >-
-        ## If you were using **_official release versions_**
 
-
-        Please download and install [**latest
-        build**](https://github.com/fast4x/RiMusic/releases/tag/custom-version)
-        from our Github page.
-
-
-        After the installation, try and reproduce the bug again.\
-
-        If problem goes away, it's probably fixed at some point and is now
-        waiting to be released officially.\
-
-        There's no need to open another issue.
-
-
-        ## If you were using latest **_custom version build_**
-
-
-        Please **UNINSTALL** this build and install previous build and confirm
-        that the problem persists.
-
-
-        Proceed and fill out the form 
   - type: dropdown
     id: android_version
     attributes:
-      label: Android version
-      description: What version of Android is your phone
+      label: * Android Version
+      description: Your device’s Android version
       options:
         - '7.0'
-        - 7.1 - 7.1.2
+        - '7.1 - 7.1.2'
         - '8.0'
         - '8.1'
         - '9'
@@ -104,95 +59,98 @@ body:
         - '15'
     validations:
       required: true
+
+  - type: input
+    id: device_model
+    attributes:
+      label: Device Model
+      description: Device you’re using (e.g., Samsung A52, Pixel 5)
+      placeholder: Redmi Note 10, OnePlus Nord 2
+    validations:
+      required: false
+
   - type: checkboxes
     id: verify_steps
     attributes:
-      label: 'I''ve done these:'
-      description: >-
-        please make sure you've done all of these steps before submitting an
-        issue
+      label: * Pre-Submission Checklist
+      description: Please confirm:
       options:
-        - label: Uninstall old build before installing a new one
+        - label: I uninstalled the previous build before installing a new one
           required: true
-        - label: Checked opening issues about my similar problem
+        - label: I searched existing issues for similar problems
           required: true
-  - type: markdown
-    attributes:
-      value: >-
-        # Real questions
 
-
-        Alright, now we've already applied some of the most common
-        troubleshooting steps.
-
-
-        Next step is to fill out the description of the bug. 
-
-        Information such as:
-
-
-        * Steps to duplicate the problem
-
-        * How you expect it to be
-
-        * What more can you tell us
-
-
-        > These questions are really essential, the more you provide, the faster
-        we can pin point the source of error, the faster we can patch it.
   - type: textarea
     id: steps_to_reproduce
     attributes:
-      label: Tell us how you trigger this bug
-      description: 'Each step should be on its own line. You can use simple sentences like:'
+      label: * Steps to Reproduce the Bug
+      description: Step-by-step description of how to trigger the bug.
       value: |-
         1. Open RiMusic
-        2. Click on A 
-        3. Click on B
-        4. Boom! Crash happens
+        2. Click on feature X
+        3. Observe error or crash
     validations:
       required: true
-  - type: textarea
-    id: evidence
-    attributes:
-      label: Submit a video
-      description: 'Please record a short clip of the bug, it helps tremendously'
-      value: |-
-        If you are on Android, please download a screen recorder and record your screen while you
-        duplicating the problem as describe above.
-        
-        > You may need to use Github App to be able to upload video - size limit is 10 MB.
-        
-        If you are on Desktop, drag video into this box and it will be uploaded automatically
-    validations:
-      required: false
+
   - type: input
     id: expected_behavior
     attributes:
-      label: What was your expectation?
-      description: What did you expect after completing those steps
-      placeholder: I clicked on next so obviously it plays random. DUH!!
+      label: * Expected Behavior
+      description: What did you expect to happen?
+      placeholder: Music should play without lag after pressing play.
     validations:
       required: true
+
   - type: textarea
-    id: additional_information
+    id: actual_behavior
     attributes:
-      label: What more can you tell us? (Optional)
-      description: >-
-        Please let me know what more you can provide in case other fields didn't
-        let you fill in
-      placeholder: >-
-        I clicked on this, then uhhh, screen flickers, sound tears, and BOOM!
-        app crashed.
+      label: What Actually Happened?
+      description: What did the app do instead?
+      placeholder: Music stuttered, and the app froze for 10 seconds.
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: (Optional) Video or Screenshot Evidence
+      description: Upload a screen recording or screenshot. Size limit: 10MB.
+      placeholder: Drag files here or paste links from Google Drive, Imgur, etc.
+
   - type: textarea
     id: app_logs
     attributes:
-      label: Logs (Optional)
-      description: >-
-        If you can still access app logs, please please please, copy it and
-        paste it here.
+      label: (Optional) App Logs
+      description: If accessible, paste logs here.
+
+  - type: textarea
+    id: additional_information
+    attributes:
+      label: Additional Information
+      description: Any other details we should know?
+      placeholder: The bug happens only when the phone is charging.
+
   - type: markdown
     attributes:
       value: >-
-        This template was generated with [Issue Forms
-        Creator](https://issue-forms-creator.netlify.app)
+
+  - type: textarea
+    id: \sarathiq
+    attributes:
+      label:  UI Suggestion
+      description: Let us know what features you want in the future (optional)
+      placeholder: Add dark mode toggle, option to download album art, more sort/filter features
+
+  - type: checkboxes
+    id: ui_rating
+    attributes:
+      label: sarathiq
+      options:
+        - label: Easy to use
+        - label: Needs improvement
+        - label: Too cluttered
+        - label: Modern and smooth
+        - label: Missing important settings
+
+  - type: markdown
+    attributes:
+      value: >-
+        _This form was built using [Issue Forms Creator](https://issue-forms-creator.netlify.app). Thanks for helping improve RiMusic!_
