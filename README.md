@@ -2,6 +2,7 @@
   <img src="./assets/design/latest/app_logo.svg" width="300" height="100" />    
   <p><b>RiMusic</b> is a <b>multilingual</b> and <b>multiplatform</b> extensible offline player.</p>
 <p><b>RiMusic does not collect any data.</b></p>
+<p>App not available. Don't get fooled!!</p>
 
   <a href="https://github.com/fast4x/RiMusic/releases"><img src="https://img.shields.io/github/downloads/fast4x/RiMusic/total?label=Total%20Downloads"></a>
   <a href="https://github.com/fast4x/RiMusic/releases/latest"><img src="https://img.shields.io/github/downloads/fast4x/RiMusic/latest/total?label=Downloads%20of%20latest%20Release"></a>
@@ -9,7 +10,7 @@
 </div>
 
 ## ❗ IMPORTANT
-<div align="center"><b><H1>RiMusic turns into an extensible offline player.</H1></b></div>  
+<div align="center"><b><H1>RiMusic turns into an extensible offline player. App not available. Don't get fooled!!</H1></b></div>  
 
 ## ❗ Disclaimer
 The developer of this project is not liable for any misuse or legal issues arising from its use and is not affiliated with any content providers. 
@@ -112,9 +113,9 @@ WARNING, the custom version is **not** an official release, download only if inv
 
 ## ❓ FAQs
 - [Wiki page FAQs](https://github.com/fast4x/RiMusic/wiki/FAQs)
-- [Group on Telegram ](https://t.me/rimusic_app)
+- [Group on Telegram ](https://t.me/rimusic_app_official)
 - [Community on Reddit](https://www.reddit.com/r/RiMusicApp/)
-- [Server on Discord](https://discord.gg/h7eS2PcGeW)
+
 
 ## 🤝 Contributing
 **Pull requests are welcome**
@@ -126,6 +127,7 @@ WARNING, the custom version is **not** an official release, download only if inv
 ### 🔤 Translations
 - Go to [Crowdin](https://crowdin.com/project/rimusic/invite?h=73f0e6b64be1c64a8aebd467d286cf851925330), help with the translations.
 
+<!--
 ### 🤝 **Developer /../ Designer that contribute:**
 
 <table>
@@ -455,6 +457,7 @@ WARNING, the custom version is **not** an official release, download only if inv
     
 </tr>
 </table>
+-->
 <!--
 - [25huizengek1](https://github.com/25huizengek1)
 - [821938089](https://github.com/821938089)
