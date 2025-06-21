@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=RiMusic
+GenericName=Music Player
+Comment=Beautiful cross-platform music player
+Categories=Audio;Music;Player;AudioVideo;
+Exec=rimusic
+Icon=com.github.sarathiq.RiMusic
+Terminal=false
+StartupNotify=true
+Keywords=music;player;audio;

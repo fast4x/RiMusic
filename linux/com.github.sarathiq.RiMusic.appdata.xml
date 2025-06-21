@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.github.sarathiq.RiMusic</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>RiMusic</name>
+  <summary>A beautiful cross-platform music player</summary>
+  <description>
+    <p>
+      RiMusic is an elegant, feature-rich music player that works across multiple platforms.
+      Built with Flutter, it provides a seamless music listening experience with a modern interface.
+    </p>
+    <ul>
+      <li>Beautiful and intuitive user interface</li>
+      <li>Cross-platform support</li>
+      <li>Advanced playback controls</li>
+      <li>Playlist management</li>
+      <li>Library organization</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">com.github.sarathiq.RiMusic.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main Window</caption>
+      <image>https://raw.githubusercontent.com/sarathiq/RiMusic/master/screenshots/main.png</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://github.com/sarathiq/RiMusic</url>
+  <developer_name>sarathiq</developer_name>
+  <releases>
+    <release version="1.0.0" date="2025-05-14">
+      <description>
+        <p>Initial Release</p>
+      </description>
+    </release>
+  </releases>
+  <content_rating type="oars-1.1" />
+</component>
