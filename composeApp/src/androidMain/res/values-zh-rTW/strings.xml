@@ -23,7 +23,7 @@
     <string name="enter_the_playlist_name">輸入播放清單名稱</string>
     <string name="playlists">播放清單</string>
     <string name="favorites">已按讚</string>
-    <string name="disliked">Disliked</string>
+    <string name="disliked"></string>
     <string name="quick_picks">精選</string>
     <string name="songs">歌曲</string>
     <string name="other_versions">其它版本</string>
