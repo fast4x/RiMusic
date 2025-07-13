@@ -396,8 +396,8 @@
     <string name="direction_right">வலது</string>
     <string name="copy_lyrics">பாடல் வரிகளை நகலெடு</string>
     <string name="value_copied">நகலெடுக்கப்பட்டது</string>
-    <string name="do_you_really_want_to_delete_cache">Do you really want to delete cache?</string>
-    <string name="lang_swedish">Swedish</string>
+    <string name="do_you_really_want_to_delete_cache">நீங்கள் தற்காலிகச் சேமிப்பகதை உண்மையாகவெ நீக்க விரும்புகிறீர்களா?</string>
+    <string name="lang_swedish">ஸ்வீடிஷ்</string>
     <string name="pinned_playlists">Pinned Playlists</string>
     <string name="locked">Locked</string>
     <string name="sort_duration">Duration</string>
